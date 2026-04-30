@@ -8,15 +8,19 @@ export function ReferralSection() {
           Referral Privilege
         </h2>
 
-        <p className="text-muted-foreground leading-relaxed mb-8">
-          Introduce someone to our service, and as a token of appreciation, you will receive one curated match at no cost.
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          Introduce someone to our circle, and if we begin working with them — whether as a client or through a curated introduction — you will receive a complimentary 30-minute private coaching session as our way of saying thank you.
+        </p>
+
+        <p className="font-serif text-foreground italic mb-10">
+          Because meaningful connections deserve to be celebrated.
         </p>
 
         <Link
           href="#referral"
           className="inline-block px-8 py-4 border border-foreground/20 text-foreground text-sm tracking-widest uppercase hover:bg-foreground hover:text-background transition-all duration-500"
         >
-          Refer & Book
+          Refer Someone
         </Link>
       </div>
     </section>
