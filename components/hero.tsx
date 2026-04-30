@@ -38,7 +38,7 @@ export function Hero() {
           href="#services"
           className="inline-block mt-12 px-8 py-4 border border-foreground/20 text-foreground text-sm tracking-widest uppercase hover:bg-foreground hover:text-background transition-all duration-500 animate-fade-in-delay-3"
         >
-          Begin Your Journey
+          Find Your Bashert
         </Link>
       </div>
 
