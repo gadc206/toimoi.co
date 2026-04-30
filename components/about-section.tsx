@@ -13,15 +13,15 @@ export function AboutSection() {
 
             <div className="space-y-6 text-muted-foreground leading-relaxed">
               <p>
-                We come from a background of building, understanding people, and creating meaningful connections in different areas of life.
+                We come from within the Jewish community, understanding the unique values, traditions, and what truly matters when building a Jewish home.
               </p>
 
               <p>
-                Over time, we realized that the most important connection someone can make is finding the right partner.
+                Over time, we realized that finding a Jewish life partner today requires more than algorithms. It requires wisdom, patience, and someone who understands the depth of what you are looking for.
               </p>
 
               <p>
-                Dating today is not lacking good people. It is lacking clarity, guidance, and real understanding.
+                Dating today is not lacking good Jewish singles. It is lacking the personal guidance and intention that our grandparents once had.
               </p>
 
               <p className="font-serif text-foreground italic">
@@ -29,11 +29,11 @@ export function AboutSection() {
               </p>
 
               <p>
-                We take the time to truly understand each person, beyond what is said on the surface. Our approach is personal, honest, and deeply intentional.
+                We take the time to truly understand each person — your observance level, your family values, your vision for a Jewish home. Our approach is personal, honest, and deeply rooted in the belief that every Jewish soul has its match.
               </p>
 
               <p className="font-serif text-foreground">
-                Because when something is guided the right way, it unfolds naturally.
+                Because when a shidduch is guided the right way, it unfolds naturally.
               </p>
             </div>
           </div>
