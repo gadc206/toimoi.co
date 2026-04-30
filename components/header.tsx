@@ -2,66 +2,93 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Menu, X } from "lucide-react"
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="px-6 md:px-12 lg:px-24 py-4 flex items-center justify-between">
-        <Link href="/" className="font-serif text-xl md:text-2xl tracking-wide text-foreground">
-          The Circle
-        </Link>
-
-        <nav className="hidden md:flex items-center gap-8">
-          <Link href="#services" className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors">
-            Services
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md">
+      <div className="px-6 md:px-12 py-6">
+        <nav className="flex items-center justify-between">
+          <Link href="/" className="font-serif text-xl tracking-wide text-foreground">
+            ToiMoi
           </Link>
-          <Link href="#about" className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors">
-            About
-          </Link>
-          <Link href="#contact" className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors">
-            Contact
-          </Link>
-        </nav>
 
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden p-2 text-foreground"
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
-
-      {isOpen && (
-        <div className="md:hidden bg-background border-b border-border">
-          <nav className="flex flex-col px-6 py-4 gap-4">
-            <Link 
-              href="#services" 
-              className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setIsOpen(false)}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-12">
+            <Link
+              href="#services"
+              className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
             >
               Services
             </Link>
-            <Link 
-              href="#about" 
-              className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setIsOpen(false)}
+            <Link
+              href="#about"
+              className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
             >
               About
             </Link>
-            <Link 
-              href="#contact" 
-              className="text-sm tracking-wider uppercase text-muted-foreground hover:text-foreground transition-colors"
-              onClick={() => setIsOpen(false)}
+            <Link
+              href="#contact"
+              className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
             >
               Contact
             </Link>
-          </nav>
-        </div>
-      )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden w-8 h-8 flex flex-col items-center justify-center gap-1.5"
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`w-6 h-px bg-foreground transition-all duration-300 ${
+                isMenuOpen ? "rotate-45 translate-y-2" : ""
+              }`}
+            />
+            <span
+              className={`w-6 h-px bg-foreground transition-all duration-300 ${
+                isMenuOpen ? "opacity-0" : ""
+              }`}
+            />
+            <span
+              className={`w-6 h-px bg-foreground transition-all duration-300 ${
+                isMenuOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
+            />
+          </button>
+        </nav>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-8 pb-8 border-t border-border pt-8">
+            <div className="flex flex-col gap-6">
+              <Link
+                href="#services"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
+              >
+                Services
+              </Link>
+              <Link
+                href="#about"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
+              >
+                About
+              </Link>
+              <Link
+                href="#contact"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm tracking-widest uppercase text-foreground/70 hover:text-foreground transition-colors duration-300"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   )
 }
