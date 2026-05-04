@@ -62,21 +62,19 @@ export function JoinDatabaseSection() {
     <section className="py-24 md:py-32 px-6 bg-secondary/50 relative overflow-hidden">
       {/* Faded crystal backgrounds */}
       <div 
-        className="absolute top-0 left-0 w-72 h-72 opacity-[0.07] pointer-events-none"
+        className="absolute top-0 left-0 w-[400px] h-[400px] opacity-25 pointer-events-none"
         style={{
           backgroundImage: "url('/images/crystal-bg-1.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(1px)",
         }}
       />
       <div 
-        className="absolute bottom-0 right-0 w-64 h-64 opacity-[0.05] pointer-events-none"
+        className="absolute bottom-0 right-0 w-[350px] h-[350px] opacity-20 pointer-events-none"
         style={{
           backgroundImage: "url('/images/crystal-bg-2.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(1px)",
         }}
       />
       <div className="max-w-2xl mx-auto text-center relative z-10">

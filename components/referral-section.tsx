@@ -5,12 +5,11 @@ export function ReferralSection() {
     <section className="py-24 md:py-32 px-6 bg-secondary/50 relative overflow-hidden">
       {/* Faded crystal background */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.05] pointer-events-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-20 pointer-events-none"
         style={{
           backgroundImage: "url('/images/crystal-bg-3.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(2px)",
         }}
       />
       <div className="max-w-2xl mx-auto text-center relative z-10">

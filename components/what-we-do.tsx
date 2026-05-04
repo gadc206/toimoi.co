@@ -20,12 +20,11 @@ export function WhatWeDo() {
     <section className="py-24 md:py-32 px-6 bg-secondary/50 relative overflow-hidden">
       {/* Faded crystal background */}
       <div 
-        className="absolute bottom-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none"
+        className="absolute bottom-0 right-0 w-[500px] h-[500px] opacity-20 pointer-events-none"
         style={{
           backgroundImage: "url('/images/crystal-bg-3.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          filter: "blur(1px)",
         }}
       />
       <div className="max-w-5xl mx-auto relative z-10">
