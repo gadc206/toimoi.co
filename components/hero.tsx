@@ -18,6 +18,10 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+        <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground mb-6 animate-fade-in">
+          Jewish Matchmaking
+        </p>
+        
         <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-light leading-tight text-foreground animate-fade-in text-balance">
           Finding your soulmate should feel calm, guided, and natural.
         </h1>
