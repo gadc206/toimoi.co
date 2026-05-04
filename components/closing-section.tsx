@@ -1,25 +1,19 @@
+import Image from "next/image"
 import Link from "next/link"
 
 export function ClosingSection() {
   return (
-    <section className="py-32 md:py-40 px-6 bg-gradient-to-b from-background to-secondary/30 relative overflow-hidden">
-      {/* Faded crystal backgrounds */}
-      <div 
-        className="absolute top-0 left-0 w-[400px] h-[400px] opacity-25 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/crystal-bg-1.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
-      <div 
-        className="absolute bottom-0 right-0 w-[450px] h-[450px] opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/crystal-bg-2.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+    <section className="py-32 md:py-40 px-6 relative overflow-hidden">
+      {/* Full crystal background like hero */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/crystal-bg-3.jpg"
+          alt=""
+          fill
+          className="object-cover opacity-35"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/40 to-background/70" />
+      </div>
       <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="font-serif text-2xl md:text-3xl lg:text-4xl font-light leading-relaxed text-foreground text-balance">
           When you feel aligned with yourself,

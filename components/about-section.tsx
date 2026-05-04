@@ -2,16 +2,17 @@ import Image from "next/image"
 
 export function AboutSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-background relative overflow-hidden">
-      {/* Faded crystal background */}
-      <div 
-        className="absolute bottom-0 left-0 w-[450px] h-[450px] opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/crystal-bg-2.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+    <section className="py-24 md:py-32 px-6 relative overflow-hidden">
+      {/* Full crystal background like hero */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/crystal-bg-2.jpg"
+          alt=""
+          fill
+          className="object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/80" />
+      </div>
       <div className="max-w-5xl mx-auto relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Text Content */}

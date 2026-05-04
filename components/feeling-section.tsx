@@ -1,15 +1,18 @@
+import Image from "next/image"
+
 export function FeelingSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-background relative overflow-hidden">
-      {/* Faded crystal background */}
-      <div 
-        className="absolute top-0 right-0 w-[500px] h-[500px] opacity-25 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/crystal-bg-1.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+    <section className="py-24 md:py-32 px-6 relative overflow-hidden">
+      {/* Full crystal background like hero */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/crystal-bg-1.jpg"
+          alt=""
+          fill
+          className="object-cover opacity-30"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
+      </div>
       <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="font-serif text-2xl md:text-3xl font-light leading-relaxed text-foreground">
           In a world that moves fast and lives behind screens, real connection has become rare.

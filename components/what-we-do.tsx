@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 const offerings = [
@@ -17,16 +18,17 @@ const offerings = [
 
 export function WhatWeDo() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-secondary/50 relative overflow-hidden">
-      {/* Faded crystal background */}
-      <div 
-        className="absolute bottom-0 right-0 w-[500px] h-[500px] opacity-20 pointer-events-none"
-        style={{
-          backgroundImage: "url('/images/crystal-bg-3.jpg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+    <section className="py-24 md:py-32 px-6 relative overflow-hidden">
+      {/* Full crystal background like hero */}
+      <div className="absolute inset-0">
+        <Image
+          src="/images/crystal-bg-3.jpg"
+          alt=""
+          fill
+          className="object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/50 to-background/60" />
+      </div>
       <div className="max-w-5xl mx-auto relative z-10">
         <h2 className="font-serif text-3xl md:text-4xl font-light text-center text-foreground mb-16">
           What We Do
