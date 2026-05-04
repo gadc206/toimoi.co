@@ -11,7 +11,7 @@ export function AboutSection() {
               About Us
             </h2>
 
-            <div className="space-y-6 text-muted-foreground leading-relaxed">
+            <div className="space-y-6 text-muted-foreground leading-relaxed text-lg">
               <p>
                 We are not a big company or an app.
               </p>

@@ -18,7 +18,7 @@ export function ServicesSection() {
               <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-4">
                 Discovery Call
               </h3>
-              <p className="text-muted-foreground leading-relaxed max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
                 A 15-minute conversation to see if we are the right fit for each other. No pressure. No commitment. Just an honest first connection.
               </p>
             </div>
@@ -45,7 +45,7 @@ export function ServicesSection() {
               <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-4">
                 Personal Consultation
               </h3>
-              <p className="text-muted-foreground leading-relaxed max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
                 A deeply personal in-person meeting where we take the time to truly understand who you are, what you have been through, and what you are genuinely looking for. This is where your journey begins.
               </p>
             </div>
@@ -73,7 +73,7 @@ export function ServicesSection() {
               <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-4">
                 Private Coaching Session
               </h3>
-              <p className="text-muted-foreground leading-relaxed max-w-xl">
+              <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
                 A one-on-one session designed to elevate your confidence, refine how you communicate, and help you express your truest self with ease and authenticity. Because how you show up changes everything.
               </p>
             </div>
@@ -102,7 +102,7 @@ export function ServicesSection() {
                 The Signature Experience
               </h3>
               
-              <div className="max-w-2xl mx-auto space-y-6 text-background/80 leading-relaxed text-center">
+              <div className="max-w-2xl mx-auto space-y-6 text-background/80 leading-relaxed text-center text-lg">
                 <p>
                   A fully bespoke six-month journey built entirely around you — your story, your values, and your vision for love.
                 </p>

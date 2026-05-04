@@ -6,7 +6,7 @@ export function FeelingSection() {
           In a world that moves fast and lives behind screens, real connection has become rare.
         </p>
         
-        <p className="mt-10 text-lg text-muted-foreground leading-relaxed">
+        <p className="mt-10 text-xl text-muted-foreground leading-relaxed">
           We help you slow down, reconnect with yourself, and meet someone in a way that feels real again.
         </p>
 
