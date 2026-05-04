@@ -2,8 +2,27 @@ import Link from "next/link"
 
 export function ClosingSection() {
   return (
-    <section className="py-32 md:py-40 px-6 bg-gradient-to-b from-background to-secondary/30">
-      <div className="max-w-2xl mx-auto text-center">
+    <section className="py-32 md:py-40 px-6 bg-gradient-to-b from-background to-secondary/30 relative overflow-hidden">
+      {/* Faded crystal backgrounds */}
+      <div 
+        className="absolute top-0 left-0 w-72 h-72 opacity-[0.07] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/crystal-bg-1.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(1px)",
+        }}
+      />
+      <div 
+        className="absolute bottom-0 right-0 w-80 h-80 opacity-[0.06] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/crystal-bg-2.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(1px)",
+        }}
+      />
+      <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="font-serif text-2xl md:text-3xl lg:text-4xl font-light leading-relaxed text-foreground text-balance">
           When you feel aligned with yourself,
           <br />

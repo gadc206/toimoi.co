@@ -2,8 +2,18 @@ import Image from "next/image"
 
 export function AboutSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-background">
-      <div className="max-w-5xl mx-auto">
+    <section className="py-24 md:py-32 px-6 bg-background relative overflow-hidden">
+      {/* Faded crystal background */}
+      <div 
+        className="absolute bottom-0 left-0 w-80 h-80 opacity-[0.06] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/crystal-bg-2.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(1px)",
+        }}
+      />
+      <div className="max-w-5xl mx-auto relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
           <div className="order-2 md:order-1">

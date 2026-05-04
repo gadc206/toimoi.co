@@ -2,8 +2,18 @@ import Link from "next/link"
 
 export function ReferralSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-secondary/50">
-      <div className="max-w-2xl mx-auto text-center">
+    <section className="py-24 md:py-32 px-6 bg-secondary/50 relative overflow-hidden">
+      {/* Faded crystal background */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-[0.05] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/crystal-bg-3.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(2px)",
+        }}
+      />
+      <div className="max-w-2xl mx-auto text-center relative z-10">
         <h2 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-6">
           Referral Privilege
         </h2>

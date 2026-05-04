@@ -1,7 +1,17 @@
 export function FeelingSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-background">
-      <div className="max-w-2xl mx-auto text-center">
+    <section className="py-24 md:py-32 px-6 bg-background relative overflow-hidden">
+      {/* Faded crystal background */}
+      <div 
+        className="absolute top-0 right-0 w-96 h-96 opacity-[0.08] pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/crystal-bg-1.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(1px)",
+        }}
+      />
+      <div className="max-w-2xl mx-auto text-center relative z-10">
         <p className="font-serif text-2xl md:text-3xl font-light leading-relaxed text-foreground">
           In a world that moves fast and lives behind screens, real connection has become rare.
         </p>
