@@ -13,27 +13,35 @@ export function AboutSection() {
 
             <div className="space-y-6 text-muted-foreground leading-relaxed">
               <p>
-                We come from a background of building, understanding people, and creating meaningful connections in different areas of life.
-              </p>
-
-              <p>
-                Over time, we realized that the most important connection someone can make is finding the right partner.
-              </p>
-
-              <p>
-                Dating today is not lacking good people. It is lacking clarity, guidance, and real understanding.
+                We are not a big company or an app.
               </p>
 
               <p className="font-serif text-foreground italic">
-                That is why we created this space.
+                We are real people who take the time to truly see you.
               </p>
 
               <p>
-                We take the time to truly understand each person, beyond what is said on the surface. Our approach is personal, honest, and deeply intentional.
+                What we do goes beyond experience or process. There is a deep level of intuition in the way we work, almost like a sixth sense. We listen not only to your words, but to what sits underneath them. We feel what is aligned and what is not, even when it is not obvious.
+              </p>
+
+              <p>
+                Together, our thoughts and perspectives create clarity. We help you understand who you truly are, what your needs are, and what your soul is really searching for — not just what you think you want on the surface.
+              </p>
+
+              <p>
+                This process is personal, it is intentional and honest. There is no template, no formula, no shortcut. Every person we work with receives individual care, real attention, and guidance that is tailored specifically to them.
+              </p>
+
+              <p className="font-serif text-foreground italic">
+                We don&apos;t believe we are the ones &quot;making&quot; the match.
+              </p>
+
+              <p>
+                We are the vessel. Hashem is the one making the match. A vessel that helps bring two people together at the right time, in the right way, when they are ready.
               </p>
 
               <p className="font-serif text-foreground">
-                Because when something is guided the right way, it unfolds naturally.
+                There is something powerful that happens when intuition, honesty, and timing align. That is where real connection begins.
               </p>
             </div>
           </div>
