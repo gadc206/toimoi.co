@@ -21,11 +21,35 @@ export function JoinDatabaseSection() {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate submission delay
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    try {
+      const submitData = new FormData()
+      submitData.append("name", formData.firstName)
+      submitData.append("familyName", formData.familyName)
+      submitData.append("dateOfBirth", formData.dateOfBirth)
+      submitData.append("sex", formData.sex)
+      submitData.append("email", formData.email)
+      submitData.append("phone", formData.phone)
+      submitData.append("bio", formData.bio)
+      if (file) {
+        submitData.append("media", file)
+      }
+
+      const response = await fetch("/api/submit-to-sheets", {
+        method: "POST",
+        body: submitData,
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit")
+      }
+
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error("Error submitting form:", error)
+      alert("There was an error submitting your information. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
