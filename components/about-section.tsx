@@ -70,12 +70,12 @@ export function AboutSection() {
               </p>
             </div>
 
-            {/* Founder 2 - Placeholder */}
+            {/* Founder 2 - Vanessa */}
             <div className="flex flex-col items-center text-center">
               <div className="relative w-64 h-64 mb-8 overflow-hidden rounded-full border-4 border-background shadow-lg">
                 <Image
-                  src="/images/founder-2.jpg"
-                  alt="Co-Founder"
+                  src="/images/founder-vanessa.jpg"
+                  alt="Vanessa Gad"
                   fill
                   className="object-cover"
                 />
@@ -85,10 +85,16 @@ export function AboutSection() {
                 </div>
               </div>
               <h4 className="font-serif text-2xl font-light text-foreground mb-4">
-                Co-Founder Name
+                Vanessa Gad
               </h4>
               <p className="text-foreground leading-relaxed text-base max-w-md">
-                Bio coming soon.
+                Vanessa is a matchmaker and business leader based in New York, with over seventeen years of experience as the CEO of a boutique real estate company serving families from around the world. Throughout her life and career, she has always believed that nothing is random and that people are placed in our path for a reason. Her work, whether in business or matchmaking, has always been deeply rooted in trust, intuition, human connection, and understanding people beyond what is visible on the surface.
+              </p>
+              <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
+                What started naturally over the years as helping singles, giving guidance, listening, and seeing connections others did not always see, slowly became a true calling. Vanessa believes that finding your soulmate is not only about chemistry or a checklist, but about timing, growth, and building a relationship with honesty, respect, and shared values. She approaches every person with warmth, compassion, and sincerity, understanding how vulnerable and emotional the process can be.
+              </p>
+              <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
+                Coming from a multicultural background, living in different countries, and speaking four languages fluently, Vanessa connects easily with people from many walks of life. Her approach to matchmaking is deeply personal and intuitive. She believes in truly getting to know each person, understanding their fears, strengths, patterns, and hopes, while guiding them with honesty, care, and encouragement.
               </p>
             </div>
           </div>
