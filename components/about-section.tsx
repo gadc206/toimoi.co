@@ -42,14 +42,6 @@ export function AboutSection() {
                 This process is personal, it is intentional and honest. There is no template, no formula, no shortcut. Every person we work with receives individual care, real attention, and guidance that is tailored specifically to them.
               </p>
 
-              <p className="font-serif text-foreground italic">
-                We don&apos;t believe we are the ones &quot;making&quot; the match.
-              </p>
-
-              <p>
-                We are the vessel. Hashem is the one making the match. A vessel that helps bring two people together at the right time, in the right way, when they are ready.
-              </p>
-
               <p className="font-serif text-foreground">
                 There is something powerful that happens when intuition, honesty, and timing align. That is where real connection begins.
               </p>
