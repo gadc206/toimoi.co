@@ -50,7 +50,7 @@ export function AboutSection() {
               <div className="relative w-64 h-64 mb-8 overflow-hidden rounded-full border-4 border-background shadow-lg">
                 <Image
                   src="/images/founder-noga.jpg"
-                  alt="Noga Cohen Harris"
+                  alt="Noga Cohen"
                   fill
                   className="object-cover"
                 />
@@ -60,10 +60,10 @@ export function AboutSection() {
                 </div>
               </div>
               <h4 className="font-serif text-2xl font-light text-foreground mb-4">
-                Noga Cohen Harris
+                Noga Cohen
               </h4>
               <p className="text-foreground leading-relaxed text-base max-w-md">
-                Noga Cohen Harris is a matchmaker and coach based in New York City, dedicated to helping individuals cultivate deeper awareness and authentic connection in pursuit of meaningful relationships. With a multidisciplinary background that blends legal training, coaching, and trauma-informed care, Noga brings depth, empathy, and clarity to her work with clients. A licensed attorney, she holds law degrees from Tel Aviv University and American University Washington College of Law (LL.M.), and began her legal career representing the State of Israel in civil and national security cases at the District Attorney&apos;s Office in Jerusalem.
+                Noga Cohen is a matchmaker and coach based in New York City, dedicated to helping individuals cultivate deeper awareness and authentic connection in pursuit of meaningful relationships. With a multidisciplinary background that blends legal training, coaching, and trauma-informed care, Noga brings depth, empathy, and clarity to her work with clients. A licensed attorney, she holds law degrees from Tel Aviv University and American University Washington College of Law (LL.M.), and began her legal career representing the State of Israel in civil and national security cases at the District Attorney&apos;s Office in Jerusalem.
               </p>
               <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
                 Noga is a passionate mental health advocate. She serves on the board of Friends of Lev Hasharon, supporting Israel&apos;s leading psychiatric hospital, and volunteers with Sahar, offering emotional support to people in crisis. Her service as a Combat Fitness Instructor in the Israel Defense Forces, where she coached the physical and mental resilience of over 1,000 soldiers, continues to inform her commitment to empowerment, healing, and personal growth.
