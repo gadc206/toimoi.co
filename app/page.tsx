@@ -15,7 +15,6 @@ export default function HomePage() {
     <main className="min-h-screen">
       <Header />
       <Hero />
-      <JoinDatabaseSection />
       <FeelingSection />
       <WhatWeDo />
       <TrustSection />
@@ -25,6 +24,7 @@ export default function HomePage() {
       <ServicesSection />
       <ReferralSection />
       <ClosingSection />
+      <JoinDatabaseSection />
       <Footer />
     </main>
   )
