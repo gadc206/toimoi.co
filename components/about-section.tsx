@@ -21,12 +21,12 @@ export function AboutSection() {
               About Us
             </h2>
 
-            <div className="space-y-6 text-muted-foreground leading-relaxed text-lg">
+            <div className="space-y-6 text-foreground leading-relaxed text-lg">
               <p>
                 We are not a big company or an app.
               </p>
 
-              <p className="font-serif text-foreground italic">
+              <p>
                 We are real people who take the time to truly see you.
               </p>
 
@@ -42,7 +42,7 @@ export function AboutSection() {
                 This process is personal, it is intentional and honest. There is no template, no formula, no shortcut. Every person we work with receives individual care, real attention, and guidance that is tailored specifically to them.
               </p>
 
-              <p className="font-serif text-foreground">
+              <p>
                 There is something powerful that happens when intuition, honesty, and timing align. That is where real connection begins.
               </p>
             </div>
