@@ -27,7 +27,7 @@ export function Hero() {
         </h1>
         
         <p className="mt-6 font-serif text-xl md:text-2xl font-light text-muted-foreground italic animate-fade-in-delay-1">
-          Not rushed. Not forced.
+          Not rushed. Not forced. Not by an algorithm.
         </p>
         
         <p className="mt-8 text-base md:text-lg text-muted-foreground leading-relaxed animate-fade-in-delay-2">
