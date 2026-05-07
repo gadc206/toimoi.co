@@ -13,9 +13,10 @@ export async function POST(request: NextRequest) {
       const blob = await put(
         `submissions/${Date.now()}-${mediaFile.name}`,
         mediaFile,
-        { access: "public" }
+        { access: "private" }
       );
-      mediaUrl = blob.url;
+      // For private blobs, we store the pathname and serve via our API
+      mediaUrl = `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''}/api/file?pathname=${encodeURIComponent(blob.pathname)}`;
     }
 
     const data = {
