@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
+import { put } from "@vercel/blob";
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
+    const mediaFile = formData.get("media") as File | null;
+
+    // Upload media to Vercel Blob if provided
+    let mediaUrl = "";
+    if (mediaFile && mediaFile.size > 0) {
+      const blob = await put(
+        `submissions/${Date.now()}-${mediaFile.name}`,
+        mediaFile,
+        { access: "public" }
+      );
+      mediaUrl = blob.url;
+    }
 
     const data = {
       timestamp: new Date().toISOString(),
@@ -14,7 +27,7 @@ export async function POST(request: NextRequest) {
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
       bio: formData.get("bio") as string,
-      hasMedia: formData.get("media") ? "Yes" : "No",
+      mediaUrl: mediaUrl,
     };
 
     // Google Sheets API setup
@@ -51,7 +64,7 @@ export async function POST(request: NextRequest) {
             data.email,
             data.phone,
             data.bio,
-            data.hasMedia,
+            data.mediaUrl,
           ],
         ],
       },
