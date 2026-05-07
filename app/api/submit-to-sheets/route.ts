@@ -19,8 +19,15 @@ export async function POST(request: NextRequest) {
     // Send to Zapier webhook
     const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
 
+    console.log("[v0] ZAPIER_WEBHOOK_URL:", zapierWebhookUrl?.substring(0, 50) + "...");
+
     if (!zapierWebhookUrl) {
       throw new Error("ZAPIER_WEBHOOK_URL is not configured");
+    }
+
+    if (!zapierWebhookUrl.includes("hooks.zapier.com")) {
+      console.error("[v0] Invalid webhook URL - should start with https://hooks.zapier.com/hooks/catch/...");
+      throw new Error("Invalid Zapier webhook URL format");
     }
 
     const response = await fetch(zapierWebhookUrl, {
