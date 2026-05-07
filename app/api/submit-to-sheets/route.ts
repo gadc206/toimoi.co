@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { google } from "googleapis";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,31 +17,45 @@ export async function POST(request: NextRequest) {
       hasMedia: formData.get("media") ? "Yes" : "No",
     };
 
-    // Send to Zapier webhook
-    const zapierWebhookUrl = process.env.ZAPIER_WEBHOOK_URL;
+    // Google Sheets API setup
+    const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+    const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+    const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
-    console.log("[v0] ZAPIER_WEBHOOK_URL:", zapierWebhookUrl?.substring(0, 50) + "...");
-
-    if (!zapierWebhookUrl) {
-      throw new Error("ZAPIER_WEBHOOK_URL is not configured");
+    if (!spreadsheetId || !serviceAccountEmail || !privateKey) {
+      throw new Error("Google Sheets credentials not configured");
     }
 
-    if (!zapierWebhookUrl.includes("hooks.zapier.com")) {
-      console.error("[v0] Invalid webhook URL - should start with https://hooks.zapier.com/hooks/catch/...");
-      throw new Error("Invalid Zapier webhook URL format");
-    }
+    const auth = new google.auth.JWT(
+      serviceAccountEmail,
+      undefined,
+      privateKey,
+      ["https://www.googleapis.com/auth/spreadsheets"]
+    );
 
-    const response = await fetch(zapierWebhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const sheets = google.sheets({ version: "v4", auth });
+
+    // Append row to the spreadsheet
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: "Sheet1!A:I",
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            data.timestamp,
+            data.name,
+            data.familyName,
+            data.dateOfBirth,
+            data.sex,
+            data.email,
+            data.phone,
+            data.bio,
+            data.hasMedia,
+          ],
+        ],
       },
-      body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-      throw new Error("Failed to send data to Zapier");
-    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
