@@ -36,8 +36,19 @@ export async function POST(request: NextRequest) {
     const serviceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
     const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
 
+    // Debug: Check which env vars are missing
+    console.log("[v0] Checking credentials...");
+    console.log("[v0] SPREADSHEET_ID exists:", !!spreadsheetId);
+    console.log("[v0] SERVICE_ACCOUNT_EMAIL exists:", !!serviceAccountEmail);
+    console.log("[v0] PRIVATE_KEY exists:", !!privateKey);
+    console.log("[v0] PRIVATE_KEY starts with:", privateKey?.substring(0, 30));
+
     if (!spreadsheetId || !serviceAccountEmail || !privateKey) {
-      throw new Error("Google Sheets credentials not configured");
+      const missing = [];
+      if (!spreadsheetId) missing.push("GOOGLE_SPREADSHEET_ID");
+      if (!serviceAccountEmail) missing.push("GOOGLE_SERVICE_ACCOUNT_EMAIL");
+      if (!privateKey) missing.push("GOOGLE_PRIVATE_KEY");
+      throw new Error(`Missing credentials: ${missing.join(", ")}`);
     }
 
     const auth = new google.auth.JWT(
@@ -48,6 +59,8 @@ export async function POST(request: NextRequest) {
     );
 
     const sheets = google.sheets({ version: "v4", auth });
+
+    console.log("[v0] Attempting to append to spreadsheet:", spreadsheetId);
 
     // Append row to the spreadsheet
     await sheets.spreadsheets.values.append({
@@ -73,9 +86,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error submitting form:", error);
+    console.error("[v0] Error submitting form:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("[v0] Error details:", errorMessage);
     return NextResponse.json(
-      { error: "Failed to submit form" },
+      { error: "Failed to submit form", details: errorMessage },
       { status: 500 }
     );
   }
