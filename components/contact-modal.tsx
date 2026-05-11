@@ -46,11 +46,29 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    try {
+      const response = await fetch("/api/send-inquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          serviceType,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to send")
+      }
+
+      setIsSubmitted(true)
+    } catch (error) {
+      console.error("Error sending inquiry:", error)
+      alert("There was an error sending your inquiry. Please try again or email us directly at toimoinow@gmail.com")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleClose = () => {
