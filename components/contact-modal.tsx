@@ -5,7 +5,7 @@ import { useState } from "react"
 interface ContactModalProps {
   isOpen: boolean
   onClose: () => void
-  serviceType: "discovery" | "consultation" | "coaching" | "signature"
+  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral"
 }
 
 const serviceInfo = {
@@ -24,6 +24,10 @@ const serviceInfo = {
   signature: {
     title: "The Signature Experience",
     subtitle: "Begin your bespoke six-month journey.",
+  },
+  referral: {
+    title: "Referral Privilege",
+    subtitle: "",
   },
 }
 
@@ -119,7 +123,35 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
               {info.title}
             </h3>
             
-            {serviceType === "discovery" ? (
+            {serviceType === "referral" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  At ToiMoi, some of the most meaningful connections begin through people who genuinely care. If you know someone who may be ready for a deeper relationship journey, we would be honored to welcome them into our circle.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  When you introduce someone to us, and we begin working with them either as a client or through a curated introduction, you will receive a complimentary 30 minute private guidance session as our way of saying thank you.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  This session can be used for relationship clarity, dating guidance, communication insight, or simply to better understand your own patterns and what you are looking for.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  Because meaningful connections deserve to be noticed, honored, and celebrated.
+                </p>
+                
+                <p className="text-foreground leading-relaxed mb-2">
+                  To refer someone, please email us at:
+                </p>
+                <a 
+                  href="mailto:toimoinow@gmail.com" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                >
+                  toimoinow@gmail.com
+                </a>
+                <p className="text-muted-foreground mt-6 text-sm">
+                  Please include their name, contact information, and a few words about why you feel they may be a good fit for ToiMoi.
+                </p>
+              </div>
+            ) : serviceType === "discovery" ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   A private 15 minute conversation designed to help us get to know each other and explore whether ToiMoi is the right fit for your journey.
