@@ -5,7 +5,7 @@ import { useState } from "react"
 interface ContactModalProps {
   isOpen: boolean
   onClose: () => void
-  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral" | "journey"
+  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral" | "journey" | "contact"
 }
 
 const serviceInfo = {
@@ -31,6 +31,10 @@ const serviceInfo = {
   },
   journey: {
     title: "Start Your Journey",
+    subtitle: "",
+  },
+  contact: {
+    title: "Contact Us",
     subtitle: "",
   },
 }
@@ -127,7 +131,34 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
               {info.title}
             </h3>
             
-            {serviceType === "journey" ? (
+            {serviceType === "contact" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  We would love to hear from you.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Whether you are interested in matchmaking, relationship guidance, a personal consultation, or simply want to learn more about our process, feel free to reach out.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  Every conversation is completely private, thoughtful, and approached without judgment.
+                </p>
+                
+                <p className="text-foreground leading-relaxed mb-2">
+                  Email us at:
+                </p>
+                <a 
+                  href="mailto:toimoinow@gmail.com?subject=Inquiry%20from%20ToiMoi%20Website" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  toimoinow@gmail.com
+                </a>
+                <p className="text-muted-foreground mt-6 italic">
+                  We look forward to connecting with you.
+                </p>
+              </div>
+            ) : serviceType === "journey" ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   Want to meet with Noga and Vanessa?
