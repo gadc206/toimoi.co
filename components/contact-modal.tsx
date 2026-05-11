@@ -123,6 +123,37 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   toimoinow@gmail.com
                 </a>
               </div>
+            ) : serviceType === "consultation" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  A deeply personal one on one meeting where we take the time to truly understand who you are, your life experiences, relationship history, values, lifestyle, and what you are genuinely looking for in a partner and in life.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  This is not a rushed interview or a superficial conversation. It is the foundation of our process and allows us to carefully understand your personality, emotional dynamics, communication style, and relationship goals on a much deeper level.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  During this in depth session, we explore questions that help you reflect on yourself in ways you may never have before. Together, we dig deeper into what your soul truly wants, what may be holding you back, and what kind of connection would genuinely bring you peace, growth, and fulfillment.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  This experience is designed to open your mind to a different level of self awareness, clarity, and emotional understanding.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  Each consultation lasts over an hour and is completely private, thoughtful, and approached with honesty, intuition, and without judgment.
+                </p>
+                <p className="text-foreground font-medium mb-6">
+                  This is where your journey begins.
+                </p>
+                
+                <p className="text-foreground leading-relaxed mb-2">
+                  To schedule your Personal Consultation, please email us at:
+                </p>
+                <a 
+                  href="mailto:toimoinow@gmail.com" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                >
+                  toimoinow@gmail.com
+                </a>
+              </div>
             ) : isCoaching ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
