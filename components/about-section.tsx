@@ -80,7 +80,13 @@ export function AboutSection() {
                 Vanessa Gad
               </h4>
               <p className="text-foreground leading-relaxed text-base max-w-md">
-                Vanessa Gad is a matchmaker and business leader based in New York, with over seventeen years of experience as the CEO of a boutique real estate company serving families from around the world. Throughout her life and career, she has always believed that nothing is random and that people are placed in our path for a reason. Her work, whether in business or matchmaking, has always been deeply rooted in trust, intuition, human connection, and understanding people beyond what is visible on the surface.
+                Vanessa Gad is a matchmaker, writer, and business leader based in New York, with over seventeen years of experience as the CEO of a boutique real estate company serving families from around the world. Throughout her life and career, she has always believed that nothing is random and that people are placed in our path for a reason.
+              </p>
+              <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
+                For the past three years, Vanessa has also been writing inspirational messages focused on trust, faith, and learning how to build a deeper connection with Hashem. She believes Hashem guides every single step of our journey, even during the moments we may not fully understand.
+              </p>
+              <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
+                Her work, whether in business, writing, or matchmaking, has always been deeply rooted in trust, intuition, human connection, and understanding people beyond what is visible on the surface.
               </p>
               <p className="text-foreground leading-relaxed text-base max-w-md mt-4">
                 Coming from a multicultural background, living in different countries, and speaking four languages fluently, Vanessa connects easily with people from many walks of life. Her approach to matchmaking is deeply personal and intuitive. She believes in truly getting to know each person, understanding their fears, strengths, patterns, and hopes, while guiding them with honesty, care, and encouragement.
