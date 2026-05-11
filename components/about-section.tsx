@@ -75,10 +75,6 @@ export function AboutSection() {
                   fill
                   className="object-cover"
                 />
-                {/* Placeholder overlay - remove when photo is added */}
-                <div className="absolute inset-0 bg-muted flex items-center justify-center">
-                  <span className="text-muted-foreground text-sm">Photo</span>
-                </div>
               </div>
               <h4 className="font-serif text-2xl font-light text-foreground mb-4">
                 Vanessa Gad
