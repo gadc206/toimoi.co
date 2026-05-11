@@ -5,7 +5,7 @@ import { useState } from "react"
 interface ContactModalProps {
   isOpen: boolean
   onClose: () => void
-  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral"
+  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral" | "journey"
 }
 
 const serviceInfo = {
@@ -27,6 +27,10 @@ const serviceInfo = {
   },
   referral: {
     title: "Referral Privilege",
+    subtitle: "",
+  },
+  journey: {
+    title: "Start Your Journey",
     subtitle: "",
   },
 }
@@ -123,7 +127,28 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
               {info.title}
             </h3>
             
-            {serviceType === "referral" ? (
+            {serviceType === "journey" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Want to meet with Noga and Vanessa?
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Email us and we will guide you from there.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  Leave any worries behind. Sometimes all it takes is one honest conversation to change everything.
+                </p>
+                
+                <a 
+                  href="mailto:toimoinow@gmail.com?subject=Start%20My%20Journey" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  toimoinow@gmail.com
+                </a>
+              </div>
+            ) : serviceType === "referral" ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   At ToiMoi, some of the most meaningful connections begin through people who genuinely care. If you know someone who may be ready for a deeper relationship journey, we would be honored to welcome them into our circle.
