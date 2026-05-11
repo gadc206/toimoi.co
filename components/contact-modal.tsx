@@ -101,7 +101,29 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
               {info.title}
             </h3>
             
-            {isCoaching ? (
+            {serviceType === "discovery" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  A private 15 minute conversation designed to help us get to know each other and explore whether ToiMoi is the right fit for your journey.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  This is not a sales call or a rushed conversation. It is an honest first connection where we take the time to understand what you are looking for, answer your questions, and share how our process works.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  No pressure. No commitment. Just a thoughtful introduction.
+                </p>
+                
+                <p className="text-foreground leading-relaxed mb-2">
+                  To schedule your Discovery Call, please email us at:
+                </p>
+                <a 
+                  href="mailto:toimoinow@gmail.com" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                >
+                  toimoinow@gmail.com
+                </a>
+              </div>
+            ) : isCoaching ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   A personalized one on one experience designed to help you gain clarity, strengthen your confidence, refine the way you communicate, and better understand the relationship patterns that may be holding you back.
