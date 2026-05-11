@@ -5,7 +5,7 @@ import { useState } from "react"
 interface ContactModalProps {
   isOpen: boolean
   onClose: () => void
-  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral" | "journey" | "contact"
+  serviceType: "discovery" | "consultation" | "coaching" | "signature" | "referral" | "journey" | "contact" | "privacy"
 }
 
 const serviceInfo = {
@@ -35,6 +35,10 @@ const serviceInfo = {
   },
   contact: {
     title: "Contact Us",
+    subtitle: "",
+  },
+  privacy: {
+    title: "Privacy Policy",
     subtitle: "",
   },
 }
@@ -131,7 +135,34 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
               {info.title}
             </h3>
             
-            {serviceType === "contact" ? (
+            {serviceType === "privacy" ? (
+              <div className="mb-8">
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  At ToiMoi, privacy and confidentiality are at the heart of everything we do.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  Any personal information, conversations, photos, videos, or details shared with us are treated with the utmost discretion and respect. We do not share, sell, or distribute your information to third parties.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  All consultations, matchmaking discussions, guidance sessions, and personal submissions remain completely private and are only used for the purpose of providing personalized matchmaking and relationship services.
+                </p>
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  Because our work is deeply personal, we are committed to creating a safe, trusted, and judgment free space for every individual we work with.
+                </p>
+                
+                <p className="text-foreground leading-relaxed mb-2">
+                  If you have any questions regarding privacy or confidentiality, please contact us at:
+                </p>
+                <a 
+                  href="mailto:toimoinow@gmail.com?subject=Privacy%20Inquiry" 
+                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  toimoinow@gmail.com
+                </a>
+              </div>
+            ) : serviceType === "contact" ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
                   We would love to hear from you.
