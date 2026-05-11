@@ -67,14 +67,14 @@ export function ServicesSection() {
             </div>
           </div>
 
-          {/* Private Coaching Session */}
+          {/* Clarity & Connection Session */}
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 pb-16 border-b border-border">
             <div className="flex-1">
               <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-4">
-                Private Coaching Session
+                Clarity & Connection Session
               </h3>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
-                A one-on-one session designed to elevate your confidence, refine how you communicate, and help you express your truest self with ease and authenticity. Because how you show up changes everything.
+                A personalized one on one experience designed to help you gain clarity, strengthen your confidence, refine the way you communicate, and better understand the relationship patterns that may be holding you back. True connection begins with self awareness, presence, and authenticity.
               </p>
             </div>
 
