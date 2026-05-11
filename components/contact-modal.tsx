@@ -142,8 +142,10 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   To refer someone, please email us at:
                 </p>
                 <a 
-                  href="mailto:toimoinow@gmail.com" 
+                  href="mailto:toimoinow@gmail.com?subject=Referral%20for%20ToiMoi" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -167,8 +169,10 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   To schedule your Discovery Call, please email us at:
                 </p>
                 <a 
-                  href="mailto:toimoinow@gmail.com" 
+                  href="mailto:toimoinow@gmail.com?subject=Discovery%20Call%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -198,8 +202,10 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   To schedule your Personal Consultation, please email us at:
                 </p>
                 <a 
-                  href="mailto:toimoinow@gmail.com" 
+                  href="mailto:toimoinow@gmail.com?subject=Personal%20Consultation%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -233,8 +239,10 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   To schedule your session, please email us at:
                 </p>
                 <a 
-                  href="mailto:toimoinow@gmail.com" 
+                  href="mailto:toimoinow@gmail.com?subject=Clarity%20%26%20Connection%20Session%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
