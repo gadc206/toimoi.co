@@ -156,8 +156,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Privacy%20Inquiry" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -180,8 +178,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Inquiry%20from%20ToiMoi%20Website" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -204,8 +200,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Start%20My%20Journey" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -231,8 +225,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Referral%20for%20ToiMoi" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -258,8 +250,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Discovery%20Call%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -291,8 +281,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Personal%20Consultation%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
@@ -328,8 +316,6 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <a 
                   href="mailto:toimoinow@gmail.com?subject=Clarity%20%26%20Connection%20Session%20Request" 
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   toimoinow@gmail.com
                 </a>
