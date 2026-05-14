@@ -1,17 +1,23 @@
 import type { Metadata } from 'next'
-import { Cormorant_Garamond, Inter } from 'next/font/google'
+import { Newsreader, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const cormorant = Cormorant_Garamond({ 
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-serif"
-});
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: "--font-sans"
-});
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-serif',
+  display: 'swap',
+  adjustFontFallback: true,
+})
+
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+  display: 'swap',
+  adjustFontFallback: true,
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.toimoi.co'),
@@ -171,14 +177,14 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable}`}>
+    <html lang="en" className={`${playfair.variable} ${newsreader.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased bg-background text-foreground">
+      <body className="font-sans antialiased [font-feature-settings:'kern'_1,'liga'_1] bg-background text-foreground">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "vercel:link": "pnpm dlx vercel@latest link",
+    "vercel:env-pull": "pnpm dlx vercel@latest env pull .env.local",
+    "vercel:env-pull:prod": "pnpm dlx vercel@latest env pull .env.local --environment=production --yes"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

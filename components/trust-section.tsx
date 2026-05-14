@@ -1,38 +1,45 @@
-import Image from "next/image"
+import { CrystalBackdrop } from "@/components/crystal-backdrop"
+import { SectionEyebrow } from "@/components/section-eyebrow"
+import { SectionShell, sectionY } from "@/components/section-shell"
+import { sectionSurfaceClass } from "@/lib/section-surfaces"
+import { cn } from "@/lib/utils"
 
 export function TrustSection() {
   return (
-    <section className="relative py-24 md:py-32 px-6 overflow-hidden">
-      {/* Subtle Crystal Overlay */}
-      <div className="absolute inset-0">
-        <Image
-          src="/images/crystal-overlay.jpg"
-          alt=""
-          fill
-          className="object-cover opacity-20 blur-md"
-        />
-        <div className="absolute inset-0 bg-muted/80" />
-      </div>
+    <section
+      id="trust"
+      className={cn(
+        sectionY,
+        sectionSurfaceClass("cream"),
+        "relative overflow-hidden scroll-mt-36",
+      )}
+    >
+      <CrystalBackdrop
+        src="/images/crystal-overlay.jpg"
+        imageClassName="opacity-[0.12] blur-md"
+        overlayClassName="bg-[oklch(0.985_0.006_82/0.88)]"
+      />
 
-      <div className="relative z-10 max-w-2xl mx-auto text-center">
-        <p className="font-serif text-2xl md:text-3xl font-light leading-relaxed text-foreground">
+      <SectionShell maxWidth="2xl" className="text-center">
+        <SectionEyebrow>Our standard</SectionEyebrow>
+        <p className="font-serif text-2xl font-light leading-relaxed text-foreground md:text-3xl">
           We work quietly, with care, and with intention.
         </p>
 
-        <div className="mt-12 space-y-4 text-muted-foreground">
+        <div className="mx-auto mt-10 max-w-md space-y-3 text-muted-foreground">
           <p>Every person we meet is treated with respect and discretion.</p>
           <p>Every introduction is thoughtful.</p>
           <p>Every step is guided.</p>
         </div>
 
-        <div className="mt-12 flex items-center justify-center gap-8 text-sm tracking-widest uppercase text-foreground/70">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-sans text-xs tracking-[0.22em] text-foreground/60 uppercase">
           <span>Private</span>
-          <span className="w-1 h-1 bg-foreground/30 rounded-full" />
+          <span className="hidden h-1 w-1 rounded-full bg-foreground/25 sm:inline-block" />
           <span>Personal</span>
-          <span className="w-1 h-1 bg-foreground/30 rounded-full" />
+          <span className="hidden h-1 w-1 rounded-full bg-foreground/25 sm:inline-block" />
           <span>Trusted</span>
         </div>
-      </div>
+      </SectionShell>
     </section>
   )
 }

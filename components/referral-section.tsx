@@ -1,45 +1,53 @@
 "use client"
 
-import Image from "next/image"
 import { useState } from "react"
-import { ContactModal } from "./contact-modal"
+
+import { ContactModal } from "@/components/contact-modal"
+import { CrystalBackdrop } from "@/components/crystal-backdrop"
+import { SectionEyebrow } from "@/components/section-eyebrow"
+import { SectionShell, sectionY } from "@/components/section-shell"
+import { SiteButton } from "@/components/site-button"
+import { sectionSurfaceClass } from "@/lib/section-surfaces"
+import { cn } from "@/lib/utils"
 
 export function ReferralSection() {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
     <>
-      <section className="py-24 md:py-32 px-6 relative overflow-hidden">
-        {/* Full crystal background like hero */}
-        <div className="absolute inset-0">
-          <Image
-            src="/images/crystal-bg-1.jpg"
-            alt=""
-            fill
-            className="object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/60 to-background/70" />
-        </div>
-        <div className="max-w-2xl mx-auto text-center relative z-10">
-          <h2 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-6">
-            Referral Privilege
+      <section
+        id="referral"
+        className={cn(
+          sectionY,
+          sectionSurfaceClass("sage"),
+          "relative overflow-hidden scroll-mt-36",
+        )}
+      >
+        <CrystalBackdrop
+          src="/images/crystal-bg-1.jpg"
+          imageClassName="opacity-[0.15]"
+          overlayClassName="bg-gradient-to-b from-[oklch(0.965_0.014_155/0.9)] via-[oklch(0.965_0.014_155/0.72)] to-[oklch(0.965_0.014_155/0.9)]"
+        />
+        <SectionShell maxWidth="2xl" className="text-center">
+          <SectionEyebrow>For friends</SectionEyebrow>
+          <h2 className="mb-5 font-serif text-2xl font-light text-foreground md:text-3xl">
+            Referral privilege
           </h2>
 
-          <p className="text-muted-foreground leading-relaxed mb-4">
+          <p className="mb-4 text-muted-foreground leading-relaxed">
             Introduce someone to our circle, and if we begin working with them — whether as a client or through a curated introduction — you will receive a complimentary 30-minute private coaching session as our way of saying thank you.
           </p>
 
-          <p className="font-serif text-foreground italic mb-10">
+          <p className="mb-8 font-serif italic text-foreground">
             Because meaningful connections deserve to be celebrated.
           </p>
 
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-block px-8 py-4 border border-foreground/20 text-foreground text-sm tracking-widest uppercase hover:bg-foreground hover:text-background transition-all duration-500"
-          >
-            Refer Someone
-          </button>
-        </div>
+          <div className="flex justify-center">
+            <SiteButton variant="outline" onClick={() => setIsModalOpen(true)}>
+              Refer someone
+            </SiteButton>
+          </div>
+        </SectionShell>
       </section>
 
       <ContactModal

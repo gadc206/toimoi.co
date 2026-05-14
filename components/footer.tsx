@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { ContactModal } from "./contact-modal"
+import { ContactModal } from "@/components/contact-modal"
+import { SiteButton } from "@/components/site-button"
 
 export function Footer() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -17,19 +18,21 @@ export function Footer() {
       <footer className="py-16 px-6 bg-foreground text-background">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex items-center gap-8 text-sm text-background/70">
-              <button 
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-background/70">
+              <SiteButton
+                variant="footer-link"
+                size="cta"
                 onClick={() => openModal("contact")}
-                className="hover:text-background transition-colors duration-300"
               >
                 Contact Us
-              </button>
-              <button 
+              </SiteButton>
+              <SiteButton
+                variant="footer-link"
+                size="cta"
                 onClick={() => openModal("privacy")}
-                className="hover:text-background transition-colors duration-300"
               >
                 Privacy
-              </button>
+              </SiteButton>
             </div>
 
             <p className="text-sm text-background/50">

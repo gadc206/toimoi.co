@@ -18,9 +18,7 @@ export default function HomePage() {
       <FeelingSection />
       <WhatWeDo />
       <TrustSection />
-      <section id="about">
-        <AboutSection />
-      </section>
+      <AboutSection />
       <ServicesSection />
       <ReferralSection />
       <ClosingSection />

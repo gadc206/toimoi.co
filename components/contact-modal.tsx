@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { SiteButton } from "@/components/site-button"
 
 interface ContactModalProps {
   isOpen: boolean
@@ -122,12 +123,11 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
             <p className="text-muted-foreground mb-8">
               We have received your inquiry and will be in touch soon.
             </p>
-            <button
-              onClick={handleClose}
-              className="px-8 py-4 bg-foreground text-background text-sm tracking-widest uppercase hover:bg-foreground/90 transition-all duration-300"
-            >
-              Close
-            </button>
+            <div className="flex justify-center">
+              <SiteButton variant="solid" onClick={handleClose}>
+                Close
+              </SiteButton>
+            </div>
           </div>
         ) : (
           <>
@@ -384,13 +384,14 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                     />
                   </div>
 
-                  <button
+                  <SiteButton
                     type="submit"
+                    variant="solid"
+                    size="block"
                     disabled={isSubmitting}
-                    className="w-full px-8 py-4 bg-foreground text-background text-sm tracking-widest uppercase hover:bg-foreground/90 transition-all duration-300 disabled:opacity-50"
                   >
                     {isSubmitting ? "Sending..." : "Send Inquiry"}
-                  </button>
+                  </SiteButton>
                 </form>
               </>
             )}
