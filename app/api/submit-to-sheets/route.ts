@@ -1,24 +1,19 @@
 import { randomUUID } from "node:crypto";
-import path from "node:path";
 
-import { loadEnvConfig } from "@next/env";
 import { NextRequest, NextResponse } from "next/server";
 import { google } from "googleapis";
 import { put } from "@vercel/blob";
 
-/** Turbopack can freeze `process.env.GOOGLE_*` at compile time; re-read .env files in dev + use bracket access. */
+/** Read env via bracket access to avoid compile-time replacement surprises. */
 function getGoogleSheetsEnv() {
-  if (process.env.NODE_ENV !== "production") {
-    loadEnvConfig(path.resolve(process.cwd()), true, console, true);
-  }
-  const env = process.env as NodeJS.ProcessEnv
-  const privateKeyRaw = env["GOOGLE_PRIVATE_KEY"]
+  const env = process.env as NodeJS.ProcessEnv;
+  const privateKeyRaw = env["GOOGLE_PRIVATE_KEY"];
   return {
     spreadsheetId: env["GOOGLE_SPREADSHEET_ID"],
     serviceAccountEmail: env["GOOGLE_SERVICE_ACCOUNT_EMAIL"],
     privateKey: privateKeyRaw?.replace(/\\n/g, "\n"),
     sheetRange: env["GOOGLE_SHEET_RANGE"] ?? "Sheet1!A:J",
-  }
+  };
 }
 
 /**
