@@ -1,17 +1,12 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { ContactModal } from "@/components/contact-modal"
 import { SiteButton } from "@/components/site-button"
 
 export function Footer() {
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState<"contact" | "privacy">("contact")
-
-  const openModal = (type: "contact" | "privacy") => {
-    setModalType(type)
-    setModalOpen(true)
-  }
 
   return (
     <>
@@ -22,16 +17,15 @@ export function Footer() {
               <SiteButton
                 variant="footer-link"
                 size="cta"
-                onClick={() => openModal("contact")}
+                onClick={() => setModalOpen(true)}
               >
                 Contact Us
               </SiteButton>
-              <SiteButton
-                variant="footer-link"
-                size="cta"
-                onClick={() => openModal("privacy")}
-              >
-                Privacy
+              <SiteButton asChild variant="footer-link" size="cta">
+                <Link href="/privacy">Privacy</Link>
+              </SiteButton>
+              <SiteButton asChild variant="footer-link" size="cta">
+                <Link href="/terms">Terms</Link>
               </SiteButton>
             </div>
 
@@ -51,7 +45,7 @@ export function Footer() {
       <ContactModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        serviceType={modalType}
+        serviceType="contact"
       />
     </>
   )
