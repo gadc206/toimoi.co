@@ -8,6 +8,7 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  serverExternalPackages: ["sql.js", "twilio"],
   images: {
     unoptimized: true,
   },
