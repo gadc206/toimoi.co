@@ -19,11 +19,18 @@ import type {
   StoredMatchAssessment,
 } from "@/lib/types";
 
-const DB_PATH = path.join(
-  process.cwd(),
-  "data",
-  process.env.TOIMO_DB_FILENAME || "toimo.sqlite",
-);
+const DB_DIR = process.env.VERCEL
+  ? path.join("/tmp", "toimo-data")
+  : path.join(process.cwd(), "data");
+
+const DB_PATH = path.join(DB_DIR, process.env.TOIMO_DB_FILENAME || "toimo.sqlite");
+
+function sqlJsWasmPath(file: string): string {
+  // On Vercel/serverless, prefer the packaged dist file; fall back to CDN.
+  const local = path.join(process.cwd(), "node_modules", "sql.js", "dist", file);
+  if (fs.existsSync(local)) return local;
+  return `https://sql.js.org/dist/${file}`;
+}
 
 function cuid(): string {
   return crypto.randomBytes(12).toString("hex");
@@ -355,7 +362,7 @@ class Db {
 
   private async init() {
     const SQL = await initSqlJs({
-      locateFile: (file) => path.join(process.cwd(), "node_modules", "sql.js", "dist", file),
+      locateFile: (file) => sqlJsWasmPath(file),
     });
     fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
     if (fs.existsSync(DB_PATH)) {
