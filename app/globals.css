@@ -25,6 +25,10 @@
   --ring: oklch(0.55 0.08 155);
   --gold: oklch(0.75 0.10 85);
   --emerald: oklch(0.55 0.08 155);
+  /* Compat aliases for WhatsApp admin UI */
+  --ink: oklch(0.30 0.01 60);
+  --line: oklch(0.90 0.008 80);
+  --panel: oklch(0.99 0.002 80);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);

@@ -9,21 +9,20 @@ type JoinDatabaseModalProps = {
   onClose: () => void
 }
 
-const initialForm = {
-  firstName: "",
-  familyName: "",
-  dateOfBirth: "",
-  sex: "",
-  email: "",
-  phone: "",
-  bio: "",
+function whatsAppDeepLink(message = "Hi"): string {
+  const raw =
+    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
+    process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ||
+    "+14155238886"
+  const digits = raw.replace(/\D/g, "")
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
 }
 
 export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
-  const [formData, setFormData] = useState(initialForm)
-  const [file, setFile] = useState<File | null>(null)
+  const [phone, setPhone] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -35,249 +34,113 @@ export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
   }, [isOpen])
 
   const handleClose = () => {
-    setFormData(initialForm)
-    setFile(null)
-    setIsSubmitted(false)
+    setPhone("")
+    setError(null)
+    setSent(false)
     setIsSubmitting(false)
     onClose()
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTextMe = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
     try {
-      const submitData = new FormData()
-      submitData.append("name", formData.firstName)
-      submitData.append("familyName", formData.familyName)
-      submitData.append("dateOfBirth", formData.dateOfBirth)
-      submitData.append("sex", formData.sex)
-      submitData.append("email", formData.email)
-      submitData.append("phone", formData.phone)
-      submitData.append("bio", formData.bio)
-      if (file) {
-        submitData.append("media", file)
-      }
-
-      const response = await fetch("/api/submit-to-sheets", {
+      const response = await fetch("/api/join/whatsapp", {
         method: "POST",
-        body: submitData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
       })
-
       const payload = (await response.json().catch(() => ({}))) as {
         error?: string
-        details?: string
       }
-
       if (!response.ok) {
-        const detail =
-          typeof payload.details === "string"
-            ? payload.details
-            : typeof payload.error === "string"
-              ? payload.error
-              : "Request failed"
-        throw new Error(detail)
+        throw new Error(payload.error || "Could not start WhatsApp outreach")
       }
-
-      setIsSubmitted(true)
-    } catch (error) {
-      console.error("Error submitting form:", error)
-      const message =
-        error instanceof Error ? error.message : "Something went wrong."
-      alert(
-        `${message}\n\nIf this persists, email toimoinow@gmail.com.`,
-      )
+      setSent(true)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong")
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
-      setFile(e.target.files[0])
     }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-foreground/60 backdrop-blur-sm"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+        aria-label="Close"
         onClick={handleClose}
-        aria-hidden
       />
-
-      <div
-        className="relative max-h-[min(90dvh,900px)] w-full max-w-2xl overflow-y-auto bg-background p-6 shadow-2xl md:p-10"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="join-db-title"
-      >
+      <div className="relative z-10 w-full max-w-md border border-foreground/15 bg-background p-6 shadow-xl sm:p-8">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute top-5 right-5 text-muted-foreground transition-colors hover:text-foreground"
-          aria-label="Close"
+          className="absolute top-4 right-4 text-xs tracking-[0.2em] text-foreground/50 uppercase hover:text-foreground"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
+          Close
         </button>
 
-        {isSubmitted ? (
-          <div className="py-10 text-center">
-            <p className="mb-3 font-serif text-2xl text-foreground">Thank you</p>
-            <p className="mb-8 text-lg text-muted-foreground">
-              Your information has been received. We will be in touch soon.
+        <p className="font-sans text-[10px] tracking-[0.25em] text-foreground/50 uppercase">
+          Private list
+        </p>
+        <h2 className="mt-3 font-serif text-2xl font-light text-foreground sm:text-3xl">
+          Join on WhatsApp
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          We’ll get to know you through a warm one-to-one WhatsApp conversation — one question at a
+          time. Reply STOP anytime.
+        </p>
+
+        {sent ? (
+          <div className="mt-8 space-y-4">
+            <p className="text-sm leading-relaxed text-foreground">
+              You’re in. Check WhatsApp for our opening message, then reply to continue.
             </p>
-            <SiteButton variant="solid" onClick={handleClose}>
-              Close
+            <SiteButton variant="outline" onClick={handleClose}>
+              Done
             </SiteButton>
           </div>
         ) : (
-          <>
-            <h3
-              id="join-db-title"
-              className="mb-2 pr-10 font-serif text-2xl font-light text-foreground md:text-3xl"
-            >
-              Join our private database
-            </h3>
-            <p className="mb-8 text-sm text-muted-foreground leading-relaxed">
-              Complete the application below. Your details stay confidential and are used only to
-              understand you and guide you toward the right match.
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-5 text-left">
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Name</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Family name</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.familyName}
-                    onChange={(e) => setFormData({ ...formData, familyName: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Date of birth</label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.dateOfBirth}
-                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Sex</label>
-                  <select
-                    required
-                    value={formData.sex}
-                    onChange={(e) => setFormData({ ...formData, sex: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  >
-                    <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Email</label>
-                  <input
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm text-muted-foreground">Phone</label>
-                  <input
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-muted-foreground">
-                  Short bio about yourself
-                </label>
-                <textarea
-                  required
-                  rows={4}
-                  value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  className="w-full resize-none border border-border bg-background px-4 py-3 text-foreground transition-colors focus:border-foreground/50 focus:outline-none"
-                  placeholder="Tell us a bit about yourself..."
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm text-muted-foreground">
-                  Photo or short video (optional)
-                </label>
-                <p className="mb-3 text-xs text-muted-foreground/80">
-                  Helps us get a sense of who you are.
-                </p>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                  className="w-full text-sm text-muted-foreground file:mr-4 file:cursor-pointer file:border file:border-border file:bg-background file:px-4 file:py-2 file:text-sm file:text-foreground transition-colors hover:file:bg-secondary"
-                />
-                {file ? (
-                  <p className="mt-2 text-sm text-foreground">Selected: {file.name}</p>
-                ) : null}
-              </div>
-
-              <p className="text-xs italic leading-relaxed text-muted-foreground/80">
-                Your information stays private and is only used for matchmaking guidance.
+          <div className="mt-8 space-y-6">
+            <div>
+              <p className="mb-3 font-sans text-[10px] tracking-[0.2em] text-foreground/45 uppercase">
+                On your phone
               </p>
+              <SiteButton asChild variant="outline" className="w-full">
+                <a href={whatsAppDeepLink("Hi")} target="_blank" rel="noopener noreferrer">
+                  Message us on WhatsApp
+                </a>
+              </SiteButton>
+            </div>
 
-              <div className="flex justify-center pt-2 md:justify-start">
-                <SiteButton type="submit" variant="solid" size="block" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit application"}
+            <div className="border-t border-foreground/10 pt-6">
+              <p className="mb-3 font-sans text-[10px] tracking-[0.2em] text-foreground/45 uppercase">
+                On your computer
+              </p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                Enter your WhatsApp number and we’ll message you to begin.
+              </p>
+              <form onSubmit={handleTextMe} className="space-y-3">
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 917 555 0100"
+                  className="w-full border border-foreground/15 bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-foreground/40"
+                />
+                {error ? <p className="text-sm text-red-700">{error}</p> : null}
+                <SiteButton type="submit" variant="outline" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending…" : "Text me on WhatsApp"}
                 </SiteButton>
-              </div>
-            </form>
-          </>
+              </form>
+            </div>
+          </div>
         )}
       </div>
     </div>

@@ -22,10 +22,16 @@ export function Header() {
     <>
       <header className="fixed top-0 right-0 left-0 z-50">
         <div className="border-b border-foreground/10 bg-background/90 backdrop-blur-md">
-          <div className="mx-auto flex max-w-6xl items-center justify-center px-5 py-2 sm:px-8 md:px-12">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-2 sm:px-8 md:px-12">
             <SiteButton asChild variant="outline-sm" size="cta">
               <Link href="#join">Add yourself to our database</Link>
             </SiteButton>
+            <Link
+              href="/admin"
+              className="font-sans text-[10px] tracking-[0.22em] text-foreground/45 uppercase transition-colors hover:text-foreground"
+            >
+              Admin
+            </Link>
           </div>
         </div>
 

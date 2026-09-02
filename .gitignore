@@ -9,9 +9,17 @@ next.user-config.*
 
 # Environment variables
 .env*.local
+.env
+.env.*
 
 # Common ignores
 node_modules
 .next/
 .DS_Store
 .vercel
+
+# Matchmaking SQLite + uploads
+/data
+*.sqlite
+/public/uploads
+!/public/uploads/.gitkeep

@@ -35,7 +35,8 @@ export function JoinDatabaseSection() {
           </h2>
 
           <p className="mb-10 text-lg leading-relaxed text-muted-foreground">
-            Join our private singles list and let us guide you toward the right match.
+            Join our private singles list on WhatsApp. We’ll ask one question at a time and guide you
+            toward the right match.
           </p>
 
           <div className="flex justify-center">
