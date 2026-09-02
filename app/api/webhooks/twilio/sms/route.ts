@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
-import { handleInbound, type InboundMedia } from "@/lib/toimo/engine";
+import { handleInbound } from "@/lib/toimo/engine";
 import { logOutboundOnly, twimlResponse } from "@/lib/sms/send";
+import { collectPhotoUrls } from "@/lib/sms/media";
 import { toE164 } from "@/lib/whatsapp/phone";
-import { isAudioContentType, isImageContentType } from "@/lib/whatsapp/transcribe";
+import { isAudioContentType } from "@/lib/whatsapp/transcribe";
 
 export const runtime = "nodejs";
+export const maxDuration = 30;
 
 function validateTwilio(req: NextRequest, params: Record<string, string>): boolean {
   if (process.env.SKIP_TWILIO_SIGNATURE === "true") return true;
@@ -15,7 +17,6 @@ function validateTwilio(req: NextRequest, params: Record<string, string>): boole
   const url =
     process.env.TWILIO_WEBHOOK_URL ||
     `${process.env.PUBLIC_BASE_URL}/api/webhooks/twilio/whatsapp`;
-  // Also accept legacy SMS webhook path during transition
   const legacy =
     process.env.TWILIO_WEBHOOK_URL ||
     `${process.env.PUBLIC_BASE_URL}/api/webhooks/twilio/sms`;
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   const sid = params.MessageSid;
   const numMedia = Number(params.NumMedia || "0");
 
-  const media: InboundMedia[] = [];
+  const media: { url: string; contentType: string }[] = [];
   for (let i = 0; i < numMedia; i++) {
     const url = params[`MediaUrl${i}`];
     const contentType = params[`MediaContentType${i}`] || "";
@@ -53,16 +54,12 @@ export async function POST(req: NextRequest) {
     return new NextResponse("Missing From", { status: 400 });
   }
 
-  // WhatsApp-only: ignore pure SMS channel if somehow pointed here without whatsapp: prefix
-  // Still accept sandbox/testing if From is already E.164
   const phone = toE164(fromRaw);
-
   const text = body;
-  const images = media.filter((m) => isImageContentType(m.contentType));
+  const photos = collectPhotoUrls(media);
   const audio = media.find((m) => isAudioContentType(m.contentType));
 
-  // Text-only: ask them to type if they send a voice note
-  if (audio && !text.trim() && images.length === 0) {
+  if (audio && !text.trim() && photos.length === 0) {
     return new NextResponse(
       twimlResponse([
         "Thanks! For now, please type your answer as text ❤️ (Voice notes aren't supported yet.)",
@@ -71,7 +68,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const result = await handleInbound(phone, text, sid, images.map((m) => m.url));
+  const result = await handleInbound(phone, text, sid, photos);
   await logOutboundOnly(result.person.id, result.outbound);
 
   return new NextResponse(twimlResponse(result.outbound), {

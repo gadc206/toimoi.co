@@ -1,9 +1,25 @@
 import OpenAI from "openai";
 import type { Person, ProfileAnswers } from "@/lib/types";
 
+const LLM_TIMEOUT_MS = 1800;
+
 function client(): OpenAI | null {
   if (!process.env.OPENAI_API_KEY) return null;
-  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: LLM_TIMEOUT_MS });
+}
+
+async function completeOrFallback(
+  fallback: string,
+  build: (openai: OpenAI, signal: AbortSignal) => Promise<string | null | undefined>,
+): Promise<string> {
+  const openai = client();
+  if (!openai) return fallback;
+  try {
+    const text = await build(openai, AbortSignal.timeout(LLM_TIMEOUT_MS));
+    return text?.trim() || fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 export async function threeWordsFollowup(threeWords: string): Promise<string> {
@@ -11,51 +27,48 @@ export async function threeWordsFollowup(threeWords: string): Promise<string> {
 People probably see some of those sides pretty quickly.
 What's the side of you that someone only discovers once you really trust them?`;
 
-  const openai = client();
-  if (!openai) return fallback;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.6,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a warm Jewish matchmaking coach (TOIMOI). Write 2-4 short SMS lines. Pick something interesting from their three words. Note what people see quickly, then ask what side someone only discovers once they really trust them. No diagnosis. No questions besides that one.",
-        },
-        { role: "user", content: `Their three words: ${threeWords}` },
-      ],
-    });
-    return completion.choices[0]?.message?.content?.trim() || fallback;
-  } catch {
-    return fallback;
-  }
+  return completeOrFallback(fallback, async (openai, signal) => {
+    const completion = await openai.chat.completions.create(
+      {
+        model: "gpt-4o-mini",
+        temperature: 0.6,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a warm Jewish matchmaking coach (TOIMOI). Write 2-4 short SMS lines. Pick something interesting from their three words. Note what people see quickly, then ask what side someone only discovers once they really trust them. No diagnosis. No questions besides that one.",
+          },
+          { role: "user", content: `Their three words: ${threeWords}` },
+        ],
+      },
+      { signal },
+    );
+    return completion.choices[0]?.message?.content;
+  });
 }
 
 export async function reflectAnswer(topic: string, answer: string): Promise<string> {
   const fallback = `Thank you for sharing that — I hear you: "${answer.slice(0, 160)}${answer.length > 160 ? "…" : ""}"`;
-  const openai = client();
-  if (!openai) return fallback;
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.5,
-      max_tokens: 120,
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a warm matchmaking coach. Reflect the user's answer in 1-2 short SMS sentences. Use only what they said. No diagnosis. No new question.",
-        },
-        { role: "user", content: `Topic: ${topic}\nAnswer: ${answer}` },
-      ],
-    });
-    return completion.choices[0]?.message?.content?.trim() || fallback;
-  } catch {
-    return fallback;
-  }
+  return completeOrFallback(fallback, async (openai, signal) => {
+    const completion = await openai.chat.completions.create(
+      {
+        model: "gpt-4o-mini",
+        temperature: 0.5,
+        max_tokens: 120,
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a warm matchmaking coach. Reflect the user's answer in 1-2 short SMS sentences. Use only what they said. No diagnosis. No new question.",
+          },
+          { role: "user", content: `Topic: ${topic}\nAnswer: ${answer}` },
+        ],
+      },
+      { signal },
+    );
+    return completion.choices[0]?.message?.content;
+  });
 }
 
 export async function mirrorPattern(
@@ -68,9 +81,6 @@ It may be worth thinking about whether the qualities that initially ATTRACT you 
 They may be.
 But they may not be.
 Does that resonate with you?`;
-
-  const openai = client();
-  if (!openai) return fallback;
 
   const summary = {
     firstName: person.firstName,
@@ -92,30 +102,31 @@ Does that resonate with you?`;
     growthEdge: profile?.growthEdge,
   };
 
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.5,
-      messages: [
-        {
-          role: "system",
-          content: `You are TOIMOI, a gentle Jewish matchmaking coach.
+  return completeOrFallback(fallback, async (openai, signal) => {
+    const completion = await openai.chat.completions.create(
+      {
+        model: "gpt-4o-mini",
+        temperature: 0.5,
+        messages: [
+          {
+            role: "system",
+            content: `You are TOIMOI, a gentle Jewish matchmaking coach.
 Identify ONE meaningful pattern from ONLY the provided answers.
 Speak in short SMS-friendly paragraphs.
 Do not invent facts. Do not diagnose.
 End by asking if it resonates.
 Keep under 900 characters.`,
-        },
-        {
-          role: "user",
-          content: `Structured answers:\n${JSON.stringify(summary, null, 2)}\n\nRecent transcript:\n${transcriptSnippet.slice(0, 3500)}`,
-        },
-      ],
-    });
-    return completion.choices[0]?.message?.content?.trim() || fallback;
-  } catch {
-    return fallback;
-  }
+          },
+          {
+            role: "user",
+            content: `Structured answers:\n${JSON.stringify(summary, null, 2)}\n\nRecent transcript:\n${transcriptSnippet.slice(0, 3500)}`,
+          },
+        ],
+      },
+      { signal },
+    );
+    return completion.choices[0]?.message?.content;
+  });
 }
 
 export async function successMeaningReflection(meaning: string): Promise<string> {
@@ -123,25 +134,23 @@ export async function successMeaningReflection(meaning: string): Promise<string>
 That's different from simply saying, "I need someone successful."
 Understanding WHY something matters to you helps us understand whether it's truly a need or simply the label we've given it.`;
 
-  const openai = client();
-  if (!openai) return fallback;
-
-  try {
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.5,
-      max_tokens: 160,
-      messages: [
-        {
-          role: "system",
-          content:
-            "Warm coaching SMS. Reflect what 'successful' means to them in 2-3 short sentences. Explain that understanding WHY helps separate need vs label. No new question.",
-        },
-        { role: "user", content: meaning },
-      ],
-    });
-    return completion.choices[0]?.message?.content?.trim() || fallback;
-  } catch {
-    return fallback;
-  }
+  return completeOrFallback(fallback, async (openai, signal) => {
+    const completion = await openai.chat.completions.create(
+      {
+        model: "gpt-4o-mini",
+        temperature: 0.5,
+        max_tokens: 160,
+        messages: [
+          {
+            role: "system",
+            content:
+              "Warm coaching SMS. Reflect what 'successful' means to them in 2-3 short sentences. Explain that understanding WHY helps separate need vs label. No new question.",
+          },
+          { role: "user", content: meaning },
+        ],
+      },
+      { signal },
+    );
+    return completion.choices[0]?.message?.content;
+  });
 }

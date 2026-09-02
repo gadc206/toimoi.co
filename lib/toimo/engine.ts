@@ -593,34 +593,31 @@ async function processStep(
       );
     }
     case "photo": {
-      const media =
-        mediaUrls[0] ||
-        (normalize(text) === "photo" || text.startsWith("/uploads/") ? text || "PHOTO" : "");
-      if (!media && !mediaUrls.length) {
+      const attached = mediaUrls.find((url) => Boolean(url));
+      const typed =
+        normalize(text) === "photo" ||
+        text.startsWith("/uploads/") ||
+        text.startsWith("/api/uploads/") ||
+        text.startsWith("/api/file")
+          ? text || "PHOTO"
+          : "";
+      const media = attached || typed;
+      if (!media) {
         return {
           outbound: [
-            "I still need a photo of you 📷\nPlease attach a picture in WhatsApp and send it.\n(In the simulator, tap Send photo.)",
+            "I still need a photo of you 📷\nPlease attach a picture and send it.",
           ],
           person,
         };
       }
-      try {
-        const photoUrl = await saveInboundPhoto(person.id, mediaUrls[0] || media || "PHOTO");
-        return advance(
-          person,
-          "looking_for",
-          ["Thank you! Who are you hoping to meet? (Women / Men)"],
-          flags,
-          { photoUrl },
-        );
-      } catch {
-        return {
-          outbound: [
-            "I couldn't save that photo. Please try sending the picture again 📷",
-          ],
-          person,
-        };
-      }
+      const photoUrl = await saveInboundPhoto(person.id, attached || media);
+      return advance(
+        person,
+        "looking_for",
+        ["Thank you! Who are you hoping to meet? (Women / Men)"],
+        flags,
+        { photoUrl },
+      );
     }
     case "looking_for": {
       return advance(person, "age", ["Let's start easy 😊 How old are you?"], flags, {

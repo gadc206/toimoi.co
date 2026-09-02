@@ -24,16 +24,48 @@ function extensionFromContentType(contentType: string | null): string {
   return "ogg";
 }
 
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  const signal = AbortSignal.timeout(timeoutMs);
+  return fetch(url, { ...init, signal });
+}
+
 export async function downloadTwilioMedia(
   mediaUrl: string,
 ): Promise<{ buffer: Buffer; contentType: string | null }> {
-  const res = await fetch(mediaUrl, { headers: authHeader() });
-  if (!res.ok) {
-    throw new Error(`Failed to download media: ${res.status}`);
+  const timeoutMs = 8000;
+  // Don't follow redirects automatically: Twilio sends us to S3, and forwarding
+  // Basic auth to S3 causes 403s.
+  const first = await fetchWithTimeout(
+    mediaUrl,
+    { headers: authHeader(), redirect: "manual" },
+    timeoutMs,
+  );
+
+  if (first.status >= 300 && first.status < 400) {
+    const location = first.headers.get("location");
+    if (!location) {
+      throw new Error("Failed to download media: redirect without location");
+    }
+    const second = await fetchWithTimeout(location, {}, timeoutMs);
+    if (!second.ok) {
+      throw new Error(`Failed to download media: ${second.status}`);
+    }
+    return {
+      buffer: Buffer.from(await second.arrayBuffer()),
+      contentType: second.headers.get("content-type") || first.headers.get("content-type"),
+    };
+  }
+
+  if (!first.ok) {
+    throw new Error(`Failed to download media: ${first.status}`);
   }
   return {
-    buffer: Buffer.from(await res.arrayBuffer()),
-    contentType: res.headers.get("content-type"),
+    buffer: Buffer.from(await first.arrayBuffer()),
+    contentType: first.headers.get("content-type"),
   };
 }
 
@@ -56,7 +88,6 @@ export async function transcribeVoiceNote(
     const result = await openai.audio.transcriptions.create({
       file: fs.createReadStream(tmp),
       model: "whisper-1",
-      // Help with English + possible Hebrew/French mixed answers
       prompt:
         "Jewish matchmaking coaching conversation. May include English, Hebrew, French, or names.",
     });
@@ -73,6 +104,7 @@ export async function transcribeVoiceNote(
 export function isAudioContentType(contentType: string | null | undefined): boolean {
   if (!contentType) return false;
   const t = contentType.toLowerCase();
+  if (t.startsWith("image/")) return false;
   return (
     t.startsWith("audio/") ||
     t.includes("ogg") ||
@@ -85,5 +117,11 @@ export function isAudioContentType(contentType: string | null | undefined): bool
 
 export function isImageContentType(contentType: string | null | undefined): boolean {
   if (!contentType) return false;
-  return contentType.toLowerCase().startsWith("image/");
+  const t = contentType.toLowerCase();
+  return (
+    t.startsWith("image/") ||
+    t.includes("heic") ||
+    t.includes("heif") ||
+    t === "application/octet-stream"
+  );
 }

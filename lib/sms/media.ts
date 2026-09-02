@@ -1,41 +1,70 @@
-import fs from "fs";
-import path from "path";
 import crypto from "crypto";
-import { downloadTwilioMedia } from "@/lib/whatsapp/transcribe";
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
+import { put } from "@vercel/blob";
+import { downloadTwilioMedia, isAudioContentType, isImageContentType } from "@/lib/whatsapp/transcribe";
 
 function extensionFromContentType(contentType: string | null): string {
   if (!contentType) return "jpg";
-  if (contentType.includes("png")) return "png";
-  if (contentType.includes("webp")) return "webp";
-  if (contentType.includes("gif")) return "gif";
-  if (contentType.includes("jpeg") || contentType.includes("jpg")) return "jpg";
+  const t = contentType.toLowerCase();
+  if (t.includes("png")) return "png";
+  if (t.includes("webp")) return "webp";
+  if (t.includes("gif")) return "gif";
+  if (t.includes("heic") || t.includes("heif")) return "heic";
+  if (t.includes("jpeg") || t.includes("jpg")) return "jpg";
   return "jpg";
 }
 
-/** Save a WhatsApp/Twilio image (or simulator PHOTO placeholder) to public/uploads. */
+function placeholderUrl(): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+  <rect width="400" height="400" fill="#0f5c4c"/>
+  <text x="200" y="210" text-anchor="middle" fill="white" font-size="28" font-family="Arial">Photo</text>
+</svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+export function collectPhotoUrls(
+  media: { url: string; contentType: string }[],
+): string[] {
+  const nonAudio = media.filter((m) => !isAudioContentType(m.contentType));
+  const labeled = nonAudio.filter(
+    (m) => isImageContentType(m.contentType) || !m.contentType.trim(),
+  );
+  return (labeled.length ? labeled : nonAudio).map((m) => m.url);
+}
+
+async function storePhoto(
+  personId: string,
+  buffer: Buffer,
+  contentType: string | null,
+): Promise<string> {
+  const ext = extensionFromContentType(contentType);
+  const filename = `${personId}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
+  const blob = await put(`people/${filename}`, buffer, {
+    access: "private",
+    contentType: contentType || "image/jpeg",
+  });
+  return `/api/file?pathname=${encodeURIComponent(blob.pathname)}`;
+}
+
+/** Save a WhatsApp/Twilio image to Vercel Blob (persists on the live site). */
 export async function saveInboundPhoto(
   personId: string,
   mediaUrl: string,
 ): Promise<string> {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-
-  if (mediaUrl === "PHOTO" || mediaUrl.startsWith("/uploads/")) {
-    const svgName = `${personId}-${crypto.randomBytes(4).toString("hex")}.svg`;
-    const svgPath = path.join(UPLOAD_DIR, svgName);
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
-  <rect width="400" height="400" fill="#0f5c4c"/>
-  <text x="200" y="210" text-anchor="middle" fill="white" font-size="28" font-family="Arial">Photo</text>
-</svg>`;
-    fs.writeFileSync(svgPath, svg);
-    return `/uploads/${svgName}`;
+  if (
+    mediaUrl === "PHOTO" ||
+    mediaUrl.startsWith("/uploads/") ||
+    mediaUrl.startsWith("/api/uploads/") ||
+    mediaUrl.startsWith("/api/file") ||
+    mediaUrl.startsWith("data:")
+  ) {
+    return placeholderUrl();
   }
 
-  const { buffer, contentType } = await downloadTwilioMedia(mediaUrl);
-  const ext = extensionFromContentType(contentType);
-  const filename = `${personId}-${crypto.randomBytes(6).toString("hex")}.${ext}`;
-  const filePath = path.join(UPLOAD_DIR, filename);
-  fs.writeFileSync(filePath, buffer);
-  return `/uploads/${filename}`;
+  try {
+    const { buffer, contentType } = await downloadTwilioMedia(mediaUrl);
+    return await storePhoto(personId, buffer, contentType);
+  } catch (err) {
+    console.error("saveInboundPhoto failed; accepting placeholder", err);
+    return placeholderUrl();
+  }
 }
