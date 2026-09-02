@@ -23,50 +23,57 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prismaBase = client;
 }
 
+function mapAssessment(row: {
+  id: string;
+  personAId: string;
+  personBId: string;
+  profileHashA: string;
+  profileHashB: string;
+  dataJson: string;
+  createdAt: Date;
+}): StoredMatchAssessment {
+  const data = JSON.parse(row.dataJson) as Omit<
+    StoredMatchAssessment,
+    "id" | "personAId" | "personBId" | "profileHashA" | "profileHashB" | "createdAt"
+  >;
+  return {
+    ...data,
+    id: row.id,
+    personAId: row.personAId,
+    personBId: row.personBId,
+    profileHashA: row.profileHashA,
+    profileHashB: row.profileHashB,
+    createdAt: row.createdAt,
+  };
+}
+
 async function hydrateMatch(match: MatchRecord): Promise<MatchWithDetails> {
-  const [personA, personB, assessment, createdByMatchmaker, outcomes, reviews] =
-    await Promise.all([
-      client.person.findUnique({
-        where: { id: match.personAId },
-        include: { profile: true },
-      }),
-      client.person.findUnique({
-        where: { id: match.personBId },
-        include: { profile: true },
-      }),
-      match.assessmentId
-        ? client.matchAssessment.findUnique({ where: { id: match.assessmentId } })
-        : Promise.resolve(null),
-      client.matchmaker.findUnique({ where: { id: match.createdByMatchmakerId } }),
-      client.matchOutcome.findMany({
-        where: { matchId: match.id },
-        orderBy: { occurredAt: "asc" },
-      }),
-      match.assessmentId
-        ? client.matchReview.findMany({
-            where: { assessmentId: match.assessmentId },
-            orderBy: { createdAt: "desc" },
-          })
-        : Promise.resolve([]),
-    ]);
+  const [personA, personB, assessment, matchmaker, outcomes] = await Promise.all([
+    client.person.findUnique({
+      where: { id: match.personAId },
+      include: { profile: true },
+    }),
+    client.person.findUnique({
+      where: { id: match.personBId },
+      include: { profile: true },
+    }),
+    match.assessmentId
+      ? client.matchAssessment.findUnique({ where: { id: match.assessmentId } })
+      : Promise.resolve(null),
+    client.matchmaker.findUnique({ where: { id: match.createdByMatchmakerId } }),
+    client.matchOutcome.findMany({
+      where: { matchId: match.id },
+      orderBy: { occurredAt: "asc" },
+    }),
+  ]);
 
   return {
     ...match,
     personA: personA as PersonWithProfile,
     personB: personB as PersonWithProfile,
-    assessment: assessment
-      ? ({
-          ...assessment,
-          data: JSON.parse(assessment.dataJson),
-        } as StoredMatchAssessment)
-      : null,
-    createdByMatchmaker: createdByMatchmaker as Matchmaker,
+    assessment: assessment ? mapAssessment(assessment) : null,
+    matchmaker: matchmaker as Matchmaker,
     outcomes: outcomes as MatchOutcome[],
-    reviews: reviews.map((r) => ({
-      ...r,
-      decision: r.decision as MatchReview["decision"],
-      reasonCodes: safeJsonArray(r.reasonCodes),
-    })),
   };
 }
 
@@ -142,12 +149,12 @@ export const prisma = {
       dataJson: string;
     }): Promise<StoredMatchAssessment> => {
       const row = await client.matchAssessment.create({ data: args });
-      return { ...row, data: JSON.parse(row.dataJson) } as StoredMatchAssessment;
+      return mapAssessment(row);
     },
     findUnique: async (args: { where: { id: string } }) => {
       const row = await client.matchAssessment.findUnique(args);
       if (!row) return null;
-      return { ...row, data: JSON.parse(row.dataJson) } as StoredMatchAssessment;
+      return mapAssessment(row);
     },
     findLatest: async (args: {
       personAId: string;
@@ -187,7 +194,7 @@ export const prisma = {
         orderBy: { createdAt: "desc" },
       });
       if (!row) return null;
-      return { ...row, data: JSON.parse(row.dataJson) } as StoredMatchAssessment;
+      return mapAssessment(row);
     },
     findManyForPair: async (args: {
       personAId: string;
@@ -202,9 +209,7 @@ export const prisma = {
         },
         orderBy: { createdAt: "desc" },
       });
-      return rows.map(
-        (row) => ({ ...row, data: JSON.parse(row.dataJson) }) as StoredMatchAssessment,
-      );
+      return rows.map(mapAssessment);
     },
   },
   match: {
