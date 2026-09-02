@@ -1,0 +1,259 @@
+// TOIMOI matchmaking schema — Postgres via Supabase.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Person {
+  id           String   @id @default(cuid())
+  phone        String   @unique
+  firstName    String?
+  email        String?
+  photoUrl     String?
+  age          Int?
+  gender       String?
+  lookingFor   String?
+  status       String   @default("new") // new | in_progress | complete | opted_out | paused
+  currentStep  String   @default("opening")
+  branchFlags  String   @default("{}") // JSON
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  completedAt  DateTime?
+  pausedAt     DateTime?
+
+  profile          ProfileAnswers?
+  messages         Message[]
+  matchesAsA       Match[] @relation("MatchPersonA")
+  matchesAsB       Match[] @relation("MatchPersonB")
+  derivedProfiles  DerivedMatchProfile[]
+  assessmentAsA    MatchAssessment[] @relation("AssessmentPersonA")
+  assessmentAsB    MatchAssessment[] @relation("AssessmentPersonB")
+  exposures        MatchExposure[]
+  shadowEvaluations ShadowEvaluation[]
+}
+
+model ProfileAnswers {
+  id       String @id @default(cuid())
+  personId String @unique
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  location                   String?
+  grewUp                     String?
+  grewUpInfluence            String?
+  familyBackground           String?
+  momBackground              String?
+  dadBackground              String?
+  connectedSide              String?
+  datingBackgroundPreference String?
+  backgroundImportance       String?
+  backgroundWhy              String?
+  backgroundOpenToOther      String?
+  familyCloseness            String?
+  siblings                   String?
+  bringIntoMarriage          String?
+  doDifferently              String?
+  religiosity                String?
+  religiosityDirection       String?
+  partnerReligiosity         String?
+  futureHomeReligious        String?
+  synagogueYesNo             String?
+  synagogueName              String?
+  communityImportance        String?
+  studied                    String?
+  work                       String?
+  workEnjoyment              String?
+  ambition                   String?
+  partnerSuccessImportance   String?
+  successMeaning             String?
+  threeWords                 String?
+  hiddenSide                 String?
+  misunderstoodAs            String?
+  hobbies                    String?
+  socialStyle                String?
+  perfectSunday              String?
+  loveLanguageReceive        String?
+  loveLanguageGive           String?
+  connectionDrivers          String?
+  connectionFollowup         String?
+  conflictStyle              String?
+  disagreementNeeds          String?
+  datingLesson               String?
+  repeatsType                String?
+  typeInCommon               String?
+  typeGoodForThem            String?
+  availabilityFeelings       String?
+  availabilityCoachingNotes  String?
+  sparkHistory               String?
+  openWithoutFireworks       String?
+  coreEmotionalNeeds         String?
+  nonNegotiables             String?
+  nonNegotiableChallenge      String?
+  partnerQualities           String?
+  qualityDefinitions         String?
+  personalityAttracted       String?
+  personalityNotAttracted    String?
+  physicalAttracted          String?
+  physicalNotAttracted       String?
+  physicalMustOrPrefer       String?
+  familyImportance           String?
+  wantsChildren              String?
+  raisingFamily              String?
+  judaismForChildren         String?
+  fiveYearLife               String?
+  homeFeel                   String?
+  ordinaryDay                String?
+  lookingForwardMost         String?
+  bringToRelationship        String?
+  difficultAboutDatingThem   String?
+  growthEdge                 String?
+  unseenSide                 String?
+  bestFriendDescription      String?
+  mirrorReflection           String?
+  mirrorResonance            String?
+  mindsetShift               String?
+  doDifferentlyNext          String?
+  partnerAgeRange            String?
+  relocationFlexibility      String?
+  hasChildren                String?
+  openToPartnerChildren      String?
+  smokingBoundaries          String?
+  marriageTimeline           String?
+  matchmakerEligibilityNotes String?
+  profileJson                String? // overflow JSON
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  personId  String
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  direction String // inbound | outbound
+  body      String
+  twilioSid String?
+  createdAt DateTime @default(now())
+
+  @@index([personId, createdAt])
+}
+
+model Matchmaker {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  matches   Match[]
+  reviews   MatchReview[]
+}
+
+model DerivedMatchProfile {
+  id               String   @id @default(cuid())
+  personId         String
+  person           Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  profileJson      String
+  sourceHash       String
+  extractorVersion String
+  createdAt        DateTime @default(now())
+
+  @@unique([personId, sourceHash, extractorVersion])
+}
+
+model MatchAssessment {
+  id               String   @id @default(cuid())
+  personAId        String
+  personBId        String
+  personA          Person   @relation("AssessmentPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB          Person   @relation("AssessmentPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+  profileHashA     String
+  profileHashB     String
+  algorithmVersion String
+  profileVersion   String
+  dataJson         String
+  createdAt        DateTime @default(now())
+  matches          Match[]
+  reviews          MatchReview[]
+  exposures        MatchExposure[]
+
+  @@index([personAId, personBId, createdAt])
+}
+
+model Match {
+  id                    String          @id @default(cuid())
+  personAId             String
+  personBId             String
+  personA               Person          @relation("MatchPersonA", fields: [personAId], references: [id], onDelete: Cascade)
+  personB               Person          @relation("MatchPersonB", fields: [personBId], references: [id], onDelete: Cascade)
+  source                String
+  createdByMatchmakerId String
+  createdByMatchmaker   Matchmaker      @relation(fields: [createdByMatchmakerId], references: [id])
+  assessmentId          String?
+  assessment            MatchAssessment? @relation(fields: [assessmentId], references: [id])
+  status                String          @default("draft")
+  notes                 String?
+  overrideNote          String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  outcomes              MatchOutcome[]
+
+  @@index([status, updatedAt])
+  @@index([personAId, personBId])
+}
+
+model MatchReview {
+  id           String          @id @default(cuid())
+  assessmentId String
+  assessment   MatchAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  matchmakerId String
+  matchmaker   Matchmaker      @relation(fields: [matchmakerId], references: [id])
+  decision     String
+  reasonCodes  String
+  notes        String?
+  createdAt    DateTime        @default(now())
+}
+
+model MatchOutcome {
+  id              String   @id @default(cuid())
+  matchId         String
+  match           Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  stage           String
+  personAResponse String?
+  personBResponse String?
+  reasonCode      String?
+  notes           String?
+  occurredAt      DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([matchId, occurredAt])
+}
+
+model MatchExposure {
+  id           String          @id @default(cuid())
+  assessmentId String
+  assessment   MatchAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  personId     String
+  person       Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  location     String
+  createdAt    DateTime        @default(now())
+
+  @@index([personId, createdAt])
+}
+
+model ShadowEvaluation {
+  id                String   @id @default(cuid())
+  personId          String
+  person             Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  algorithmVersion   String
+  newRankingJson     String
+  legacyRankingJson  String
+  pairwiseAgreement  Float
+  falseExclusions    Int
+  createdAt          DateTime @default(now())
+
+  @@index([personId, createdAt])
+}

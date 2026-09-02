@@ -38,6 +38,9 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     orderBy: { updatedAt: "desc" },
   })) as PersonWithProfile[];
 
+  // Ensure matchmaker identities exist in Supabase
+  await prisma.ensureMatchmakers();
+
   const filtered = people.filter((p) => {
     if (params.status && p.status !== params.status) return false;
     if (params.q) {
