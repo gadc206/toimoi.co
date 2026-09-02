@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { handleInbound } from "@/lib/toimo/engine";
 import { logOutboundOnly, twimlResponse } from "@/lib/sms/send";
@@ -8,6 +8,8 @@ import { isAudioContentType } from "@/lib/whatsapp/transcribe";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
+// Run near Supabase (eu-west-1) so each database round trip is not a US→Ireland hop.
+export const preferredRegion = ["lhr1", "fra1"];
 
 function validateTwilio(req: NextRequest, params: Record<string, string>): boolean {
   if (process.env.SKIP_TWILIO_SIGNATURE === "true") return true;
@@ -69,7 +71,7 @@ export async function POST(req: NextRequest) {
   }
 
   const result = await handleInbound(phone, text, sid, photos);
-  await logOutboundOnly(result.person.id, result.outbound);
+  after(() => logOutboundOnly(result.person.id, result.outbound));
 
   return new NextResponse(twimlResponse(result.outbound), {
     status: 200,

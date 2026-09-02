@@ -91,10 +91,10 @@ async function savePerson(
 }
 
 async function saveProfile(personId: string, data: ProfileUpdateInput) {
-  await ensureProfile(personId);
-  return prisma.profileAnswers.update({
+  return prisma.profileAnswers.upsert({
     where: { personId },
-    data,
+    create: { personId, ...data },
+    update: data,
   });
 }
 
@@ -270,18 +270,20 @@ export async function handleInbound(
   }
 
   // First inbound with no prior outbound: greet, or start immediately if they already said ready/yes
-  const outboundCount = await prisma.message.count({
-    where: { personId: person.id, direction: "outbound" },
-  });
-  if (outboundCount === 0 && person.currentStep === "opening") {
-    person = await savePerson(person.id, { status: "in_progress" });
-    if (isAffirmative(text) || normalize(text) === "ready") {
-      return advance(person, "first_name", [
-        OPENING_MESSAGE,
-        "Great — let's begin.\nWhat's your first name?",
-      ]);
+  if (person.currentStep === "opening") {
+    const outboundCount = await prisma.message.count({
+      where: { personId: person.id, direction: "outbound" },
+    });
+    if (outboundCount === 0) {
+      person = await savePerson(person.id, { status: "in_progress" });
+      if (isAffirmative(text) || normalize(text) === "ready") {
+        return advance(person, "first_name", [
+          OPENING_MESSAGE,
+          "Great — let's begin.\nWhat's your first name?",
+        ]);
+      }
+      return { outbound: [OPENING_MESSAGE], person };
     }
-    return { outbound: [OPENING_MESSAGE], person };
   }
 
   return processStep(person, text, mediaUrls);
