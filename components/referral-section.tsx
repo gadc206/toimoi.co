@@ -3,12 +3,8 @@
 import { useState } from "react"
 
 import { ContactModal } from "@/components/contact-modal"
-import { CrystalBackdrop } from "@/components/crystal-backdrop"
-import { SectionEyebrow } from "@/components/section-eyebrow"
-import { SectionShell, sectionY } from "@/components/section-shell"
+import { Reveal } from "@/components/reveal"
 import { SiteButton } from "@/components/site-button"
-import { sectionSurfaceClass } from "@/lib/section-surfaces"
-import { cn } from "@/lib/utils"
 
 export function ReferralSection() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -17,37 +13,23 @@ export function ReferralSection() {
     <>
       <section
         id="referral"
-        className={cn(
-          sectionY,
-          sectionSurfaceClass("sage"),
-          "relative overflow-hidden scroll-mt-36",
-        )}
+        className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
       >
-        <CrystalBackdrop
-          src="/images/crystal-bg-1.jpg"
-          imageClassName="opacity-[0.15]"
-          overlayClassName="bg-gradient-to-b from-[oklch(0.965_0.014_155/0.9)] via-[oklch(0.965_0.014_155/0.72)] to-[oklch(0.965_0.014_155/0.9)]"
-        />
-        <SectionShell maxWidth="2xl" className="text-center">
-          <SectionEyebrow>For friends</SectionEyebrow>
-          <h2 className="mb-5 font-serif text-2xl font-light text-foreground md:text-3xl">
-            Referral privilege
+        <Reveal className="max-w-xl text-center">
+          <p className="label text-foreground/40">Referral</p>
+          <h2 className="display mt-8 text-[clamp(2.2rem,5vw,4.4rem)]">
+            Send someone.
+            <br />
+            <span className="display-italic">Get a session.</span>
           </h2>
-
-          <p className="mb-4 text-muted-foreground leading-relaxed">
-            Introduce someone to our circle, and if we begin working with them — whether as a client or through a curated introduction — you will receive a complimentary 30-minute private coaching session as our way of saying thank you.
+          <p className="mx-auto mt-8 max-w-sm text-[15px] leading-[1.85] text-foreground/55">
+            If we work with the person you refer, you receive a complimentary thirty-minute
+            guidance session.
           </p>
-
-          <p className="mb-8 font-serif italic text-foreground">
-            Because meaningful connections deserve to be celebrated.
-          </p>
-
-          <div className="flex justify-center">
-            <SiteButton variant="outline" onClick={() => setIsModalOpen(true)}>
-              Refer someone
-            </SiteButton>
+          <div className="mt-12 flex justify-center">
+            <SiteButton onClick={() => setIsModalOpen(true)}>Refer someone</SiteButton>
           </div>
-        </SectionShell>
+        </Reveal>
       </section>
 
       <ContactModal

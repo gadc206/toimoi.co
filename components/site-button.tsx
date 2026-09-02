@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -5,50 +7,23 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const siteButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 text-center text-sm font-normal tracking-widest uppercase transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "group inline-flex items-center justify-center gap-3 font-sans text-[11px] font-medium tracking-[0.24em] uppercase transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {
-        outline:
-          "min-h-[3.25rem] border border-foreground/20 bg-transparent text-foreground hover:bg-foreground hover:text-background",
-        "outline-sm":
-          "min-h-0 border border-foreground/25 bg-background/60 px-5 py-2.5 text-[10px] font-medium uppercase tracking-[0.22em] text-foreground shadow-sm backdrop-blur-sm hover:bg-foreground hover:text-background",
-        solid:
-          "min-h-[3.25rem] border border-transparent bg-foreground text-background hover:bg-foreground/90",
-        "inverse-outline":
-          "min-h-[3.25rem] border border-background/30 bg-transparent text-background hover:bg-background hover:text-foreground",
+        outline: "text-foreground",
+        "outline-sm": "text-[10px] tracking-[0.22em] text-foreground",
+        solid: "text-foreground",
+        inverse: "text-background",
+        "inverse-outline": "text-background",
         "footer-link":
-          "min-h-0 border-0 bg-transparent px-2 py-1 text-sm font-normal normal-case tracking-normal text-background/70 hover:text-background",
+          "gap-0 text-[10px] tracking-[0.2em] text-background/50 hover:text-background",
       },
       size: {
-        /** Same width class for every framed CTA */
-        cta: "w-full min-w-0 px-8 py-3.5 sm:w-auto sm:min-w-[13.5rem]",
-        /** Full-width on small screens (forms) */
-        block: "w-full min-w-0 px-8 py-3.5 sm:w-auto sm:min-w-[13.5rem]",
+        cta: "w-auto min-w-0",
+        block: "w-auto min-w-0",
       },
     },
-    compoundVariants: [
-      {
-        variant: "footer-link",
-        size: "cta",
-        className: "w-auto min-w-0 px-2 sm:min-w-0",
-      },
-      {
-        variant: "footer-link",
-        size: "block",
-        className: "w-auto min-w-0 px-2 sm:min-w-0",
-      },
-      {
-        variant: "outline-sm",
-        size: "cta",
-        className: "w-auto sm:min-w-0",
-      },
-      {
-        variant: "outline-sm",
-        size: "block",
-        className: "w-full sm:w-auto sm:min-w-0",
-      },
-    ],
     defaultVariants: {
       variant: "outline",
       size: "cta",
@@ -59,18 +34,66 @@ const siteButtonVariants = cva(
 export type SiteButtonProps = React.ComponentProps<"button"> &
   VariantProps<typeof siteButtonVariants> & {
     asChild?: boolean
+    arrow?: boolean
   }
 
 const SiteButton = React.forwardRef<HTMLButtonElement, SiteButtonProps>(
-  ({ className, variant, size, asChild = false, type, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      asChild = false,
+      type,
+      arrow,
+      children,
+      onMouseMove,
+      onMouseLeave,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : "button"
+    const showArrow = !asChild && (arrow ?? variant !== "footer-link")
+
+    const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onMouseMove?.(e)
+      if (variant === "footer-link") return
+      const el = e.currentTarget
+      const r = el.getBoundingClientRect()
+      const x = e.clientX - (r.left + r.width / 2)
+      const y = e.clientY - (r.top + r.height / 2)
+      el.style.transform = `translate(${x * 0.14}px, ${y * 0.18}px)`
+    }
+
+    const handleLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+      onMouseLeave?.(e)
+      e.currentTarget.style.transform = ""
+    }
+
+    const content = showArrow ? (
+      <>
+        <span className="underline-lux">{children}</span>
+        <span className="cta-arrow" aria-hidden>
+          →
+        </span>
+      </>
+    ) : (
+      children
+    )
+
     return (
       <Comp
         ref={ref as React.Ref<HTMLButtonElement>}
         type={asChild ? undefined : type ?? "button"}
+        data-magnetic=""
         className={cn(siteButtonVariants({ variant, size }), className)}
+        onMouseMove={handleMove}
+        onMouseLeave={handleLeave}
         {...props}
-      />
+      >
+        {content}
+      </Comp>
     )
   },
 )

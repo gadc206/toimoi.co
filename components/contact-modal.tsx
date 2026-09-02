@@ -91,29 +91,23 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-foreground/60 backdrop-blur-sm"
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+      <div
+        className="absolute inset-0 bg-foreground/40"
         onClick={handleClose}
       />
-      
-      {/* Modal */}
-      <div className="relative bg-background max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8 md:p-12 shadow-2xl">
-        {/* Close button */}
+
+      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-background px-8 py-12 sm:px-14 sm:py-16">
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
+          className="label absolute top-8 right-8 text-foreground/40 transition-colors hover:text-foreground"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
+          Close
         </button>
 
         {isSubmitted ? (
           <div className="text-center py-12">
-            <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-4">
+            <h3 className="display mb-4 text-3xl text-foreground md:text-4xl">
               Thank You
             </h3>
             <p className="text-muted-foreground mb-8">
@@ -127,7 +121,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
           </div>
         ) : (
           <>
-            <h3 className="font-serif text-2xl md:text-3xl font-light text-foreground mb-2">
+            <h3 className="display mb-2 text-3xl text-foreground md:text-4xl">
               {info.title}
             </h3>
             
@@ -228,29 +222,16 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
             ) : serviceType === "consultation" ? (
               <div className="mb-8">
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  A deeply personal one on one meeting where we take the time to truly understand who you are, your life experiences, relationship history, values, lifestyle, and what you are genuinely looking for in a partner and in life.
-                </p>
-                <p className="text-muted-foreground leading-relaxed mb-6">
-                  This is not a rushed interview or a superficial conversation. It is the foundation of our process and allows us to carefully understand your personality, emotional dynamics, communication style, and relationship goals on a much deeper level.
-                </p>
-                <p className="text-muted-foreground leading-relaxed mb-6">
-                  During this in depth session, we explore questions that help you reflect on yourself in ways you may never have before. Together, we dig deeper into what your soul truly wants, what may be holding you back, and what kind of connection would genuinely bring you peace, growth, and fulfillment.
-                </p>
-                <p className="text-muted-foreground leading-relaxed mb-6">
-                  This experience is designed to open your mind to a different level of self awareness, clarity, and emotional understanding.
+                  One hour, in person. We sit with your story and what you are looking for.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-6 italic">
-                  Each consultation lasts over an hour and is completely private, thoughtful, and approached with honesty, intuition, and without judgment.
+                  Private, unhurried, and without pressure.
                 </p>
-                <p className="text-foreground font-medium mb-6">
-                  This is where your journey begins.
-                </p>
-                
                 <p className="text-foreground leading-relaxed mb-2">
-                  To schedule your Personal Consultation, please email us at:
+                  To schedule, email:
                 </p>
-                <a 
-                  href="mailto:toimoinow@gmail.com?subject=Personal%20Consultation%20Request" 
+                <a
+                  href="mailto:toimoinow@gmail.com?subject=Personal%20Consultation%20Request"
                   className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
                 >
                   toimoinow@gmail.com
@@ -310,7 +291,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                       required
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/50 transition-colors"
+                      className="w-full border-0 border-b border-foreground/20 bg-transparent py-3 text-foreground outline-none transition-colors placeholder:text-foreground/30 focus:border-foreground"
                       placeholder="Your name"
                     />
                   </div>
@@ -324,7 +305,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                       required
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/50 transition-colors"
+                      className="w-full border-0 border-b border-foreground/20 bg-transparent py-3 text-foreground outline-none transition-colors placeholder:text-foreground/30 focus:border-foreground"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -337,7 +318,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/50 transition-colors"
+                      className="w-full border-0 border-b border-foreground/20 bg-transparent py-3 text-foreground outline-none transition-colors placeholder:text-foreground/30 focus:border-foreground"
                       placeholder="Your phone number"
                     />
                   </div>
@@ -350,7 +331,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                       rows={4}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-foreground/50 transition-colors resize-none"
+                      className="w-full resize-none border-0 border-b border-foreground/20 bg-transparent py-3 text-foreground outline-none transition-colors placeholder:text-foreground/30 focus:border-foreground"
                       placeholder="Tell us a little about yourself or what you're looking for..."
                     />
                   </div>

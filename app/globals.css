@@ -4,37 +4,46 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0.003 80);
-  --foreground: oklch(0.30 0.01 60);
-  --card: oklch(0.99 0.002 80);
-  --card-foreground: oklch(0.30 0.01 60);
-  --popover: oklch(0.99 0.002 80);
-  --popover-foreground: oklch(0.30 0.01 60);
-  --primary: oklch(0.35 0.01 60);
-  --primary-foreground: oklch(0.98 0.003 80);
-  --secondary: oklch(0.95 0.005 80);
-  --secondary-foreground: oklch(0.35 0.01 60);
-  --muted: oklch(0.93 0.006 80);
-  --muted-foreground: oklch(0.38 0.01 60);
-  --accent: oklch(0.55 0.08 155);
-  --accent-foreground: oklch(0.98 0.003 80);
+  --ivory: #f3eee6;
+  --cream: #f7f2ea;
+  --emerald: #1a3d34;
+  --emerald-deep: #102924;
+  --charcoal: #1c1916;
+  --taupe: #b7a99a;
+  --taupe-soft: #d4c8b8;
+  --ink-muted: #6b6258;
+
+  --background: #f3eee6;
+  --foreground: #1c1916;
+  --card: #f7f2ea;
+  --card-foreground: #1c1916;
+  --popover: #f7f2ea;
+  --popover-foreground: #1c1916;
+  --primary: #1a3d34;
+  --primary-foreground: #f3eee6;
+  --secondary: #e8e0d4;
+  --secondary-foreground: #1c1916;
+  --muted: #ebe4d8;
+  --muted-foreground: #6b6258;
+  --accent: #1a3d34;
+  --accent-foreground: #f3eee6;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.90 0.008 80);
-  --input: oklch(0.93 0.006 80);
-  --ring: oklch(0.55 0.08 155);
-  --gold: oklch(0.75 0.10 85);
-  --emerald: oklch(0.55 0.08 155);
-  /* Compat aliases for WhatsApp admin UI */
-  --ink: oklch(0.30 0.01 60);
-  --line: oklch(0.90 0.008 80);
-  --panel: oklch(0.99 0.002 80);
+  --border: #d4c8b8;
+  --input: #e8e0d4;
+  --ring: #1a3d34;
+  --gold: #c4b48a;
+  --sage: #e7efe8;
+  --beige: #f3eee6;
+  --ink: #1c1916;
+  --line: #d4c8b8;
+  --panel: #f7f2ea;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0rem;
+  --radius: 0.4rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -81,10 +90,10 @@
 }
 
 @theme inline {
-  /* Playfair (display) + Newsreader (body): chic editorial stack, no Arial-style generic sans */
-  --font-sans: var(--font-sans), ui-serif, Georgia, 'Times New Roman', serif;
-  --font-serif: var(--font-serif), ui-serif, Georgia, 'Times New Roman', serif;
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-bodoni), 'Bodoni Moda', 'Didot', 'Bodoni MT', serif;
+  --font-display: var(--font-bodoni), 'Bodoni Moda', 'Didot', 'Bodoni MT', serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'Cascadia Code', monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -109,6 +118,9 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-emerald: var(--emerald);
+  --color-ivory: var(--ivory);
+  --color-taupe: var(--taupe);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -127,50 +139,235 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background font-sans text-foreground antialiased;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  ::selection {
+    background: var(--emerald);
+    color: var(--ivory);
   }
 }
 
-@keyframes fadeIn {
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+html.has-custom-cursor input,
+html.has-custom-cursor textarea,
+html.has-custom-cursor select {
+  cursor: text !important;
+}
+
+.display {
+  font-family: var(--font-bodoni), 'Bodoni Moda', Didot, serif;
+  font-weight: 500;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+.display-italic {
+  font-family: var(--font-bodoni), 'Bodoni Moda', Didot, serif;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+}
+
+.label {
+  font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.nav-link {
+  font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--foreground);
+  white-space: nowrap;
+  opacity: 0.62;
+  transition:
+    opacity 0.5s ease,
+    font-style 0.5s ease;
+}
+.nav-link:hover {
+  opacity: 1;
+  font-style: italic;
+}
+
+.cta-arrow {
+  display: inline-block;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .cta-arrow {
+  transform: translateX(6px);
+}
+
+.underline-lux {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition: background-size 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.underline-lux:hover,
+.group:hover .underline-lux {
+  background-size: 100% 1px;
+}
+
+.photo-editorial {
+  filter: saturate(0.62) contrast(1.06);
+  transform: scale(1.04);
+  transition: transform 1.8s cubic-bezier(0.22, 1, 0.36, 1), filter 1.2s ease;
+}
+.group\/photo:hover .photo-editorial {
+  transform: scale(1);
+  filter: saturate(0.72) contrast(1.08);
+}
+
+.photo-mono {
+  filter: grayscale(0.85) contrast(1.08) brightness(0.96);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-clip {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(12% 8% 12% 8%);
+  transform: scale(1.1);
+  transition:
+    clip-path 1.5s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-in .reveal-clip,
+.reveal-clip.reveal-in {
+  clip-path: inset(0);
+  transform: scale(1);
+}
+
+.italic-drift {
+  display: inline-block;
+  will-change: transform;
+}
+
+.logo-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 2.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.logo-mark[data-state='apart'] .logo-ring-top {
+  transform: translateY(-18%);
+}
+.logo-mark[data-state='apart'] .logo-ring-bottom {
+  transform: translateY(18%);
+}
+.logo-mark[data-state='locked'] .logo-ring-top,
+.logo-mark[data-state='locked'] .logo-ring-bottom {
+  transform: translateY(0);
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 999px;
+  opacity: 0;
+}
+.cursor-dot.is-visible,
+.cursor-ring.is-visible {
+  opacity: 1;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--charcoal);
+}
+.cursor-ring {
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border: 1px solid var(--charcoal);
+  transition:
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+}
+.cursor-ring.is-link {
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+}
+.cursor-ring.is-image {
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  background: transparent;
+}
+.cursor-dot.is-image {
+  opacity: 0;
+}
+
+.intro-overlay {
+  background: var(--ivory);
+}
+
+@keyframes intro-fade {
   from {
-    opacity: 0;
-    transform: translateY(20px);
+    opacity: 1;
   }
   to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal,
+  .reveal-clip,
+  .logo-ring,
+  .photo-editorial,
+  .cta-arrow {
+    transition: none;
+  }
+  .reveal {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
-}
-
-@keyframes shimmer {
-  0%, 100% {
-    opacity: 0.3;
+  .reveal-clip {
+    clip-path: none;
+    transform: none;
   }
-  50% {
-    opacity: 0.6;
+  .italic-drift {
+    transform: none !important;
   }
-}
-
-.animate-fade-in {
-  animation: fadeIn 1s ease-out forwards;
-}
-
-.animate-fade-in-delay-1 {
-  animation: fadeIn 1s ease-out 0.2s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-delay-2 {
-  animation: fadeIn 1s ease-out 0.4s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-delay-3 {
-  animation: fadeIn 1s ease-out 0.6s forwards;
-  opacity: 0;
-}
-
-.animate-shimmer {
-  animation: shimmer 4s ease-in-out infinite;
 }

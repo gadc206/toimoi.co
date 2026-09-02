@@ -2,7 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
+
 import { ContactModal } from "@/components/contact-modal"
+import { LogoMark } from "@/components/logo-mark"
 import { SiteButton } from "@/components/site-button"
 
 export function Footer() {
@@ -10,35 +12,30 @@ export function Footer() {
 
   return (
     <>
-      <footer className="py-16 px-6 bg-foreground text-background">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-background/70">
-              <SiteButton
-                variant="footer-link"
-                size="cta"
-                onClick={() => setModalOpen(true)}
-              >
-                Contact Us
-              </SiteButton>
-              <SiteButton asChild variant="footer-link" size="cta">
-                <Link href="/privacy">Privacy</Link>
-              </SiteButton>
-              <SiteButton asChild variant="footer-link" size="cta">
-                <Link href="/terms">Terms</Link>
-              </SiteButton>
-            </div>
-
-            <p className="text-sm text-background/50">
-              Discreet & Confidential
-            </p>
+      <footer className="bg-background">
+        <div className="mx-auto flex max-w-[1600px] flex-col items-center gap-8 px-6 py-12 sm:px-10 lg:px-14">
+          <Link href="/" aria-label="TOIMOI home">
+            <LogoMark size="nav" />
+          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            <SiteButton
+              variant="footer-link"
+              className="text-foreground/40 hover:text-foreground"
+              onClick={() => setModalOpen(true)}
+            >
+              Contact
+            </SiteButton>
+            <SiteButton asChild variant="footer-link" className="text-foreground/40 hover:text-foreground">
+              <Link href="/privacy">Privacy</Link>
+            </SiteButton>
+            <SiteButton asChild variant="footer-link" className="text-foreground/40 hover:text-foreground">
+              <Link href="/terms">Terms</Link>
+            </SiteButton>
+            <SiteButton asChild variant="footer-link" className="text-foreground/40 hover:text-foreground">
+              <Link href="/admin">Admin</Link>
+            </SiteButton>
           </div>
-
-          <div className="mt-12 pt-8 border-t border-background/10 text-center">
-            <p className="text-xs text-background/40 tracking-widest uppercase">
-              Designed with intention
-            </p>
-          </div>
+          <p className="label text-foreground/30">© {new Date().getFullYear()} TOIMOI</p>
         </div>
       </footer>
 

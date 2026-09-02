@@ -2,58 +2,44 @@
 
 import { useState } from "react"
 
-import { ContactModal } from "@/components/contact-modal"
-import { CrystalBackdrop } from "@/components/crystal-backdrop"
-import { SectionEyebrow } from "@/components/section-eyebrow"
-import { SectionShell, sectionY } from "@/components/section-shell"
+import { GetAddedButton } from "@/components/get-added-button"
+import { LogoMark } from "@/components/logo-mark"
+import { Reveal } from "@/components/reveal"
 import { SiteButton } from "@/components/site-button"
-import { sectionSurfaceClass } from "@/lib/section-surfaces"
-import { cn } from "@/lib/utils"
+import { ContactModal } from "@/components/contact-modal"
 
 export function ClosingSection() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isConsultOpen, setIsConsultOpen] = useState(false)
 
   return (
     <>
       <section
         id="closing"
-        className={cn(
-          sectionY,
-          sectionSurfaceClass("cream"),
-          "relative overflow-hidden scroll-mt-36 md:py-32",
-        )}
+        className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
       >
-        <CrystalBackdrop
-          src="/images/crystal-bg-3.jpg"
-          imageClassName="opacity-[0.2]"
-          overlayClassName="bg-gradient-to-b from-[oklch(0.985_0.006_82/0.88)] via-[oklch(0.985_0.006_82/0.65)] to-[oklch(0.985_0.006_82/0.9)]"
-        />
-        <SectionShell maxWidth="2xl" className="text-center">
-          <SectionEyebrow>When you are ready</SectionEyebrow>
-          <p className="text-balance font-serif text-2xl font-light leading-relaxed text-foreground md:text-3xl lg:text-4xl">
-            When you feel aligned with yourself,
-            <br />
-            the right person no longer feels far.
-          </p>
-
-          <div className="mt-10 flex justify-center">
-            <SiteButton variant="solid" onClick={() => setIsModalOpen(true)}>
-              Start your journey
-            </SiteButton>
+        <Reveal className="flex flex-col items-center text-center">
+          <p className="label text-foreground/40">When you are ready</p>
+          <div className="mt-12">
+            <LogoMark size="intro" state="locked" />
           </div>
-
-          <p className="mt-12 font-serif text-lg italic text-muted-foreground">
-            Not everyone is for everyone.
+          <p className="display mt-16 max-w-xl text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.25]">
+            It only takes
             <br />
-            We are here to help you find the one who is.
+            <span className="display-italic">one person</span>
+            <br />
+            to change everything.
           </p>
-        </SectionShell>
+          <div className="mt-14 flex flex-col items-center gap-5">
+            <GetAddedButton>Begin Your Journey</GetAddedButton>
+            <SiteButton onClick={() => setIsConsultOpen(true)}>Private Consultation</SiteButton>
+          </div>
+        </Reveal>
       </section>
 
       <ContactModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        serviceType="journey"
+        isOpen={isConsultOpen}
+        onClose={() => setIsConsultOpen(false)}
+        serviceType="consultation"
       />
     </>
   )

@@ -8,6 +8,8 @@ type CrystalBackdropProps = {
   imageClassName?: string
   /** Tailwind classes for the gradient wash on top of the photo */
   overlayClassName?: string
+  /** Slow ken-burns drift. Honors prefers-reduced-motion via CSS. */
+  drift?: boolean
 }
 
 /**
@@ -18,6 +20,7 @@ export function CrystalBackdrop({
   src,
   imageClassName = "opacity-30",
   overlayClassName = "bg-gradient-to-b from-background/70 via-background/50 to-background/70",
+  drift = false,
 }: CrystalBackdropProps) {
   return (
     <div className="pointer-events-none absolute inset-0 select-none" aria-hidden>
@@ -25,7 +28,7 @@ export function CrystalBackdrop({
         src={src}
         alt=""
         fill
-        className={cn("object-cover", imageClassName)}
+        className={cn("object-cover", drift && "animate-crystal-drift", imageClassName)}
         sizes="100vw"
       />
       <div className={cn("absolute inset-0", overlayClassName)} />

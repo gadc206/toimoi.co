@@ -5,7 +5,7 @@ import { LegalPage } from "@/components/legal-page"
 export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
-    "TOIMOI Terms and Conditions — rules for using our Jewish matchmaking intake and WhatsApp messaging services.",
+    "TOIMOI Terms and Conditions: rules for using our Jewish matchmaking intake and WhatsApp messaging services.",
   alternates: {
     canonical: "https://www.toimoi.co/terms",
   },

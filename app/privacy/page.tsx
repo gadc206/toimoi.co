@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/legal-page"
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "TOIMOI Privacy Policy — how we collect, use, and protect information for Jewish matchmaking intake and WhatsApp messaging.",
+    "TOIMOI Privacy Policy: how we collect, use, and protect information for Jewish matchmaking intake and WhatsApp messaging.",
   alternates: {
     canonical: "https://www.toimoi.co/privacy",
   },

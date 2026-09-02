@@ -1,31 +1,37 @@
 import type { Metadata } from 'next'
-import { Newsreader, Playfair_Display } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Bodoni_Moda, Geist_Mono, Outfit } from 'next/font/google'
+import { CustomCursor } from '@/components/custom-cursor'
 import './globals.css'
 
-const playfair = Playfair_Display({
+const bodoni = Bodoni_Moda({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-serif',
+  variable: '--font-bodoni',
   display: 'swap',
-  adjustFontFallback: true,
+  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700'],
 })
 
-const newsreader = Newsreader({
+const outfit = Outfit({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-sans',
+  variable: '--font-outfit',
   display: 'swap',
-  adjustFontFallback: true,
+  weight: ['300', '400', '500'],
+})
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.toimoi.co'),
   title: {
-    default: 'ToiMoi | Luxury Matchmaking & Relationship Coaching in New York',
-    template: '%s | ToiMoi Matchmaking',
+    default: 'TOIMOI | Private Matchmaking & Dating Coaching in New York',
+    template: '%s | TOIMOI',
   },
-  description: 'ToiMoi is a boutique matchmaking service in New York offering personalized introductions, relationship coaching, and guidance for meaningful connections. Experience bespoke matchmaking with a deeply personal approach.',
+  description: 'TOIMOI is a private matchmaking and dating coaching house in New York. Personalized introductions and guidance for meaningful connection.',
   keywords: [
     'matchmaking',
     'matchmaker',
@@ -45,10 +51,11 @@ export const metadata: Metadata = {
     'find love',
     'meaningful connections',
     'ToiMoi',
+    'TOIMOI',
   ],
-  authors: [{ name: 'ToiMoi' }],
-  creator: 'ToiMoi',
-  publisher: 'ToiMoi',
+  authors: [{ name: 'TOIMOI' }],
+  creator: 'TOIMOI',
+  publisher: 'TOIMOI',
   formatDetection: {
     email: false,
     address: false,
@@ -58,22 +65,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://www.toimoi.co',
-    siteName: 'ToiMoi',
-    title: 'ToiMoi | Luxury Matchmaking & Relationship Coaching',
-    description: 'Boutique matchmaking service offering personalized introductions and relationship coaching. Connecting souls, one match at a time.',
+    siteName: 'TOIMOI',
+    title: 'TOIMOI | Private Matchmaking & Dating Coaching',
+    description: 'A private matchmaking and dating coaching house in New York.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'ToiMoi - Luxury Matchmaking Service',
+        alt: 'TOIMOI',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ToiMoi | Luxury Matchmaking & Relationship Coaching',
-    description: 'Boutique matchmaking service offering personalized introductions and relationship coaching in New York.',
+    title: 'TOIMOI | Private Matchmaking & Dating Coaching',
+    description: 'A private matchmaking and dating coaching house in New York.',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -95,26 +102,9 @@ export const metadata: Metadata = {
     canonical: 'https://www.toimoi.co',
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '32x32' },
-      {
-        url: '/icon-light-32x32.png',
-        type: 'image/png',
-        sizes: '32x32',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        type: 'image/png',
-        sizes: '32x32',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: '/icon.svg',
   },
 }
 
@@ -126,8 +116,8 @@ export default function RootLayout({
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
-    name: 'ToiMoi',
-    description: 'Boutique matchmaking service offering personalized introductions and relationship coaching for meaningful connections.',
+    name: 'TOIMOI',
+    description: 'Private matchmaking and dating coaching in New York.',
     url: 'https://www.toimoi.co',
     logo: 'https://www.toimoi.co/og-image.jpg',
     image: 'https://www.toimoi.co/og-image.jpg',
@@ -154,7 +144,7 @@ export default function RootLayout({
         name: 'United States',
       },
     ],
-    serviceType: ['Matchmaking', 'Relationship Coaching', 'Dating Consultation'],
+    serviceType: ['Matchmaking', 'Dating Coaching', 'Relationship Consultation'],
     priceRange: '$$$',
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
@@ -162,15 +152,11 @@ export default function RootLayout({
       opens: '09:00',
       closes: '18:00',
     },
-    sameAs: [
-      // Add your social media URLs here
-      // 'https://www.instagram.com/toimoi',
-      // 'https://www.facebook.com/toimoi',
-    ],
+    sameAs: [],
     founder: [
       {
         '@type': 'Person',
-        name: 'Noga Roth',
+        name: 'Noga Cohen',
         jobTitle: 'Co-Founder & Matchmaker',
       },
       {
@@ -182,14 +168,15 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${playfair.variable} ${newsreader.variable}`}>
+    <html lang="en" className={`${bodoni.variable} ${outfit.variable} ${geistMono.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased [font-feature-settings:'kern'_1,'liga'_1] bg-background text-foreground">
+      <body className="bg-background font-sans text-foreground antialiased">
+        <CustomCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

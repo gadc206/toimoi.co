@@ -1,46 +1,60 @@
-import Image from "next/image"
-import Link from "next/link"
+"use client"
 
-import { SiteButton } from "@/components/site-button"
+import { useEffect, useState } from "react"
+
+import { LandingJoin } from "@/components/landing-join"
+import { LogoMark } from "@/components/logo-mark"
 
 export function Hero() {
+  const [phase, setPhase] = useState<"boot" | "apart" | "lock">("boot")
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (reduce) {
+      setPhase("lock")
+      return
+    }
+
+    setPhase("apart")
+    const lock = window.setTimeout(() => setPhase("lock"), 560)
+    return () => window.clearTimeout(lock)
+  }, [])
+
+  const locked = phase === "lock"
+
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-[5.5rem] sm:pt-24 md:pt-28">
-      <div className="absolute inset-0">
-        <Image
-          src="/images/crystal-hero.jpg"
-          alt=""
-          fill
-          className="object-cover opacity-[0.52] blur-[3px]"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/32 to-background" />
+    <section className="relative flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 pb-36">
+      <p
+        className="label text-foreground/40 transition-opacity duration-1000"
+        style={{ opacity: phase === "boot" ? 0 : 1 }}
+      >
+        New York
+      </p>
+
+      <div className="mt-12">
+        <LogoMark size="intro" state={locked ? "locked" : "apart"} />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
-        <p className="animate-fade-in font-sans text-xs tracking-[0.32em] text-muted-foreground uppercase">
-          Jewish matchmaking
-        </p>
+      <p
+        className="label mt-14 text-foreground/35 transition-opacity duration-1000"
+        style={{ opacity: phase === "boot" ? 0 : 1 }}
+      >
+        Toi · Moi
+      </p>
 
-        <h1 className="animate-fade-in mt-8 text-balance font-serif text-4xl font-light leading-[1.15] text-foreground md:text-5xl lg:text-6xl">
-          Finding your soulmate should feel calm, guided, and natural.
-        </h1>
+      <ul
+        className="label mt-14 space-y-2 text-center text-foreground/40 transition-opacity duration-[1400ms]"
+        style={{ opacity: locked ? 1 : 0 }}
+      >
+        <li>Private Matchmaking</li>
+        <li>Dating Coaching</li>
+      </ul>
 
-        <p className="animate-fade-in-delay-1 mt-6 font-serif text-xl font-light italic text-muted-foreground md:text-2xl">
-          Not rushed. Not forced. Not by an algorithm.
-        </p>
-
-        <p className="animate-fade-in-delay-2 mt-8 text-base leading-relaxed text-muted-foreground md:text-lg">
-          A thoughtful, personal approach to meaningful connection.
-        </p>
-
-        <SiteButton
-          asChild
-          variant="outline"
-          className="mt-12 animate-fade-in-delay-3"
-        >
-          <Link href="#services">Begin your journey</Link>
-        </SiteButton>
+      <div
+        className="absolute inset-x-0 bottom-10 flex justify-center px-6 transition-opacity duration-[1600ms] sm:bottom-12"
+        style={{ opacity: locked ? 1 : 0, pointerEvents: locked ? "auto" : "none" }}
+      >
+        <LandingJoin />
       </div>
     </section>
   )
