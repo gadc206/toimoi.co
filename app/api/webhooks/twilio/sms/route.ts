@@ -1,15 +1,18 @@
 import { after, NextRequest, NextResponse } from "next/server";
-import twilio from "twilio";
-import { handleInbound } from "@/lib/toimo/engine";
-import { logOutboundOnly, twimlResponse } from "@/lib/sms/send";
+import { validateRequest as validateTwilioRequest } from "twilio/lib/webhooks/webhooks";
+import { handleInbound, type InboundTiming } from "@/lib/toimo/engine";
+import { logOutboundOnly } from "@/lib/sms/log";
 import { collectPhotoUrls } from "@/lib/sms/media";
+import { twimlResponse } from "@/lib/sms/twiml";
 import { toE164 } from "@/lib/whatsapp/phone";
-import { isAudioContentType } from "@/lib/whatsapp/transcribe";
+import { isAudioContentType } from "@/lib/whatsapp/media";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
-// Run near Supabase (eu-west-1) so each database round trip is not a US→Ireland hop.
-export const preferredRegion = ["lhr1", "fra1"];
+
+function milliseconds(value: number): string {
+  return value.toFixed(1);
+}
 
 function validateTwilio(req: NextRequest, params: Record<string, string>): boolean {
   if (process.env.SKIP_TWILIO_SIGNATURE === "true") return true;
@@ -23,17 +26,19 @@ function validateTwilio(req: NextRequest, params: Record<string, string>): boole
     process.env.TWILIO_WEBHOOK_URL ||
     `${process.env.PUBLIC_BASE_URL}/api/webhooks/twilio/sms`;
   return (
-    twilio.validateRequest(authToken, signature, url, params) ||
-    twilio.validateRequest(authToken, signature, legacy, params)
+    validateTwilioRequest(authToken, signature, url, params) ||
+    validateTwilioRequest(authToken, signature, legacy, params)
   );
 }
 
 export async function POST(req: NextRequest) {
+  const requestStarted = performance.now();
   const form = await req.formData();
   const params: Record<string, string> = {};
   form.forEach((value, key) => {
     params[key] = String(value);
   });
+  const parseMs = performance.now() - requestStarted;
 
   if (!validateTwilio(req, params)) {
     return new NextResponse("Invalid signature", { status: 403 });
@@ -70,11 +75,50 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const result = await handleInbound(phone, text, sid, photos);
+  let engineTiming: InboundTiming | undefined;
+  const result = await handleInbound(phone, text, sid, photos, {
+    onTiming: (timing) => {
+      engineTiming = timing;
+    },
+  });
   after(() => logOutboundOnly(result.person.id, result.outbound));
 
-  return new NextResponse(twimlResponse(result.outbound), {
+  const twimlStarted = performance.now();
+  const responseBody = twimlResponse(result.outbound);
+  const twimlMs = performance.now() - twimlStarted;
+  const totalMs = performance.now() - requestStarted;
+  const timing = engineTiming ?? {
+    personLookupMs: 0,
+    inboundSaveMs: 0,
+    answerAndStateMs: 0,
+  };
+
+  console.info("whatsapp_webhook_timing", {
+    requestId: sid || "missing",
+    region: process.env.VERCEL_REGION || "local",
+    mediaCount: media.length,
+    parseMs: Number(milliseconds(parseMs)),
+    personLookupMs: Number(milliseconds(timing.personLookupMs)),
+    inboundSaveMs: Number(milliseconds(timing.inboundSaveMs)),
+    answerAndStateMs: Number(milliseconds(timing.answerAndStateMs)),
+    twimlMs: Number(milliseconds(twimlMs)),
+    totalMs: Number(milliseconds(totalMs)),
+  });
+
+  const serverTiming = [
+    `parse;dur=${milliseconds(parseMs)}`,
+    `person-lookup;dur=${milliseconds(timing.personLookupMs)}`,
+    `inbound-save;dur=${milliseconds(timing.inboundSaveMs)}`,
+    `answer-state;dur=${milliseconds(timing.answerAndStateMs)}`,
+    `twiml;dur=${milliseconds(twimlMs)}`,
+    `total;dur=${milliseconds(totalMs)}`,
+  ].join(", ");
+
+  return new NextResponse(responseBody, {
     status: 200,
-    headers: { "Content-Type": "text/xml" },
+    headers: {
+      "Content-Type": "text/xml",
+      "Server-Timing": serverTiming,
+    },
   });
 }

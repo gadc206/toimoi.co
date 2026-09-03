@@ -3,15 +3,13 @@ import os from "os";
 import path from "path";
 import crypto from "crypto";
 import OpenAI from "openai";
+import { downloadTwilioMedia } from "@/lib/whatsapp/media";
 
-function authHeader(): HeadersInit {
-  const sid = process.env.TWILIO_ACCOUNT_SID;
-  const token = process.env.TWILIO_AUTH_TOKEN;
-  if (!sid || !token) return {};
-  return {
-    Authorization: "Basic " + Buffer.from(`${sid}:${token}`).toString("base64"),
-  };
-}
+export {
+  downloadTwilioMedia,
+  isAudioContentType,
+  isImageContentType,
+} from "@/lib/whatsapp/media";
 
 function extensionFromContentType(contentType: string | null): string {
   if (!contentType) return "ogg";
@@ -22,51 +20,6 @@ function extensionFromContentType(contentType: string | null): string {
   if (contentType.includes("webm")) return "webm";
   if (contentType.includes("amr")) return "amr";
   return "ogg";
-}
-
-async function fetchWithTimeout(
-  url: string,
-  init: RequestInit,
-  timeoutMs: number,
-): Promise<Response> {
-  const signal = AbortSignal.timeout(timeoutMs);
-  return fetch(url, { ...init, signal });
-}
-
-export async function downloadTwilioMedia(
-  mediaUrl: string,
-): Promise<{ buffer: Buffer; contentType: string | null }> {
-  const timeoutMs = 8000;
-  // Don't follow redirects automatically: Twilio sends us to S3, and forwarding
-  // Basic auth to S3 causes 403s.
-  const first = await fetchWithTimeout(
-    mediaUrl,
-    { headers: authHeader(), redirect: "manual" },
-    timeoutMs,
-  );
-
-  if (first.status >= 300 && first.status < 400) {
-    const location = first.headers.get("location");
-    if (!location) {
-      throw new Error("Failed to download media: redirect without location");
-    }
-    const second = await fetchWithTimeout(location, {}, timeoutMs);
-    if (!second.ok) {
-      throw new Error(`Failed to download media: ${second.status}`);
-    }
-    return {
-      buffer: Buffer.from(await second.arrayBuffer()),
-      contentType: second.headers.get("content-type") || first.headers.get("content-type"),
-    };
-  }
-
-  if (!first.ok) {
-    throw new Error(`Failed to download media: ${first.status}`);
-  }
-  return {
-    buffer: Buffer.from(await first.arrayBuffer()),
-    contentType: first.headers.get("content-type"),
-  };
 }
 
 /** Transcribe a WhatsApp voice note with OpenAI Whisper. */
@@ -99,29 +52,4 @@ export async function transcribeVoiceNote(
       // ignore cleanup errors
     }
   }
-}
-
-export function isAudioContentType(contentType: string | null | undefined): boolean {
-  if (!contentType) return false;
-  const t = contentType.toLowerCase();
-  if (t.startsWith("image/")) return false;
-  return (
-    t.startsWith("audio/") ||
-    t.includes("ogg") ||
-    t.includes("opus") ||
-    t.includes("amr") ||
-    t.includes("mpeg") ||
-    t.includes("mp4")
-  );
-}
-
-export function isImageContentType(contentType: string | null | undefined): boolean {
-  if (!contentType) return false;
-  const t = contentType.toLowerCase();
-  return (
-    t.startsWith("image/") ||
-    t.includes("heic") ||
-    t.includes("heif") ||
-    t === "application/octet-stream"
-  );
 }

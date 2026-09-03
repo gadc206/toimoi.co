@@ -2,7 +2,6 @@ import { prisma } from "@/lib/db";
 import type {
   Person,
   PersonUpdateInput,
-  PersonWithProfile,
   ProfileUpdateInput,
 } from "@/lib/types";
 import {
@@ -60,6 +59,13 @@ export type InboundMedia = {
 
 export type InboundMeta = {
   viaVoice?: boolean;
+  onTiming?: (timing: InboundTiming) => void;
+};
+
+export type InboundTiming = {
+  personLookupMs: number;
+  inboundSaveMs: number;
+  answerAndStateMs: number;
 };
 
 export type EngineResult = {
@@ -86,8 +92,7 @@ async function savePerson(
       ...data,
       ...(flags ? { branchFlags: JSON.stringify(flags) } : {}),
     },
-    include: { profile: true },
-  }) as Promise<PersonWithProfile>;
+  }) as Promise<Person>;
 }
 
 async function saveProfile(personId: string, data: ProfileUpdateInput) {
@@ -99,7 +104,7 @@ async function saveProfile(personId: string, data: ProfileUpdateInput) {
 }
 
 async function advance(
-  person: PersonWithProfile,
+  person: Person,
   nextStep: string,
   outbound: string[],
   flags?: BranchFlags,
@@ -122,12 +127,11 @@ function unclear(promptHint: string): string {
   return `No rush — take your time 😊 ${promptHint}`;
 }
 
-export async function getOrCreatePerson(phone: string): Promise<PersonWithProfile> {
+export async function getOrCreatePerson(phone: string): Promise<Person> {
   const normalized = toE164(phone);
-  const existing = (await prisma.person.findUnique({
+  const existing = await prisma.person.findUnique({
     where: { phone: normalized },
-    include: { profile: true },
-  })) as PersonWithProfile | null;
+  });
   if (existing) return existing;
 
   const created = await prisma.person.create({
@@ -136,13 +140,9 @@ export async function getOrCreatePerson(phone: string): Promise<PersonWithProfil
       status: "new",
       currentStep: "opening",
     },
-    include: { profile: true },
   });
   await ensureProfile(created.id);
-  return (await prisma.person.findUniqueOrThrow({
-    where: { id: created.id },
-    include: { profile: true },
-  })) as PersonWithProfile;
+  return created;
 }
 
 export function openingBodies(): string[] {
@@ -157,13 +157,16 @@ export async function handleInbound(
   meta: InboundMeta = {},
 ): Promise<EngineResult> {
   const text = body.trim();
+  const personLookupStarted = performance.now();
   let person = await getOrCreatePerson(phone);
+  const personLookupMs = performance.now() - personLookupStarted;
 
   const inboundBody =
     text ||
     (mediaUrls.length ? "[photo]" : "");
   const loggedBody = meta.viaVoice && text ? `[voice] ${text}` : inboundBody || "[empty]";
 
+  const inboundSaveStarted = performance.now();
   await prisma.message.create({
     data: {
       personId: person.id,
@@ -172,10 +175,13 @@ export async function handleInbound(
       twilioSid,
     },
   });
+  const inboundSaveMs = performance.now() - inboundSaveStarted;
 
   const command = normalize(text);
+  const answerAndStateStarted = performance.now();
 
-  if (["stop", "unsubscribe", "cancel", "end", "quit"].includes(command)) {
+  try {
+    if (["stop", "unsubscribe", "cancel", "end", "quit"].includes(command)) {
     person = await savePerson(person.id, {
       status: "opted_out",
       currentStep: "opted_out",
@@ -277,7 +283,7 @@ export async function handleInbound(
     if (outboundCount === 0) {
       person = await savePerson(person.id, { status: "in_progress" });
       if (isAffirmative(text) || normalize(text) === "ready") {
-        return advance(person, "first_name", [
+        return await advance(person, "first_name", [
           OPENING_MESSAGE,
           "Great — let's begin.\nWhat's your first name?",
         ]);
@@ -286,10 +292,17 @@ export async function handleInbound(
     }
   }
 
-  return processStep(person, text, mediaUrls);
+    return await processStep(person, text, mediaUrls);
+  } finally {
+    meta.onTiming?.({
+      personLookupMs,
+      inboundSaveMs,
+      answerAndStateMs: performance.now() - answerAndStateStarted,
+    });
+  }
 }
 
-async function promptForStep(step: string, person: PersonWithProfile): Promise<string[]> {
+async function promptForStep(step: string, person: Person): Promise<string[]> {
   const flags = parseBranchFlags(person.branchFlags);
   switch (step) {
     case "opening":
@@ -547,7 +560,7 @@ async function promptForStep(step: string, person: PersonWithProfile): Promise<s
 }
 
 async function processStep(
-  person: PersonWithProfile,
+  person: Person,
   text: string,
   mediaUrls: string[] = [],
 ): Promise<EngineResult> {
@@ -1236,7 +1249,7 @@ async function processStep(
 }
 
 async function maybeAvailabilityOrSparkOrNeeds(
-  person: PersonWithProfile,
+  person: Person,
   flags: BranchFlags,
 ): Promise<EngineResult> {
   // Only enter availability coaching when their answers suggest unavailable/chase patterns
@@ -1252,7 +1265,7 @@ async function maybeAvailabilityOrSparkOrNeeds(
 }
 
 async function maybeSparkOrNeeds(
-  person: PersonWithProfile,
+  person: Person,
   flags: BranchFlags,
 ): Promise<EngineResult> {
   if (flags.needsSpark) {

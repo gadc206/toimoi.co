@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { put } from "@vercel/blob";
-import { downloadTwilioMedia, isAudioContentType, isImageContentType } from "@/lib/whatsapp/transcribe";
+import {
+  downloadTwilioMedia,
+  isAudioContentType,
+  isImageContentType,
+} from "@/lib/whatsapp/media";
 
 function extensionFromContentType(contentType: string | null): string {
   if (!contentType) return "jpg";

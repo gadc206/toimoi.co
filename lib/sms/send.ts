@@ -10,23 +10,6 @@ function getClient() {
   return twilio(sid, token);
 }
 
-/** TwiML reply for WhatsApp inbound webhooks (same Message verbs). */
-export function twimlResponse(messages: string[]): string {
-  const parts = messages.flatMap((m) => splitSms(m));
-  const escaped = parts
-    .map((body) => {
-      const safe = body
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
-      return `<Message>${safe}</Message>`;
-    })
-    .join("");
-  return `<?xml version="1.0" encoding="UTF-8"?><Response>${escaped}</Response>`;
-}
-
 export async function sendWhatsAppAndLog(personId: string, to: string, bodies: string[]) {
   const from = twilioWhatsAppFrom();
   const client = getClient();
@@ -58,13 +41,3 @@ export async function sendWhatsAppAndLog(personId: string, to: string, bodies: s
 
 /** @deprecated use sendWhatsAppAndLog — kept as alias during WhatsApp-only migration */
 export const sendSmsAndLog = sendWhatsAppAndLog;
-
-export async function logOutboundOnly(personId: string, bodies: string[]) {
-  const chunks = bodies.flatMap((b) => splitSms(b));
-  for (const body of chunks) {
-    await prisma.message.create({
-      data: { personId, direction: "outbound", body },
-    });
-  }
-  return chunks;
-}
