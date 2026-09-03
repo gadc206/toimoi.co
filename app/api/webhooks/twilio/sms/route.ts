@@ -15,7 +15,12 @@ function milliseconds(value: number): string {
 }
 
 function validateTwilio(req: NextRequest, params: Record<string, string>): boolean {
-  if (process.env.SKIP_TWILIO_SIGNATURE === "true") return true;
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.SKIP_TWILIO_SIGNATURE === "true"
+  ) {
+    return true;
+  }
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   if (!authToken) return false;
   const signature = req.headers.get("x-twilio-signature") || "";
