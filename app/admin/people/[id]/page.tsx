@@ -4,6 +4,7 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { suggestMatches } from "@/lib/matching";
 import { NudgeButton } from "@/app/admin/people/[id]/NudgeButton";
+import { DeletePersonButton } from "@/app/admin/DeletePersonButton";
 import { SuggestionReview } from "@/app/admin/people/[id]/SuggestionReview";
 import { MatchingDetailsEditor } from "@/app/admin/people/[id]/MatchingDetailsEditor";
 import type { Matchmaker, PersonWithDetails } from "@/lib/types";
@@ -113,8 +114,9 @@ export default async function PersonDetailPage({
               {person.status} · {person.currentStep}
             </p>
           </div>
-          <div className="mt-4">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
             <NudgeButton personId={person.id} />
+            <DeletePersonButton personId={person.id} name={person.firstName} compact />
           </div>
         </div>
       </section>
