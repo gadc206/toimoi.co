@@ -14,6 +14,29 @@ function milliseconds(value: number): string {
   return value.toFixed(1);
 }
 
+function webhookUrls(req: NextRequest): string[] {
+  const configured = process.env.TWILIO_WEBHOOK_URL;
+  const baseUrl = process.env.PUBLIC_BASE_URL?.replace(/\/$/, "");
+  const path = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const host = forwardedHost || req.headers.get("host");
+  const forwardedProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const protocol = forwardedProto || req.nextUrl.protocol.replace(":", "") || "https";
+
+  return Array.from(
+    new Set(
+      [
+        configured,
+        req.url,
+        host ? `${protocol}://${host}${path}` : undefined,
+        baseUrl ? `${baseUrl}${path}` : undefined,
+        baseUrl ? `${baseUrl}/api/webhooks/twilio/whatsapp` : undefined,
+        baseUrl ? `${baseUrl}/api/webhooks/twilio/sms` : undefined,
+      ].filter((url): url is string => Boolean(url)),
+    ),
+  );
+}
+
 function validateTwilio(req: NextRequest, params: Record<string, string>): boolean {
   if (
     process.env.NODE_ENV !== "production" &&
@@ -24,15 +47,8 @@ function validateTwilio(req: NextRequest, params: Record<string, string>): boole
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   if (!authToken) return false;
   const signature = req.headers.get("x-twilio-signature") || "";
-  const url =
-    process.env.TWILIO_WEBHOOK_URL ||
-    `${process.env.PUBLIC_BASE_URL}/api/webhooks/twilio/whatsapp`;
-  const legacy =
-    process.env.TWILIO_WEBHOOK_URL ||
-    `${process.env.PUBLIC_BASE_URL}/api/webhooks/twilio/sms`;
-  return (
-    validateTwilioRequest(authToken, signature, url, params) ||
-    validateTwilioRequest(authToken, signature, legacy, params)
+  return webhookUrls(req).some((url) =>
+    validateTwilioRequest(authToken, signature, url, params),
   );
 }
 
@@ -46,6 +62,12 @@ export async function POST(req: NextRequest) {
   const parseMs = performance.now() - requestStarted;
 
   if (!validateTwilio(req, params)) {
+    console.warn("twilio_webhook_signature_rejected", {
+      requestId: params.MessageSid || "missing",
+      region: process.env.VERCEL_REGION || "local",
+      host: req.headers.get("x-forwarded-host") || req.headers.get("host") || "missing",
+      path: req.nextUrl.pathname,
+    });
     return new NextResponse("Invalid signature", { status: 403 });
   }
 
