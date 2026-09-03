@@ -229,7 +229,7 @@ export async function handleInbound(
 
     if (["restart", "start over", "reset"].includes(command)) {
       person = await resetPerson(person.id);
-      return { outbound: ["Fresh start ❤️", ...openingBodies()], person };
+      return { outbound: openingBodies(), person };
     }
 
     if (
@@ -273,7 +273,7 @@ export async function handleInbound(
     }
 
     if (person.currentStep === "opening") {
-      return advance(person, "full_name", [EASY_PART, question("full_name")]);
+      return advance(person, "full_name", openingBodies());
     }
 
     return await processStep(person, text, mediaUrls);

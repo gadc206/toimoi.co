@@ -2,6 +2,7 @@ import { after, NextRequest, NextResponse } from "next/server";
 import { validateRequest as validateTwilioRequest } from "twilio/lib/webhooks/webhooks";
 import { handleInbound, type InboundTiming } from "@/lib/toimo/engine";
 import { logOutboundOnly } from "@/lib/sms/log";
+import { sendWhatsAppAndLog } from "@/lib/sms/send";
 import { collectPhotoUrls } from "@/lib/sms/media";
 import { twimlResponse } from "@/lib/sms/twiml";
 import { toE164 } from "@/lib/whatsapp/phone";
@@ -108,10 +109,20 @@ export async function POST(req: NextRequest) {
       engineTiming = timing;
     },
   });
-  after(() => logOutboundOnly(result.person.id, result.outbound));
+  const outbound = result.outbound.filter((body) => body.trim().length > 0);
+  const [firstOutbound, ...restOutbound] = outbound;
+
+  if (restOutbound.length > 0) {
+    after(async () => {
+      await logOutboundOnly(result.person.id, [firstOutbound]);
+      await sendWhatsAppAndLog(result.person.id, phone, restOutbound);
+    });
+  } else {
+    after(() => logOutboundOnly(result.person.id, outbound));
+  }
 
   const twimlStarted = performance.now();
-  const responseBody = twimlResponse(result.outbound);
+  const responseBody = twimlResponse(firstOutbound ? [firstOutbound] : []);
   const twimlMs = performance.now() - twimlStarted;
   const totalMs = performance.now() - requestStarted;
   const timing = engineTiming ?? {
