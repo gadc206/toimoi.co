@@ -2,6 +2,7 @@ export type Person = {
   id: string;
   phone: string;
   firstName: string | null;
+  dateOfBirth: string | null;
   email: string | null;
   photoUrl: string | null;
   age: number | null;
@@ -20,6 +21,7 @@ export type ProfileAnswers = {
   id: string;
   personId: string;
   location: string | null;
+  everydayLife: string | null;
   grewUp: string | null;
   grewUpInfluence: string | null;
   familyBackground: string | null;
@@ -48,6 +50,7 @@ export type ProfileAnswers = {
   partnerSuccessImportance: string | null;
   successMeaning: string | null;
   threeWords: string | null;
+  selfDescription: string | null;
   hiddenSide: string | null;
   misunderstoodAs: string | null;
   hobbies: string | null;
@@ -75,6 +78,7 @@ export type ProfileAnswers = {
   personalityAttracted: string | null;
   personalityNotAttracted: string | null;
   physicalAttracted: string | null;
+  attractionMeaning: string | null;
   physicalNotAttracted: string | null;
   physicalMustOrPrefer: string | null;
   familyImportance: string | null;
@@ -94,6 +98,7 @@ export type ProfileAnswers = {
   mirrorResonance: string | null;
   mindsetShift: string | null;
   doDifferentlyNext: string | null;
+  readiness: string | null;
   partnerAgeRange: string | null;
   relocationFlexibility: string | null;
   hasChildren: string | null;

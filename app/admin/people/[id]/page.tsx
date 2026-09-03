@@ -90,7 +90,7 @@ export default async function PersonDetailPage({
             {person.age ? `, ${person.age}` : ""}
           </h1>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            {[person.gender, person.lookingFor ? `looking for ${person.lookingFor}` : null]
+            {[person.gender, person.dateOfBirth ? `born ${person.dateOfBirth}` : null]
               .filter(Boolean)
               .join(" · ")}
           </p>
@@ -121,12 +121,43 @@ export default async function PersonDetailPage({
 
       <div className="mt-4 space-y-3">
         <Section title="Basics" highlight>
-          <Field label="Location" value={p?.location} />
-          <Field label="Grew up" value={p?.grewUp} />
-          <Field label="Religiosity" value={p?.religiosity} />
-          <Field label="Synagogue" value={p?.synagogueName} />
-          <Field label="Work" value={p?.work} />
-          <Field label="Wants children" value={p?.wantsChildren} />
+          <Field label="1. Full name" value={person.firstName} />
+          <Field label="2. Date of birth" value={person.dateOfBirth} />
+          <Field label="Age" value={person.age} />
+          <Field label="3. Gender" value={person.gender} />
+          <Field label="4. Email" value={person.email} />
+          <Field label="5. Partner age range" value={p?.partnerAgeRange} />
+        </Section>
+
+        <Section title="Questions 6-15" highlight>
+          <Field
+            label="6. Where they live, everyday life, and relocating"
+            value={p?.everydayLife}
+          />
+          <Field label="7. Religiously today" value={p?.religiosity} />
+          <Field
+            label="8. What they want religiously in a partner"
+            value={p?.partnerReligiosity}
+          />
+          <Field
+            label="9. How they want to be understood"
+            value={p?.selfDescription}
+          />
+          <Field
+            label="10. Three most important things in the person they marry"
+            value={p?.partnerQualities}
+          />
+          <Field label="11. Cannot compromise on" value={p?.nonNegotiables} />
+          <Field
+            label="12. What dating taught them"
+            value={p?.datingLesson}
+          />
+          <Field label="13. What attraction means" value={p?.attractionMeaning} />
+          <Field
+            label="14. Marriage and home in 5 years"
+            value={p?.fiveYearLife}
+          />
+          <Field label="15. What being ready means" value={p?.readiness} />
         </Section>
 
         <Section title="Background & family">

@@ -49,9 +49,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         p.firstName,
         p.email,
         p.phone,
+        p.profile?.everydayLife,
         p.profile?.location,
-        p.profile?.synagogueName,
-        p.profile?.work,
         p.profile?.religiosity,
       ]
         .filter(Boolean)
@@ -159,7 +158,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                 </span>
               </div>
               <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
-                {[p.profile?.location, p.profile?.religiosity, p.profile?.work]
+                {[p.profile?.everydayLife, p.profile?.religiosity]
                   .filter(Boolean)
                   .join(" · ") || p.phone}
               </p>

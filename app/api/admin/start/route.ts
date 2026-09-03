@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     where: { id: person.id },
     data: {
       status: person.status === "complete" ? person.status : "in_progress",
-      currentStep: person.status === "complete" ? person.currentStep : "opening",
+      currentStep: person.status === "complete" ? person.currentStep : "full_name",
     },
   });
 

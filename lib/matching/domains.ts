@@ -29,6 +29,7 @@ const SELF_FIELDS = new Set([
   "bringIntoMarriage",
   "doDifferently",
   "threeWords",
+  "selfDescription",
   "hiddenSide",
   "hobbies",
   "socialStyle",
@@ -42,6 +43,8 @@ const SELF_FIELDS = new Set([
   "raisingFamily",
   "judaismForChildren",
   "fiveYearLife",
+  "everydayLife",
+  "readiness",
   "homeFeel",
   "ordinaryDay",
   "bringToRelationship",
@@ -62,6 +65,7 @@ const SEEK_FIELDS = new Set([
   "qualityDefinitions",
   "personalityAttracted",
   "personalityNotAttracted",
+  "attractionMeaning",
 ]);
 
 function evidence(personId: string, signal: ProfileSignal): EvidenceRef {

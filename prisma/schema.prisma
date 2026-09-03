@@ -15,6 +15,7 @@ model Person {
   id           String   @id @default(cuid())
   phone        String   @unique
   firstName    String?
+  dateOfBirth  String?
   email        String?
   photoUrl     String?
   age          Int?
@@ -45,6 +46,7 @@ model ProfileAnswers {
   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   location                   String?
+  everydayLife               String?
   grewUp                     String?
   grewUpInfluence            String?
   familyBackground           String?
@@ -73,6 +75,7 @@ model ProfileAnswers {
   partnerSuccessImportance   String?
   successMeaning             String?
   threeWords                 String?
+  selfDescription            String?
   hiddenSide                 String?
   misunderstoodAs            String?
   hobbies                    String?
@@ -100,6 +103,7 @@ model ProfileAnswers {
   personalityAttracted       String?
   personalityNotAttracted    String?
   physicalAttracted          String?
+  attractionMeaning          String?
   physicalNotAttracted       String?
   physicalMustOrPrefer       String?
   familyImportance           String?
@@ -119,6 +123,7 @@ model ProfileAnswers {
   mirrorResonance            String?
   mindsetShift               String?
   doDifferentlyNext          String?
+  readiness                  String?
   partnerAgeRange            String?
   relocationFlexibility      String?
   hasChildren                String?

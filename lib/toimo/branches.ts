@@ -31,6 +31,109 @@ export function parseAge(text: string): number | null {
   return age;
 }
 
+const MONTHS: Record<string, number> = {
+  january: 0,
+  jan: 0,
+  february: 1,
+  feb: 1,
+  march: 2,
+  mar: 2,
+  april: 3,
+  apr: 3,
+  may: 4,
+  june: 5,
+  jun: 5,
+  july: 6,
+  jul: 6,
+  august: 7,
+  aug: 7,
+  september: 8,
+  sept: 8,
+  sep: 8,
+  october: 9,
+  oct: 9,
+  november: 10,
+  nov: 10,
+  december: 11,
+  dec: 11,
+};
+
+function ageFromUtc(year: number, monthIndex: number, day: number): number {
+  const today = new Date();
+  let age = today.getUTCFullYear() - year;
+  const month = today.getUTCMonth() - monthIndex;
+  if (month < 0 || (month === 0 && today.getUTCDate() < day)) age -= 1;
+  return age;
+}
+
+function validDob(year: number, monthIndex: number, day: number): { iso: string; age: number } | null {
+  if (monthIndex < 0 || monthIndex > 11 || day < 1 || day > 31) return null;
+  const utc = Date.UTC(year, monthIndex, day);
+  const d = new Date(utc);
+  if (d.getUTCFullYear() !== year || d.getUTCMonth() !== monthIndex || d.getUTCDate() !== day) {
+    return null;
+  }
+  const age = ageFromUtc(year, monthIndex, day);
+  if (age < 18 || age > 99) return null;
+  return {
+    iso: `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+    age,
+  };
+}
+
+export function parseDateOfBirth(text: string): { iso: string; age: number } | null {
+  const raw = text.trim();
+  if (!raw) return null;
+
+  const iso = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (iso) {
+    return validDob(Number(iso[1]), Number(iso[2]) - 1, Number(iso[3]));
+  }
+
+  const namedFirst = raw.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})$/);
+  if (namedFirst) {
+    const monthIndex = MONTHS[namedFirst[1].toLowerCase()];
+    if (monthIndex != null) return validDob(Number(namedFirst[3]), monthIndex, Number(namedFirst[2]));
+  }
+
+  const namedSecond = raw.match(/^(\d{1,2})\s+([A-Za-z]+),?\s+(\d{4})$/);
+  if (namedSecond) {
+    const monthIndex = MONTHS[namedSecond[2].toLowerCase()];
+    if (monthIndex != null) return validDob(Number(namedSecond[3]), monthIndex, Number(namedSecond[1]));
+  }
+
+  const numeric = raw.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})$/);
+  if (numeric) {
+    let year = Number(numeric[3]);
+    if (year < 100) year += year >= 30 ? 1900 : 2000;
+    const first = Number(numeric[1]);
+    const second = Number(numeric[2]);
+    if (first > 12) return validDob(year, second - 1, first);
+    if (second > 12) return validDob(year, first - 1, second);
+    return validDob(year, first - 1, second);
+  }
+
+  return null;
+}
+
+export function inferLookingFor(gender: string): string | null {
+  const text = normalize(gender);
+  if (
+    text === "f" ||
+    text === "w" ||
+    text.includes("woman") ||
+    text.includes("female") ||
+    text.includes("girl")
+  ) {
+    return "Men";
+  }
+  if (text === "m" || text.includes("male") || text === "man" || text.includes("guy")) {
+    return "Women";
+  }
+  if (text.includes("man") && !text.includes("woman")) return "Women";
+  return null;
+}
+
 export function locationsSeemDifferent(live: string, grewUp: string): boolean {
   const a = normalize(live);
   const b = normalize(grewUp);

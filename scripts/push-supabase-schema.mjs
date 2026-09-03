@@ -33,6 +33,7 @@ if (!url) {
 
 const profileColumns = [
   "location",
+  "everydayLife",
   "grewUp",
   "grewUpInfluence",
   "familyBackground",
@@ -61,6 +62,7 @@ const profileColumns = [
   "partnerSuccessImportance",
   "successMeaning",
   "threeWords",
+  "selfDescription",
   "hiddenSide",
   "misunderstoodAs",
   "hobbies",
@@ -88,6 +90,7 @@ const profileColumns = [
   "personalityAttracted",
   "personalityNotAttracted",
   "physicalAttracted",
+  "attractionMeaning",
   "physicalNotAttracted",
   "physicalMustOrPrefer",
   "familyImportance",
@@ -107,6 +110,7 @@ const profileColumns = [
   "mirrorResonance",
   "mindsetShift",
   "doDifferentlyNext",
+  "readiness",
   "partnerAgeRange",
   "relocationFlexibility",
   "hasChildren",
@@ -124,6 +128,7 @@ CREATE TABLE IF NOT EXISTS "Person" (
   "id" TEXT PRIMARY KEY,
   "phone" TEXT NOT NULL UNIQUE,
   "firstName" TEXT,
+  "dateOfBirth" TEXT,
   "email" TEXT,
   "photoUrl" TEXT,
   "age" INTEGER,
@@ -252,6 +257,12 @@ VALUES
   ('seed_vanessa', 'Vanessa', CURRENT_TIMESTAMP),
   ('seed_noga', 'Noga', CURRENT_TIMESTAMP)
 ON CONFLICT ("name") DO NOTHING;
+
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "dateOfBirth" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "everydayLife" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "selfDescription" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "attractionMeaning" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "readiness" TEXT;
 `;
 
 const client = new pg.Client({
