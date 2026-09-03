@@ -165,7 +165,7 @@ html.has-custom-cursor select {
 
 .display {
   font-family: var(--font-bodoni), 'Bodoni Moda', Didot, serif;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 0.92;
   letter-spacing: -0.02em;
 }
@@ -173,28 +173,28 @@ html.has-custom-cursor select {
 .display-italic {
   font-family: var(--font-bodoni), 'Bodoni Moda', Didot, serif;
   font-style: italic;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 0.86;
   letter-spacing: -0.03em;
 }
 
 .label {
   font-family: var(--font-outfit), ui-sans-serif, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.28em;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .nav-link {
   font-family: var(--font-outfit), ui-sans-serif, sans-serif;
-  font-size: 0.6875rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--foreground);
   white-space: nowrap;
-  opacity: 0.62;
+  opacity: 0.72;
   transition:
     opacity 0.5s ease,
     font-style 0.5s ease;
@@ -222,6 +222,83 @@ html.has-custom-cursor select {
 .underline-lux:hover,
 .group:hover .underline-lux {
   background-size: 100% 1px;
+}
+
+.btn-lux {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 3.85rem;
+  width: min(100%, 24rem);
+  padding: 1.15rem 2.15rem;
+  border: 1px solid color-mix(in srgb, var(--charcoal) 30%, transparent);
+  font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--charcoal);
+  touch-action: manipulation;
+  transition:
+    color 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-lux::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--charcoal);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-lux:hover,
+.btn-lux:focus-visible {
+  color: var(--ivory);
+  border-color: var(--charcoal);
+}
+.btn-lux:hover::before,
+.btn-lux:focus-visible::before {
+  transform: scaleY(1);
+}
+.btn-lux:active {
+  color: var(--ivory);
+  border-color: var(--charcoal);
+}
+.btn-lux:active::before {
+  transform: scaleY(1);
+}
+
+@media (hover: none) {
+  .btn-lux:hover {
+    color: var(--charcoal);
+    border-color: color-mix(in srgb, var(--charcoal) 30%, transparent);
+  }
+  .btn-lux:hover::before {
+    transform: scaleY(0);
+  }
+  .btn-lux:active {
+    color: var(--ivory);
+    border-color: var(--charcoal);
+  }
+  .btn-lux:active::before {
+    transform: scaleY(1);
+  }
+}
+
+@media (max-width: 380px) {
+  .btn-lux {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    padding: 1.05rem 1.2rem;
+  }
 }
 
 .photo-editorial {
@@ -356,7 +433,9 @@ html.has-custom-cursor select {
   .reveal-clip,
   .logo-ring,
   .photo-editorial,
-  .cta-arrow {
+  .cta-arrow,
+  .btn-lux,
+  .btn-lux::before {
     transition: none;
   }
   .reveal {

@@ -25,7 +25,7 @@ export function Hero() {
   return (
     <section className="relative flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 pb-36">
       <p
-        className="label text-foreground/40 transition-opacity duration-1000"
+        className="label text-foreground/55 transition-opacity duration-1000"
         style={{ opacity: phase === "boot" ? 0 : 1 }}
       >
         New York
@@ -36,14 +36,14 @@ export function Hero() {
       </div>
 
       <p
-        className="label mt-14 text-foreground/35 transition-opacity duration-1000"
+        className="label mt-14 text-foreground/50 transition-opacity duration-1000"
         style={{ opacity: phase === "boot" ? 0 : 1 }}
       >
         Toi · Moi
       </p>
 
       <ul
-        className="label mt-14 space-y-2 text-center text-foreground/40 transition-opacity duration-[1400ms]"
+        className="label mt-14 space-y-2 text-center text-foreground/50 transition-opacity duration-[1400ms]"
         style={{ opacity: locked ? 1 : 0 }}
       >
         <li>Private Matchmaking</li>

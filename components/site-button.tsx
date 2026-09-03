@@ -7,7 +7,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const siteButtonVariants = cva(
-  "group inline-flex items-center justify-center gap-3 font-sans text-[11px] font-medium tracking-[0.24em] uppercase transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 disabled:pointer-events-none disabled:opacity-40",
+  "group inline-flex items-center justify-center gap-3 font-sans text-[13px] font-medium tracking-[0.22em] uppercase transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground/30 disabled:pointer-events-none disabled:opacity-40",
   {
     variants: {
       variant: {

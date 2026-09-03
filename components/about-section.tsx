@@ -10,13 +10,13 @@ export function AboutSection() {
       className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
     >
       <Reveal className="max-w-xl text-center">
-        <p className="label text-foreground/40">The house</p>
-        <h2 className="display mt-8 text-[clamp(2.2rem,5vw,4.4rem)]">
+        <p className="label text-foreground/50">The house</p>
+        <h2 className="display mt-8 text-[clamp(2.5rem,5.6vw,5rem)]">
           Noga Cohen
           <br />
           <span className="display-italic">&amp; Vanessa Gad</span>
         </h2>
-        <p className="mx-auto mt-8 max-w-md text-[15px] leading-[1.85] text-foreground/55">
+        <p className="mx-auto mt-8 max-w-md text-[17px] leading-[1.85] text-foreground/65">
           They run TOIMOI in New York. You answer in conversation. Matching is chosen from those
           answers, not a profile you swipe past.
         </p>
@@ -36,7 +36,7 @@ export function AboutSection() {
               className="object-cover object-top"
             />
           </div>
-          <p className="label mt-6 text-foreground/40">Co-founder</p>
+          <p className="label mt-6 text-foreground/50">Co-founder</p>
           <h3 className="display mt-2 text-2xl sm:text-3xl">Noga Cohen</h3>
           <div className="mt-5 w-full text-left">
             <FounderBio>
@@ -75,7 +75,7 @@ export function AboutSection() {
               className="object-cover object-[center_20%]"
             />
           </div>
-          <p className="label mt-6 text-foreground/40">Co-founder</p>
+          <p className="label mt-6 text-foreground/50">Co-founder</p>
           <h3 className="display mt-2 text-2xl sm:text-3xl">Vanessa Gad</h3>
           <div className="mt-5 w-full text-left">
             <FounderBio>

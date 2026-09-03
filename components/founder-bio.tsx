@@ -15,7 +15,7 @@ export function FounderBio({ children }: FounderBioProps) {
     <div>
       <div
         className={cn(
-          "relative space-y-5 text-[15px] leading-[1.85] text-foreground/55",
+          "relative space-y-5 text-[16px] leading-[1.85] text-foreground/65",
           !open && "max-h-24 overflow-hidden",
         )}
       >

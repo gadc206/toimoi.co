@@ -29,7 +29,7 @@ export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
         aria-label="Close"
         onClick={onClose}
       />
-      <div className="relative z-10 w-full max-w-2xl bg-background px-8 py-12 sm:px-14 sm:py-16">
+      <div className="relative z-10 w-full max-w-xl bg-background px-8 py-12 sm:px-14 sm:py-16">
         <button
           type="button"
           onClick={onClose}
@@ -42,8 +42,8 @@ export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
         <h2 className="display mt-4 pr-12 text-4xl text-foreground sm:text-5xl">
           Join our database
         </h2>
-        <p className="mt-5 max-w-lg text-[15px] leading-[1.8] text-foreground/60">
-          Choose how you are joining. We will continue with you on WhatsApp.
+        <p className="mt-5 max-w-lg text-[16px] leading-[1.8] text-foreground/65">
+          We will continue with you on WhatsApp.
         </p>
 
         <div className="mt-10">

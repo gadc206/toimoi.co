@@ -18,11 +18,11 @@ export function ClosingSection() {
         className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
       >
         <Reveal className="flex flex-col items-center text-center">
-          <p className="label text-foreground/40">When you are ready</p>
+          <p className="label text-foreground/50">When you are ready</p>
           <div className="mt-12">
             <LogoMark size="intro" state="locked" />
           </div>
-          <p className="display mt-16 max-w-xl text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.25]">
+          <p className="display mt-16 max-w-xl text-[clamp(2rem,4vw,3.2rem)] leading-[1.25]">
             It only takes
             <br />
             <span className="display-italic">one person</span>

@@ -18,7 +18,7 @@ const offerings = [
     key: "consultation" as const,
     title: "Personal Consultation",
     body: "One hour, in person.",
-    price: "$350",
+    price: "$360",
     cta: "Begin",
   },
   {
@@ -51,16 +51,16 @@ export function ServicesSection() {
       >
         <div id="services" className="sr-only" />
         <Reveal className="text-center">
-          <p className="label text-foreground/40">Offerings</p>
+          <p className="label text-foreground/50">Offerings</p>
         </Reveal>
 
         <div className="mt-20 w-full max-w-md">
           {offerings.map((item, i) => (
             <Reveal key={item.key} delay={i * 80}>
               <div className="border-t border-foreground/10 py-10 text-center">
-                <h3 className="display text-3xl md:text-4xl">{item.title}</h3>
-                <p className="mt-3 text-[15px] leading-[1.85] text-foreground/55">{item.body}</p>
-                <p className="label mt-5 text-foreground/35">{item.price}</p>
+                <h3 className="display text-4xl md:text-5xl">{item.title}</h3>
+                <p className="mt-3 text-[17px] leading-[1.85] text-foreground/65">{item.body}</p>
+                <p className="label mt-5 text-foreground/50">{item.price}</p>
                 <div className="mt-6 flex justify-center">
                   <SiteButton onClick={() => openModal(item.key)}>{item.cta}</SiteButton>
                 </div>
@@ -70,10 +70,10 @@ export function ServicesSection() {
 
           <Reveal delay={240}>
             <div className="border-y border-foreground/10 py-10 text-center">
-              <h3 className="display text-3xl md:text-4xl">
+              <h3 className="display text-4xl md:text-5xl">
                 The Signature <span className="display-italic">Experience</span>
               </h3>
-              <p className="mx-auto mt-3 max-w-sm text-[15px] leading-[1.85] text-foreground/55">
+              <p className="mx-auto mt-3 max-w-sm text-[17px] leading-[1.85] text-foreground/65">
                 Six months. Invitation only. Price after consultation.
               </p>
               <div className="mt-6 flex justify-center">

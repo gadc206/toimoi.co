@@ -26,8 +26,8 @@ export function HowItWorks() {
     >
       <div id="join" className="sr-only" />
       <Reveal className="w-full max-w-xl text-center">
-        <p className="label text-foreground/40">The approach</p>
-        <h2 className="display mt-8 text-[clamp(2rem,4.5vw,3.8rem)]">
+        <p className="label text-foreground/50">The approach</p>
+        <h2 className="display mt-8 text-[clamp(2.3rem,5vw,4.4rem)]">
           A different kind of matching.
         </h2>
       </Reveal>
@@ -35,9 +35,9 @@ export function HowItWorks() {
       <div className="mt-24 flex w-full max-w-xl flex-col gap-16">
         {steps.map((step, i) => (
           <Reveal key={step.n} delay={i * 90} className="text-center">
-            <p className="label text-foreground/35">{step.n}</p>
-            <h3 className="display mt-4 text-3xl md:text-4xl">{step.title}</h3>
-            <p className="mx-auto mt-4 max-w-sm text-[15px] leading-[1.85] text-foreground/55">
+            <p className="label text-foreground/45">{step.n}</p>
+            <h3 className="display mt-4 text-4xl md:text-5xl">{step.title}</h3>
+            <p className="mx-auto mt-4 max-w-sm text-[17px] leading-[1.85] text-foreground/65">
               {step.body}
             </p>
           </Reveal>
