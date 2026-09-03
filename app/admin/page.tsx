@@ -80,16 +80,37 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     women: people.filter((p) => personGenderCategory(p.gender) === "women").length,
   };
 
-  const statusTabs = [
-    { key: "", label: "All", count: counts.all },
-    { key: "in_progress", label: "In progress", count: counts.in_progress },
-    { key: "complete", label: "Complete", count: counts.complete },
-  ];
-
-  const genderTabs = [
-    { key: "", label: "All genders", count: counts.all },
-    { key: "men", label: "Men", count: counts.men },
-    { key: "women", label: "Women", count: counts.women },
+  const filterTabs = [
+    {
+      kind: "all" as const,
+      key: "",
+      label: "All",
+      count: counts.all,
+    },
+    {
+      kind: "status" as const,
+      key: "in_progress",
+      label: "In progress",
+      count: counts.in_progress,
+    },
+    {
+      kind: "status" as const,
+      key: "complete",
+      label: "Complete",
+      count: counts.complete,
+    },
+    {
+      kind: "gender" as const,
+      key: "men",
+      label: "Men",
+      count: counts.men,
+    },
+    {
+      kind: "gender" as const,
+      key: "women",
+      label: "Women",
+      count: counts.women,
+    },
   ];
 
   const queryState = {
@@ -97,6 +118,34 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     gender: params.gender,
     q: params.q,
   };
+
+  function tabHref(tab: (typeof filterTabs)[number]) {
+    if (tab.kind === "all") {
+      return adminPeopleHref({ q: params.q });
+    }
+    if (tab.kind === "status") {
+      return adminPeopleHref({
+        ...queryState,
+        status: tab.key,
+        gender: undefined,
+      });
+    }
+    return adminPeopleHref({
+      ...queryState,
+      status: undefined,
+      gender: tab.key,
+    });
+  }
+
+  function tabActive(tab: (typeof filterTabs)[number]) {
+    if (tab.kind === "all") {
+      return !params.status && !params.gender;
+    }
+    if (tab.kind === "status") {
+      return params.status === tab.key;
+    }
+    return params.gender === tab.key;
+  }
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-24 pt-6">
@@ -135,42 +184,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       </form>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-        {statusTabs.map((tab) => {
-          const active = (params.status || "") === tab.key;
-          const href = adminPeopleHref({
-            ...queryState,
-            status: tab.key || undefined,
-          });
+        {filterTabs.map((tab) => {
+          const active = tabActive(tab);
+          const isGender = tab.kind === "gender";
           return (
             <Link
-              key={tab.key || "all-status"}
-              href={href}
+              key={`${tab.kind}-${tab.key || "all"}`}
+              href={tabHref(tab)}
               className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${
                 active
-                  ? "bg-[var(--accent)] text-white"
-                  : "border border-[var(--line)] bg-white text-[var(--ink)]"
-              }`}
-            >
-              {tab.label} {tab.count}
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
-        {genderTabs.map((tab) => {
-          const active = (params.gender || "") === tab.key;
-          const href = adminPeopleHref({
-            ...queryState,
-            gender: tab.key || undefined,
-          });
-          return (
-            <Link
-              key={tab.key || "all-gender"}
-              href={href}
-              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm ${
-                active
-                  ? "bg-[var(--ink)] text-white"
+                  ? isGender
+                    ? "bg-[var(--ink)] text-white"
+                    : "bg-[var(--accent)] text-white"
                   : "border border-[var(--line)] bg-white text-[var(--ink)]"
               }`}
             >
