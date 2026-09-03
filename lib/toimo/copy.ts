@@ -13,8 +13,10 @@ export const SELFIE_PROMPT = `And please send us a selfie right now :)
 Nothing professional, no filter, no searching through your pictures 😂
 Just a simple selfie so we can see the real you.`;
 
+export const HALFWAY_MESSAGE = `You're more than half way there!`;
+
 export const CLOSING_MESSAGE = `Thank you for sharing so openly ❤️
-You're in the TOIMOI matchmaking database. A matchmaker will review your profile.`;
+You're in the TOIMOI matchmaking database. A matchmaker will review your profile and you will be matched!`;
 
 export const QUESTIONS = {
   full_name: "1. What's your full name?",

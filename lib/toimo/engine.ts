@@ -7,6 +7,7 @@ import type {
 import {
   CLOSING_MESSAGE,
   EASY_PART,
+  HALFWAY_MESSAGE,
   OPENING_MESSAGE,
   QUESTIONS,
   SELFIE_PROMPT,
@@ -391,7 +392,10 @@ async function processStep(
     }
     case "partner_religiosity": {
       await saveProfile(person.id, { partnerReligiosity: text.trim() });
-      return advance(person, "self_description", [question("self_description")]);
+      return advance(person, "self_description", [
+        HALFWAY_MESSAGE,
+        question("self_description"),
+      ]);
     }
     case "self_description": {
       await saveProfile(person.id, { selfDescription: text.trim() });
