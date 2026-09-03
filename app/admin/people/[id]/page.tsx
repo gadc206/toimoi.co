@@ -3,11 +3,12 @@ import { notFound, redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { suggestMatches } from "@/lib/matching";
+import { QUESTIONS } from "@/lib/toimo/copy";
 import { NudgeButton } from "@/app/admin/people/[id]/NudgeButton";
 import { DeletePersonButton } from "@/app/admin/DeletePersonButton";
 import { SuggestionReview } from "@/app/admin/people/[id]/SuggestionReview";
 import { MatchingDetailsEditor } from "@/app/admin/people/[id]/MatchingDetailsEditor";
-import type { Matchmaker, PersonWithDetails } from "@/lib/types";
+import type { Matchmaker, PersonWithDetails, ProfileAnswers } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -25,26 +26,91 @@ function Field({ label, value }: { label: string; value?: string | number | null
 
 function Section({
   title,
+  subtitle,
   children,
-  highlight = false,
+  defaultOpen = false,
 }: {
   title: string;
+  subtitle?: string;
   children: React.ReactNode;
-  highlight?: boolean;
+  defaultOpen?: boolean;
 }) {
   return (
     <details
-      className={`rounded-3xl border border-[var(--line)] p-4 ${
-        highlight ? "bg-[var(--accent-soft)]/35" : "bg-[var(--panel)]"
-      }`}
+      open={defaultOpen}
+      className="rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-4"
     >
-      <summary className="cursor-pointer list-none text-base font-semibold text-[var(--ink)] [&::-webkit-details-marker]:hidden">
-        {title}
-        <span className="float-right text-[var(--muted)]">▸</span>
+      <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-base font-semibold text-[var(--ink)]">{title}</p>
+            {subtitle ? <p className="mt-0.5 text-sm text-[var(--muted)]">{subtitle}</p> : null}
+          </div>
+          <span className="shrink-0 pt-0.5 text-[var(--muted)]">▸</span>
+        </div>
       </summary>
-      <dl className="mt-2 divide-y divide-[var(--line)]">{children}</dl>
+      <div className="mt-3 border-t border-[var(--line)]">{children}</div>
     </details>
   );
+}
+
+function intakeFields(person: PersonWithDetails, profile: ProfileAnswers | null) {
+  return [
+    { label: QUESTIONS.full_name, value: person.firstName },
+    { label: QUESTIONS.date_of_birth, value: person.dateOfBirth },
+    { label: QUESTIONS.gender, value: person.gender },
+    { label: QUESTIONS.email, value: person.email },
+    { label: QUESTIONS.partner_age_range, value: profile?.partnerAgeRange },
+    { label: QUESTIONS.everyday_life, value: profile?.everydayLife },
+    { label: QUESTIONS.religiosity, value: profile?.religiosity },
+    { label: QUESTIONS.partner_religiosity, value: profile?.partnerReligiosity },
+    { label: QUESTIONS.family_background, value: profile?.familyBackground },
+    { label: QUESTIONS.self_description, value: profile?.selfDescription },
+    { label: QUESTIONS.partner_qualities, value: profile?.partnerQualities },
+    { label: QUESTIONS.non_negotiables, value: profile?.nonNegotiables },
+    { label: QUESTIONS.physical_type, value: profile?.physicalAttracted },
+  ];
+}
+
+function legacyNotes(profile: ProfileAnswers | null) {
+  if (!profile) return [];
+
+  return [
+    { label: "Mom", value: profile.momBackground },
+    { label: "Dad", value: profile.dadBackground },
+    { label: "Dating background preference", value: profile.datingBackgroundPreference },
+    { label: "Family closeness", value: profile.familyCloseness },
+    { label: "Bring into marriage", value: profile.bringIntoMarriage },
+    { label: "Do differently", value: profile.doDifferently },
+    { label: "Religious direction", value: profile.religiosityDirection },
+    { label: "Future home religiously", value: profile.futureHomeReligious },
+    { label: "Community importance", value: profile.communityImportance },
+    { label: "Judaism for children", value: profile.judaismForChildren },
+    { label: "Three words", value: profile.threeWords },
+    { label: "Hidden side", value: profile.hiddenSide },
+    { label: "Hobbies", value: profile.hobbies },
+    { label: "Social style", value: profile.socialStyle },
+    { label: "Perfect Sunday", value: profile.perfectSunday },
+    { label: "Love language (receive)", value: profile.loveLanguageReceive },
+    { label: "Love language (give)", value: profile.loveLanguageGive },
+    { label: "Core emotional needs", value: profile.coreEmotionalNeeds },
+    { label: "Personality attracted to", value: profile.personalityAttracted },
+    { label: "Growth edge", value: profile.growthEdge },
+    { label: "Do differently next", value: profile.doDifferentlyNext },
+    { label: "Dating lesson", value: profile.datingLesson },
+    { label: "Type pattern", value: profile.typeInCommon },
+    { label: "Mirror reflection", value: profile.mirrorReflection },
+    { label: "Mindset shift", value: profile.mindsetShift },
+    { label: "Best friend description", value: profile.bestFriendDescription },
+  ].filter((item) => item.value != null && item.value !== "");
+}
+
+function statusLabel(status: string) {
+  if (status === "in_progress") return "In progress";
+  if (status === "complete") return "Complete";
+  if (status === "opted_out") return "Opted out";
+  if (status === "paused") return "Paused";
+  return status;
 }
 
 export default async function PersonDetailPage({
@@ -66,7 +132,10 @@ export default async function PersonDetailPage({
 
   const matches = person.status === "complete" ? await suggestMatches(person.id) : [];
   const matchmakers = (await prisma.matchmaker.findMany()) as Matchmaker[];
-  const p = person.profile;
+  const profile = person.profile;
+  const answers = intakeFields(person, profile);
+  const answeredCount = answers.filter((item) => item.value != null && item.value !== "").length;
+  const extras = legacyNotes(profile);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-24 pt-5">
@@ -86,15 +155,22 @@ export default async function PersonDetailPage({
           )}
         </div>
         <div className="p-4">
-          <h1 className="text-3xl font-semibold text-[var(--ink)]">
-            {person.firstName || "Unnamed"}
-            {person.age ? `, ${person.age}` : ""}
-          </h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            {[person.gender, person.dateOfBirth ? `born ${person.dateOfBirth}` : null]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h1 className="text-3xl font-semibold text-[var(--ink)]">
+                {person.firstName || "Unnamed"}
+                {person.age ? `, ${person.age}` : ""}
+              </h1>
+              <p className="mt-1 text-sm text-[var(--muted)]">
+                {[person.gender, person.dateOfBirth ? `born ${person.dateOfBirth}` : null]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
+            </div>
+            <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-700">
+              {statusLabel(person.status)}
+            </span>
+          </div>
           <div className="mt-4 space-y-1 text-sm">
             <p>
               <span className="text-[var(--muted)]">Phone </span>
@@ -111,124 +187,52 @@ export default async function PersonDetailPage({
               </p>
             ) : null}
             <p className="text-[var(--muted)]">
-              {person.status} · {person.currentStep}
+              {answeredCount} of 13 intake answers · step {person.currentStep.replace(/_/g, " ")}
             </p>
           </div>
-          <div className="mt-4">
-            <NudgeButton personId={person.id} />
-          </div>
+          {person.status === "in_progress" ? (
+            <div className="mt-4">
+              <NudgeButton personId={person.id} />
+            </div>
+          ) : null}
         </div>
       </section>
 
       <div className="mt-4 space-y-3">
-        <Section title="Basics" highlight>
-          <Field label="1. Full name" value={person.firstName} />
-          <Field label="2. Date of birth" value={person.dateOfBirth} />
-          <Field label="Age" value={person.age} />
-          <Field label="3. Gender" value={person.gender} />
-          <Field label="4. Email" value={person.email} />
-          <Field label="5. Partner age range" value={p?.partnerAgeRange} />
+        <Section
+          title="Intake answers"
+          subtitle={`${answeredCount} of 13 answered`}
+          defaultOpen
+        >
+          <dl className="divide-y divide-[var(--line)]">
+            {answers.map((item) => (
+              <Field key={item.label} label={item.label} value={item.value} />
+            ))}
+            {answeredCount === 0 ? (
+              <p className="py-3 text-sm text-[var(--muted)]">No intake answers yet.</p>
+            ) : null}
+          </dl>
         </Section>
 
-        <Section title="Questions 6-16" highlight>
-          <Field
-            label="6. Where they live, everyday life, and relocating"
-            value={p?.everydayLife}
-          />
-          <Field label="7. Religiously today" value={p?.religiosity} />
-          <Field
-            label="8. What they want religiously in a partner"
-            value={p?.partnerReligiosity}
-          />
-          <Field
-            label="9. Ashkenazi, Sephardi, or both"
-            value={p?.familyBackground}
-          />
-          <Field
-            label="10. How they want to be understood"
-            value={p?.selfDescription}
-          />
-          <Field
-            label="11. Three most important things in the person they marry"
-            value={p?.partnerQualities}
-          />
-          <Field label="12. Cannot compromise on" value={p?.nonNegotiables} />
-          <Field label="13. Physical type" value={p?.physicalAttracted} />
-        </Section>
-
-        <Section title="Background & family">
-          <Field label="Family background" value={p?.familyBackground} />
-          <Field label="Mom" value={p?.momBackground} />
-          <Field label="Dad" value={p?.dadBackground} />
-          <Field label="Dating preference" value={p?.datingBackgroundPreference} />
-          <Field label="Family closeness" value={p?.familyCloseness} />
-          <Field label="Bring into marriage" value={p?.bringIntoMarriage} />
-          <Field label="Do differently" value={p?.doDifferently} />
-        </Section>
-
-        <Section title="Religion & community">
-          <Field label="Direction" value={p?.religiosityDirection} />
-          <Field label="Partner religiosity" value={p?.partnerReligiosity} />
-          <Field label="Future home" value={p?.futureHomeReligious} />
-          <Field label="Community importance" value={p?.communityImportance} />
-          <Field label="Judaism for children" value={p?.judaismForChildren} />
-        </Section>
-
-        <Section title="Who they are">
-          <Field label="Three words" value={p?.threeWords} />
-          <Field label="Hidden side" value={p?.hiddenSide} />
-          <Field label="Hobbies" value={p?.hobbies} />
-          <Field label="Social style" value={p?.socialStyle} />
-          <Field label="Perfect Sunday" value={p?.perfectSunday} />
-          <Field label="Love language (receive)" value={p?.loveLanguageReceive} />
-          <Field label="Love language (give)" value={p?.loveLanguageGive} />
-        </Section>
-
-        <Section title="Needs & matching" highlight>
-          <Field label="Core emotional needs" value={p?.coreEmotionalNeeds} />
-          <Field label="Non-negotiables" value={p?.nonNegotiables} />
-          <Field label="Partner qualities" value={p?.partnerQualities} />
-          <Field label="Personality attracted" value={p?.personalityAttracted} />
-          <Field label="Physical attracted" value={p?.physicalAttracted} />
-          <Field label="Growth edge" value={p?.growthEdge} />
-          <Field label="Do differently next" value={p?.doDifferentlyNext} />
-        </Section>
-
-        <Section title="Practical requirements" highlight>
-          <MatchingDetailsEditor
-            personId={person.id}
-            initial={{
-              partnerAgeRange: p?.partnerAgeRange || "",
-              relocationFlexibility: p?.relocationFlexibility || "",
-              hasChildren: p?.hasChildren || "",
-              openToPartnerChildren: p?.openToPartnerChildren || "",
-              smokingBoundaries: p?.smokingBoundaries || "",
-              marriageTimeline: p?.marriageTimeline || "",
-              matchmakerEligibilityNotes: p?.matchmakerEligibilityNotes || "",
-            }}
-          />
-        </Section>
-
-        <Section title="Coaching notes" highlight>
-          <Field label="Dating lesson" value={p?.datingLesson} />
-          <Field label="Type pattern" value={p?.typeInCommon} />
-          <Field label="Mirror reflection" value={p?.mirrorReflection} />
-          <Field label="Mindset shift" value={p?.mindsetShift} />
-          <Field label="Best friend description" value={p?.bestFriendDescription} />
-        </Section>
-
-        <Section title="Suggested matches">
-          <Link
-            href={`/admin/matches/create?personA=${person.id}`}
-            className="my-2 block rounded-2xl bg-[var(--accent)] px-4 py-3 text-center text-sm font-medium text-white"
-          >
-            Manually match {person.firstName || "this person"}
-          </Link>
-          {matches.length === 0 ? (
+        <Section
+          title="AI suggested matches"
+          subtitle={
+            person.status !== "complete"
+              ? "Available after intake is complete"
+              : matches.length > 0
+                ? `${matches.length} ranked ${matches.length === 1 ? "match" : "matches"} from the matching engine`
+                : "No compatible completed profiles yet"
+          }
+          defaultOpen={person.status === "complete"}
+        >
+          {person.status !== "complete" ? (
             <p className="py-3 text-sm text-[var(--muted)]">
-              {person.status === "complete"
-                ? "No compatible completed profiles yet."
-                : "Matches appear after this profile is complete."}
+              Finish the WhatsApp intake first. AI matches run once a profile is marked complete.
+            </p>
+          ) : matches.length === 0 ? (
+            <p className="py-3 text-sm text-[var(--muted)]">
+              No compatible completed profiles yet. Add more people or check back when new profiles
+              finish intake.
             </p>
           ) : (
             <ul className="space-y-3 py-2">
@@ -310,22 +314,63 @@ export default async function PersonDetailPage({
           )}
         </Section>
 
-        <Section title="WhatsApp transcript">
-          <div className="space-y-3 py-3">
-            {person.messages.map((m) => (
-              <div
-                key={m.id}
-                className={`max-w-[92%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
-                  m.direction === "inbound"
-                    ? "border border-[var(--line)] bg-white"
-                    : "ml-auto bg-[var(--accent)] text-white"
-                }`}
-              >
-                {m.body}
-              </div>
-            ))}
+        <Section title="Matchmaker tools" subtitle="Manual matching and internal notes">
+          <Link
+            href={`/admin/matches/create?personA=${person.id}`}
+            className="my-3 block rounded-2xl bg-[var(--accent)] px-4 py-3 text-center text-sm font-medium text-white"
+          >
+            Manually match {person.firstName || "this person"}
+          </Link>
+
+          <div className="border-t border-[var(--line)] pt-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-[var(--muted)]">
+              Matchmaker notes
+            </p>
+            <MatchingDetailsEditor
+              personId={person.id}
+              initial={{
+                partnerAgeRange: profile?.partnerAgeRange || "",
+                relocationFlexibility: profile?.relocationFlexibility || "",
+                hasChildren: profile?.hasChildren || "",
+                openToPartnerChildren: profile?.openToPartnerChildren || "",
+                smokingBoundaries: profile?.smokingBoundaries || "",
+                marriageTimeline: profile?.marriageTimeline || "",
+                matchmakerEligibilityNotes: profile?.matchmakerEligibilityNotes || "",
+              }}
+            />
           </div>
         </Section>
+
+        <Section title="WhatsApp conversation" subtitle={`${person.messages.length} messages`}>
+          <div className="space-y-3 py-3">
+            {person.messages.length === 0 ? (
+              <p className="text-sm text-[var(--muted)]">No messages yet.</p>
+            ) : (
+              person.messages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`max-w-[92%] rounded-2xl px-3 py-2 text-sm whitespace-pre-wrap ${
+                    m.direction === "inbound"
+                      ? "border border-[var(--line)] bg-white"
+                      : "ml-auto bg-[var(--accent)] text-white"
+                  }`}
+                >
+                  {m.body}
+                </div>
+              ))
+            )}
+          </div>
+        </Section>
+
+        {extras.length > 0 ? (
+          <Section title="Additional notes" subtitle="Older or extra profile fields">
+            <dl className="divide-y divide-[var(--line)]">
+              {extras.map((item) => (
+                <Field key={item.label} label={item.label} value={item.value} />
+              ))}
+            </dl>
+          </Section>
+        ) : null}
       </div>
 
       <section className="mt-8 border-t border-[var(--line)] pt-6">
