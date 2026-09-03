@@ -4,7 +4,7 @@
 
 export const OPENING_MESSAGE = `Hi!!
 Welcome to TOIMOI ❤️
-We are going to ask you 15 questions, plus a quick selfie.
+We are going to ask you 16 questions, plus a quick selfie.
 Take your time and most importantly, be honest. There is absolutely no judgement here. We want to understand who YOU are and who could really be right for you.`;
 
 export const EASY_PART = `First, the easy part 😊`;
@@ -29,18 +29,20 @@ export const QUESTIONS = {
   religiosity: "7. How would you describe yourself religiously today?",
   partner_religiosity:
     "8. What are you looking for religiously in the person you marry?",
+  family_background:
+    "9. Are you Ashkenazi, Sephardi, or both?",
   self_description:
-    "9. If you had to describe yourself to someone who has never met you, what would you want them to understand about you?",
+    "10. If you had to describe yourself to someone who has never met you, what would you want them to understand about you?",
   partner_qualities:
-    "10. What are the 3 most important things you are looking for in the person you marry?",
+    "11. What are the 3 most important things you are looking for in the person you marry?",
   non_negotiables:
-    "11. What is something you know you absolutely cannot compromise on?",
+    "12. What is something you know you absolutely cannot compromise on?",
   dating_lesson:
-    "12. What have your past relationships or dating experiences taught you about what you need and what doesn't work for you?",
+    "13. What have your past relationships or dating experiences taught you about what you need and what doesn't work for you?",
   attraction:
-    "13. What does attraction mean to you? What do you usually notice or feel when you are really attracted to someone?",
+    "14. What does attraction mean to you? What do you usually notice or feel when you are really attracted to someone?",
   five_year:
-    "14. When you picture your life 5 years from now, what kind of marriage and home do you hope you have?",
+    "15. When you picture your life 5 years from now, what kind of marriage and home do you hope you have?",
   readiness:
-    "15. Last one ❤️ Take away the pressure, the list in your head, what your parents want and what everyone around you is doing. Are you really ready to let someone into your life and build something together? And if you are, what does being ready mean to YOU?",
+    "16. Last one ❤️ Take away the pressure, the list in your head, what your parents want and what everyone around you is doing. Are you really ready to let someone into your life and build something together? And if you are, what does being ready mean to YOU?",
 } as const;

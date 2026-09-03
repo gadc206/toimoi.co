@@ -13,6 +13,7 @@ export const TOIMOI_SECTIONS = [
   "everyday_life",
   "religiosity",
   "partner_religiosity",
+  "family_background",
   "self_description",
   "partner_qualities",
   "non_negotiables",

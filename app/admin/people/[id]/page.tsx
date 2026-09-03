@@ -129,7 +129,7 @@ export default async function PersonDetailPage({
           <Field label="5. Partner age range" value={p?.partnerAgeRange} />
         </Section>
 
-        <Section title="Questions 6-15" highlight>
+        <Section title="Questions 6-16" highlight>
           <Field
             label="6. Where they live, everyday life, and relocating"
             value={p?.everydayLife}
@@ -140,24 +140,28 @@ export default async function PersonDetailPage({
             value={p?.partnerReligiosity}
           />
           <Field
-            label="9. How they want to be understood"
+            label="9. Ashkenazi, Sephardi, or both"
+            value={p?.familyBackground}
+          />
+          <Field
+            label="10. How they want to be understood"
             value={p?.selfDescription}
           />
           <Field
-            label="10. Three most important things in the person they marry"
+            label="11. Three most important things in the person they marry"
             value={p?.partnerQualities}
           />
-          <Field label="11. Cannot compromise on" value={p?.nonNegotiables} />
+          <Field label="12. Cannot compromise on" value={p?.nonNegotiables} />
           <Field
-            label="12. What dating taught them"
+            label="13. What dating taught them"
             value={p?.datingLesson}
           />
-          <Field label="13. What attraction means" value={p?.attractionMeaning} />
+          <Field label="14. What attraction means" value={p?.attractionMeaning} />
           <Field
-            label="14. Marriage and home in 5 years"
+            label="15. Marriage and home in 5 years"
             value={p?.fiveYearLife}
           />
-          <Field label="15. What being ready means" value={p?.readiness} />
+          <Field label="16. What being ready means" value={p?.readiness} />
         </Section>
 
         <Section title="Background & family">

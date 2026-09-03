@@ -182,7 +182,7 @@ function cultureGate(owner: PersonWithProfile, candidate: PersonWithProfile): Ga
       refs,
     );
   }
-  const requested = ["ashkenazi", "sephardic"].find((term) => wanted.includes(term));
+  const requested = ["ashkenazi", "sephardi"].find((term) => wanted.includes(term));
   if (requested && !candidateBackground.includes(requested) && !candidateBackground.includes("both")) {
     return gate(
       `culture_${owner.id}`,

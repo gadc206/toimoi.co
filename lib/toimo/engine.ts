@@ -56,6 +56,7 @@ type FlowStep =
   | "everyday_life"
   | "religiosity"
   | "partner_religiosity"
+  | "family_background"
   | "self_description"
   | "partner_qualities"
   | "non_negotiables"
@@ -392,10 +393,14 @@ async function processStep(
     }
     case "partner_religiosity": {
       await saveProfile(person.id, { partnerReligiosity: text.trim() });
-      return advance(person, "self_description", [
+      return advance(person, "family_background", [
         HALFWAY_MESSAGE,
-        question("self_description"),
+        question("family_background"),
       ]);
+    }
+    case "family_background": {
+      await saveProfile(person.id, { familyBackground: text.trim() });
+      return advance(person, "self_description", [question("self_description")]);
     }
     case "self_description": {
       await saveProfile(person.id, { selfDescription: text.trim() });

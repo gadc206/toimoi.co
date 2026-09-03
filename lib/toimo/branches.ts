@@ -160,7 +160,7 @@ export function prefersSpecificBackground(text: string): boolean {
     return false;
   }
   return (
-    t.includes("sephardic") ||
+    t.includes("sephardi") ||
     t.includes("ashkenazi") ||
     t.includes("prefer") ||
     t.includes("usually")
