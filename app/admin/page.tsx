@@ -4,7 +4,6 @@ import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { personGenderCategory } from "@/lib/admin/person-gender";
 import { adminPeopleHref } from "@/lib/admin/query";
-import { DeletePersonButton } from "@/app/admin/DeletePersonButton";
 import { StartOutreachForm } from "@/app/admin/StartOutreachForm";
 import { LogoutButton } from "@/app/admin/LogoutButton";
 import type { PersonWithProfile } from "@/lib/types";
@@ -183,45 +182,40 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
 
       <section className="mt-5 space-y-3">
         {filtered.map((p) => (
-          <div
+          <Link
             key={p.id}
-            className="flex items-center gap-2 rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-3"
+            href={`/admin/people/${p.id}`}
+            className="flex items-center gap-3 rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-3 active:scale-[0.99]"
           >
-            <Link
-              href={`/admin/people/${p.id}`}
-              className="flex min-w-0 flex-1 items-center gap-3 active:scale-[0.99]"
-            >
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[var(--accent-soft)]">
-                {p.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.photoUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--accent)]">
-                    {(p.firstName || "?").slice(0, 1).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="truncate text-lg font-semibold text-[var(--ink)]">
-                    {p.firstName || "Unnamed"}
-                    {p.age ? `, ${p.age}` : ""}
-                  </h2>
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}
-                  >
-                    {statusLabel(p.status)}
-                  </span>
+            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[var(--accent-soft)]">
+              {p.photoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={p.photoUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--accent)]">
+                  {(p.firstName || "?").slice(0, 1).toUpperCase()}
                 </div>
-                <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
-                  {[p.gender, p.profile?.everydayLife, p.profile?.religiosity]
-                    .filter(Boolean)
-                    .join(" · ") || p.phone}
-                </p>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <h2 className="truncate text-lg font-semibold text-[var(--ink)]">
+                  {p.firstName || "Unnamed"}
+                  {p.age ? `, ${p.age}` : ""}
+                </h2>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}
+                >
+                  {statusLabel(p.status)}
+                </span>
               </div>
-            </Link>
-            <DeletePersonButton personId={p.id} name={p.firstName} compact />
-          </div>
+              <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
+                {[p.gender, p.profile?.everydayLife, p.profile?.religiosity]
+                  .filter(Boolean)
+                  .join(" · ") || p.phone}
+              </p>
+            </div>
+          </Link>
         ))}
 
         {filtered.length === 0 ? (

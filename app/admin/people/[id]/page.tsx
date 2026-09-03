@@ -114,9 +114,8 @@ export default async function PersonDetailPage({
               {person.status} · {person.currentStep}
             </p>
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="mt-4">
             <NudgeButton personId={person.id} />
-            <DeletePersonButton personId={person.id} name={person.firstName} compact />
           </div>
         </div>
       </section>
@@ -328,6 +327,10 @@ export default async function PersonDetailPage({
           </div>
         </Section>
       </div>
+
+      <section className="mt-8 border-t border-[var(--line)] pt-6">
+        <DeletePersonButton personId={person.id} name={person.firstName} />
+      </section>
     </main>
   );
 }
