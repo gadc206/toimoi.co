@@ -1,13 +1,9 @@
 "use client"
 
-import { useState } from "react"
-
-import { JoinDatabaseModal } from "@/components/join-database-modal"
+import { whatsAppDeepLink } from "@/lib/whatsapp-join"
 
 export function LandingJoin() {
-  const [open, setOpen] = useState(false)
-
-  const handleMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (window.matchMedia("(pointer: coarse)").matches) return
     const el = e.currentTarget
     const r = el.getBoundingClientRect()
@@ -17,23 +13,21 @@ export function LandingJoin() {
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        onMouseMove={handleMove}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = ""
-        }}
-        className="btn-lux group"
-        data-magnetic=""
-      >
-        <span>Join our database</span>
-        <span className="cta-arrow" aria-hidden>
-          →
-        </span>
-      </button>
-      <JoinDatabaseModal isOpen={open} onClose={() => setOpen(false)} />
-    </>
+    <a
+      href={whatsAppDeepLink("Hi")}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn-lux group"
+      data-magnetic=""
+      onMouseMove={handleMove}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = ""
+      }}
+    >
+      <span>Join our database</span>
+      <span className="cta-arrow" aria-hidden>
+        →
+      </span>
+    </a>
   )
 }

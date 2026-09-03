@@ -1,10 +1,8 @@
 "use client"
 
-import { useState } from "react"
-
-import { JoinDatabaseModal } from "@/components/join-database-modal"
 import { SiteButton } from "@/components/site-button"
 import type { SiteButtonProps } from "@/components/site-button"
+import { whatsAppDeepLink } from "@/lib/whatsapp-join"
 
 type GetAddedButtonProps = {
   children?: React.ReactNode
@@ -17,19 +15,14 @@ export function GetAddedButton({
   variant = "outline",
   className,
 }: GetAddedButtonProps) {
-  const [open, setOpen] = useState(false)
-
   return (
-    <>
-      <SiteButton
-        type="button"
-        variant={variant}
-        className={className}
-        onClick={() => setOpen(true)}
-      >
-        {children}
-      </SiteButton>
-      <JoinDatabaseModal isOpen={open} onClose={() => setOpen(false)} />
-    </>
+    <SiteButton asChild variant={variant} className={className}>
+      <a href={whatsAppDeepLink("Hi")} target="_blank" rel="noopener noreferrer">
+        <span className="underline-lux">{children}</span>
+        <span className="cta-arrow" aria-hidden>
+          →
+        </span>
+      </a>
+    </SiteButton>
   )
 }
