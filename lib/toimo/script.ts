@@ -17,8 +17,5 @@ export const TOIMOI_SECTIONS = [
   "self_description",
   "partner_qualities",
   "non_negotiables",
-  "dating_lesson",
-  "attraction",
-  "five_year",
-  "readiness",
+  "physical_type",
 ] as const;

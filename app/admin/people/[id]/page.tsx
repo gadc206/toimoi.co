@@ -152,16 +152,7 @@ export default async function PersonDetailPage({
             value={p?.partnerQualities}
           />
           <Field label="12. Cannot compromise on" value={p?.nonNegotiables} />
-          <Field
-            label="13. What dating taught them"
-            value={p?.datingLesson}
-          />
-          <Field label="14. What attraction means" value={p?.attractionMeaning} />
-          <Field
-            label="15. Marriage and home in 5 years"
-            value={p?.fiveYearLife}
-          />
-          <Field label="16. What being ready means" value={p?.readiness} />
+          <Field label="13. Physical type" value={p?.physicalAttracted} />
         </Section>
 
         <Section title="Background & family">

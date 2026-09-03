@@ -60,10 +60,7 @@ type FlowStep =
   | "self_description"
   | "partner_qualities"
   | "non_negotiables"
-  | "dating_lesson"
-  | "attraction"
-  | "five_year"
-  | "readiness";
+  | "physical_type";
 
 async function ensureProfile(personId: string) {
   return prisma.profileAnswers.upsert({
@@ -412,24 +409,19 @@ async function processStep(
     }
     case "non_negotiables": {
       await saveProfile(person.id, { nonNegotiables: text.trim() });
-      return advance(person, "dating_lesson", [question("dating_lesson")]);
+      return advance(person, "physical_type", [question("physical_type")]);
     }
-    case "dating_lesson": {
-      await saveProfile(person.id, { datingLesson: text.trim() });
-      return advance(person, "attraction", [question("attraction")]);
-    }
-    case "attraction": {
-      await saveProfile(person.id, { attractionMeaning: text.trim() });
-      return advance(person, "five_year", [question("five_year")]);
-    }
-    case "five_year": {
-      await saveProfile(person.id, { fiveYearLife: text.trim() });
-      return advance(person, "readiness", [question("readiness")]);
-    }
-    case "readiness": {
-      await saveProfile(person.id, { readiness: text.trim() });
+    case "physical_type": {
+      await saveProfile(person.id, { physicalAttracted: text.trim() });
       return advance(person, "complete", [CLOSING_MESSAGE]);
     }
+    // Legacy steps removed from the flow — route to the next valid question or finish.
+    case "dating_lesson":
+    case "attraction":
+      return advance(person, "physical_type", [question("physical_type")]);
+    case "five_year":
+    case "readiness":
+      return advance(person, "complete", [CLOSING_MESSAGE]);
     default: {
       return advance(person, "full_name", [
         `Let's pick back up gently. ${question("full_name")}`,
