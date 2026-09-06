@@ -1,7 +1,6 @@
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
 import { ManifestoSection } from "@/components/manifesto-section"
-import { SocialProofSection } from "@/components/social-proof-section"
 import { HowItWorks } from "@/components/how-it-works"
 import { AboutSection } from "@/components/about-section"
 import { ServicesSection } from "@/components/services-section"
@@ -17,7 +16,6 @@ export default function HomePage() {
       <main className="pb-24">
         <Hero />
         <ManifestoSection />
-        <SocialProofSection />
         <HowItWorks />
         <AboutSection />
         <ServicesSection />
