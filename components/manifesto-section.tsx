@@ -13,8 +13,7 @@ export function ManifestoSection() {
         <p className="display mt-10 text-[1.7rem] leading-[1.25] text-foreground sm:mt-24 sm:text-[clamp(2.15rem,5vw,4.2rem)] sm:leading-[1.15]">
           It is about recognizing
           <br />
-          <span className="italic sm:hidden">the right one.</span>
-          <ParallaxWord className="display-italic hidden text-[clamp(3rem,8vw,7.2rem)] sm:inline">
+          <ParallaxWord className="italic sm:text-[clamp(3rem,8vw,7.2rem)]">
             the right one.
           </ParallaxWord>
         </p>
