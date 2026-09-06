@@ -47,14 +47,14 @@ export function ServicesSection() {
     <>
       <section
         id="offerings"
-        className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
+        className="flex min-h-0 flex-col items-center justify-center bg-background px-6 py-16 md:min-h-[100svh] md:py-32"
       >
         <div id="services" className="sr-only" />
         <Reveal className="text-center">
           <p className="label text-foreground/50">Offerings</p>
         </Reveal>
 
-        <div className="mt-20 w-full max-w-md">
+        <div className="mt-12 w-full max-w-md md:mt-20">
           {offerings.map((item, i) => (
             <Reveal key={item.key} delay={i * 80}>
               <div className="border-t border-foreground/10 py-10 text-center">

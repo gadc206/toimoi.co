@@ -18,16 +18,27 @@ model Person {
   dateOfBirth  String?
   email        String?
   photoUrl     String?
+  resumeUrl    String?
   age          Int?
   gender       String?
   lookingFor   String?
   status       String   @default("new") // new | in_progress | complete | opted_out | paused
   currentStep  String   @default("opening")
   branchFlags  String   @default("{}") // JSON
+  referralCode String?  @unique
+  referredById String?
+  referredBy   Person?  @relation("PersonReferrals", fields: [referredById], references: [id])
+  referrals    Person[] @relation("PersonReferrals")
+  referralCount Int     @default(0)
+  listPriority Int      @default(0)
+  listBoostedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   completedAt  DateTime?
   pausedAt     DateTime?
+
+  @@index([referredById])
+  @@index([listPriority])
 
   profile          ProfileAnswers?
   messages         Message[]

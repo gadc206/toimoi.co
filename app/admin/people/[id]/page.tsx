@@ -189,6 +189,22 @@ export default async function PersonDetailPage({
             <p className="text-[var(--muted)]">
               {answeredCount} of 13 intake answers · step {person.currentStep.replace(/_/g, " ")}
             </p>
+            {person.listPriority > 0 ? (
+              <p className="text-[var(--accent)]">Moved up the list from referrals</p>
+            ) : null}
+            {person.referralCount > 0 || person.referralCode ? (
+              <p className="text-[var(--muted)]">
+                {person.referralCount} referral{person.referralCount === 1 ? "" : "s"}
+                {person.referralCode ? ` · ${person.referralCode}` : ""}
+              </p>
+            ) : null}
+            {person.resumeUrl ? (
+              <p>
+                <a href={person.resumeUrl} className="text-[var(--accent)]" target="_blank" rel="noreferrer">
+                  View resume
+                </a>
+              </p>
+            ) : null}
           </div>
           {person.status === "in_progress" ? (
             <div className="mt-4">

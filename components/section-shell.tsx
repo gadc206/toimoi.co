@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-export const sectionY = "py-24 md:py-32"
+export const sectionY = "py-16 md:py-32"
 export const sectionX = "px-6 sm:px-8"
 
 type SectionShellProps = {

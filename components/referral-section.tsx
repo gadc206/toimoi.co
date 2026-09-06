@@ -13,7 +13,7 @@ export function ReferralSection() {
     <>
       <section
         id="referral"
-        className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
+        className="flex min-h-0 flex-col items-center justify-center bg-background px-6 py-16 md:min-h-[100svh] md:py-32"
       >
         <Reveal className="max-w-xl text-center">
           <p className="label text-foreground/50">Referral</p>
@@ -25,6 +25,9 @@ export function ReferralSection() {
           <p className="mx-auto mt-8 max-w-sm text-[17px] leading-[1.85] text-foreground/65">
             If we work with the person you refer, you receive a complimentary thirty-minute
             guidance session.
+          </p>
+          <p className="mx-auto mt-5 max-w-sm text-[17px] leading-[1.85] text-foreground/65">
+            And if you refer this to 5 people, you go up on our list.
           </p>
           <div className="mt-12 flex justify-center">
             <SiteButton onClick={() => setIsModalOpen(true)}>Refer someone</SiteButton>

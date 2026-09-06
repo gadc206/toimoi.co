@@ -131,12 +131,18 @@ CREATE TABLE IF NOT EXISTS "Person" (
   "dateOfBirth" TEXT,
   "email" TEXT,
   "photoUrl" TEXT,
+  "resumeUrl" TEXT,
   "age" INTEGER,
   "gender" TEXT,
   "lookingFor" TEXT,
   "status" TEXT NOT NULL DEFAULT 'new',
   "currentStep" TEXT NOT NULL DEFAULT 'opening',
   "branchFlags" TEXT NOT NULL DEFAULT '{}',
+  "referralCode" TEXT UNIQUE,
+  "referredById" TEXT,
+  "referralCount" INTEGER NOT NULL DEFAULT 0,
+  "listPriority" INTEGER NOT NULL DEFAULT 0,
+  "listBoostedAt" TIMESTAMP(3),
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   "completedAt" TIMESTAMP(3),
@@ -259,10 +265,19 @@ VALUES
 ON CONFLICT ("name") DO NOTHING;
 
 ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "dateOfBirth" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "resumeUrl" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "referralCode" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "referredById" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "referralCount" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "listPriority" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "listBoostedAt" TIMESTAMP(3);
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "everydayLife" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "selfDescription" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "attractionMeaning" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "readiness" TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS "Person_referralCode_key" ON "Person"("referralCode");
+CREATE INDEX IF NOT EXISTS "Person_referredById_idx" ON "Person"("referredById");
+CREATE INDEX IF NOT EXISTS "Person_listPriority_idx" ON "Person"("listPriority");
 `;
 
 const client = new pg.Client({

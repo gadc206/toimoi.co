@@ -64,6 +64,17 @@ export function isAudioContentType(contentType: string | null | undefined): bool
   );
 }
 
+export function isDocumentContentType(contentType: string | null | undefined): boolean {
+  if (!contentType) return false;
+  const type = contentType.toLowerCase();
+  return (
+    type.includes("pdf") ||
+    type.includes("msword") ||
+    type.includes("wordprocessingml") ||
+    type.includes("officedocument")
+  );
+}
+
 export function isImageContentType(contentType: string | null | undefined): boolean {
   if (!contentType) return false;
   const type = contentType.toLowerCase();

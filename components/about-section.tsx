@@ -7,7 +7,7 @@ export function AboutSection() {
   return (
     <section
       id="about"
-      className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
+      className="flex min-h-0 flex-col items-center justify-center bg-background px-6 py-16 md:min-h-[100svh] md:py-32"
     >
       <Reveal className="max-w-xl text-center">
         <p className="label text-foreground/50">The house</p>
@@ -22,7 +22,7 @@ export function AboutSection() {
         </p>
       </Reveal>
 
-      <div className="mt-20 grid w-full max-w-3xl grid-cols-2 gap-6 sm:gap-12">
+      <div className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-6 md:mt-20 sm:gap-12">
         <article className="flex flex-col items-center text-center">
           <div
             className="relative h-28 w-28 overflow-hidden rounded-full sm:h-36 sm:w-36"

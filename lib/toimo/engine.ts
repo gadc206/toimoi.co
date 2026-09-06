@@ -5,20 +5,30 @@ import type {
   ProfileUpdateInput,
 } from "@/lib/types";
 import {
-  CLOSING_MESSAGE,
   EASY_PART,
-  HALFWAY_MESSAGE,
+  ENCOURAGEMENT_GREAT,
+  ENCOURAGEMENT_HALFWAY,
+  ENCOURAGEMENT_LAST,
   OPENING_MESSAGE,
   QUESTIONS,
+  RESUME_PROMPT,
   SELFIE_PROMPT,
+  closingMessage,
+  questionWithProgress,
 } from "@/lib/toimo/copy";
+import {
+  attributeReferral,
+  ensureReferralCode,
+  referralShareUrl,
+  siteBaseUrl,
+} from "@/lib/toimo/referral";
 import {
   inferLookingFor,
   normalize,
   parseDateOfBirth,
   type BranchFlags,
 } from "@/lib/toimo/branches";
-import { saveInboundPhoto } from "@/lib/sms/media";
+import { saveInboundDocument, saveInboundPhoto } from "@/lib/sms/media";
 import { toE164 } from "@/lib/whatsapp/phone";
 
 function isValidEmail(text: string): boolean {
@@ -52,7 +62,6 @@ type FlowStep =
   | "gender"
   | "email"
   | "partner_age_range"
-  | "photo"
   | "everyday_life"
   | "religiosity"
   | "partner_religiosity"
@@ -60,7 +69,9 @@ type FlowStep =
   | "self_description"
   | "partner_qualities"
   | "non_negotiables"
-  | "physical_type";
+  | "physical_type"
+  | "photo"
+  | "resume";
 
 async function ensureProfile(personId: string) {
   return prisma.profileAnswers.upsert({
@@ -111,8 +122,12 @@ function unclear(promptHint: string): string {
   return `No rush. Take your time 😊 ${promptHint}`;
 }
 
-function question(step: keyof typeof QUESTIONS): string {
-  return QUESTIONS[step];
+function question(step: keyof typeof QUESTIONS, encouragement?: string): string {
+  return questionWithProgress(step, encouragement);
+}
+
+function isSkip(text: string): boolean {
+  return ["skip", "no", "later", "pass", "none", "n/a"].includes(normalize(text));
 }
 
 async function resetPerson(personId: string) {
@@ -125,6 +140,7 @@ async function resetPerson(personId: string) {
       dateOfBirth: null,
       email: null,
       photoUrl: null,
+      resumeUrl: null,
       age: null,
       gender: null,
       lookingFor: null,
@@ -142,7 +158,7 @@ export async function getOrCreatePerson(phone: string): Promise<Person> {
   const existing = await prisma.person.findUnique({
     where: { phone: normalized },
   });
-  if (existing) return existing;
+  if (existing) return ensureReferralCode(existing);
 
   const created = await prisma.person.create({
     data: {
@@ -152,7 +168,7 @@ export async function getOrCreatePerson(phone: string): Promise<Person> {
     },
   });
   await ensureProfile(created.id);
-  return created;
+  return ensureReferralCode(created);
 }
 
 export function openingBodies(): string[] {
@@ -169,6 +185,7 @@ export async function handleInbound(
   const text = body.trim();
   const personLookupStarted = performance.now();
   let person = await getOrCreatePerson(phone);
+  person = await attributeReferral(person, text);
   const personLookupMs = performance.now() - personLookupStarted;
 
   const inboundBody = text || (mediaUrls.length ? "[photo]" : "");
@@ -289,8 +306,20 @@ export async function handleInbound(
 function promptForStep(step: string): string[] {
   if (step === "opening") return openingBodies();
   if (step === "photo") return [SELFIE_PROMPT];
+  if (step === "resume") return [RESUME_PROMPT];
   if (step in QUESTIONS) return [question(step as keyof typeof QUESTIONS)];
   return ["Thanks for sharing. Whenever you're ready, keep going."];
+}
+
+async function finishIntake(
+  person: Person,
+  personData: PersonUpdateInput = {},
+): Promise<EngineResult> {
+  const withCode = await ensureReferralCode(person);
+  const shareUrl = withCode.referralCode
+    ? referralShareUrl(withCode.referralCode)
+    : siteBaseUrl();
+  return advance(withCode, "complete", [closingMessage(shareUrl)], personData);
 }
 
 async function processStep(
@@ -328,7 +357,7 @@ async function processStep(
       if (gender.length < 1) {
         return { outbound: [unclear(question("gender"))], person };
       }
-      return advance(person, "email", [question("email")], {
+      return advance(person, "email", [question("email", ENCOURAGEMENT_GREAT)], {
         gender,
         lookingFor: inferLookingFor(gender),
       });
@@ -353,6 +382,44 @@ async function processStep(
         };
       }
       await saveProfile(person.id, { partnerAgeRange: text.trim() });
+      return advance(person, "everyday_life", [question("everyday_life")]);
+    }
+    case "everyday_life": {
+      await saveProfile(person.id, {
+        everydayLife: text.trim(),
+        location: text.trim(),
+        relocationFlexibility: text.trim(),
+      });
+      return advance(person, "religiosity", [question("religiosity")]);
+    }
+    case "religiosity": {
+      await saveProfile(person.id, { religiosity: text.trim() });
+      return advance(person, "partner_religiosity", [
+        question("partner_religiosity", ENCOURAGEMENT_HALFWAY),
+      ]);
+    }
+    case "partner_religiosity": {
+      await saveProfile(person.id, { partnerReligiosity: text.trim() });
+      return advance(person, "family_background", [question("family_background")]);
+    }
+    case "family_background": {
+      await saveProfile(person.id, { familyBackground: text.trim() });
+      return advance(person, "self_description", [question("self_description")]);
+    }
+    case "self_description": {
+      await saveProfile(person.id, { selfDescription: text.trim() });
+      return advance(person, "partner_qualities", [question("partner_qualities")]);
+    }
+    case "partner_qualities": {
+      await saveProfile(person.id, { partnerQualities: text.trim() });
+      return advance(person, "non_negotiables", [question("non_negotiables")]);
+    }
+    case "non_negotiables": {
+      await saveProfile(person.id, { nonNegotiables: text.trim() });
+      return advance(person, "physical_type", [question("physical_type", ENCOURAGEMENT_LAST)]);
+    }
+    case "physical_type": {
+      await saveProfile(person.id, { physicalAttracted: text.trim() });
       return advance(person, "photo", [SELFIE_PROMPT]);
     }
     case "photo": {
@@ -374,46 +441,30 @@ async function processStep(
         };
       }
       const photoUrl = await saveInboundPhoto(person.id, attached || media);
-      return advance(person, "everyday_life", [question("everyday_life")], { photoUrl });
-    }
-    case "everyday_life": {
-      await saveProfile(person.id, {
-        everydayLife: text.trim(),
-        location: text.trim(),
-        relocationFlexibility: text.trim(),
+      const profile = await prisma.profileAnswers.findUnique({
+        where: { personId: person.id },
       });
-      return advance(person, "religiosity", [question("religiosity")]);
+      // Old mid-flow people answered the selfie before the later questions.
+      if (!profile?.physicalAttracted) {
+        return advance(person, "everyday_life", [question("everyday_life")], { photoUrl });
+      }
+      return advance(person, "resume", [RESUME_PROMPT], { photoUrl });
     }
-    case "religiosity": {
-      await saveProfile(person.id, { religiosity: text.trim() });
-      return advance(person, "partner_religiosity", [question("partner_religiosity")]);
-    }
-    case "partner_religiosity": {
-      await saveProfile(person.id, { partnerReligiosity: text.trim() });
-      return advance(person, "family_background", [
-        HALFWAY_MESSAGE,
-        question("family_background"),
-      ]);
-    }
-    case "family_background": {
-      await saveProfile(person.id, { familyBackground: text.trim() });
-      return advance(person, "self_description", [question("self_description")]);
-    }
-    case "self_description": {
-      await saveProfile(person.id, { selfDescription: text.trim() });
-      return advance(person, "partner_qualities", [question("partner_qualities")]);
-    }
-    case "partner_qualities": {
-      await saveProfile(person.id, { partnerQualities: text.trim() });
-      return advance(person, "non_negotiables", [question("non_negotiables")]);
-    }
-    case "non_negotiables": {
-      await saveProfile(person.id, { nonNegotiables: text.trim() });
-      return advance(person, "physical_type", [question("physical_type")]);
-    }
-    case "physical_type": {
-      await saveProfile(person.id, { physicalAttracted: text.trim() });
-      return advance(person, "complete", [CLOSING_MESSAGE]);
+    case "resume": {
+      if (isSkip(text)) {
+        return finishIntake(person);
+      }
+      const attached = mediaUrls.find((url) => Boolean(url));
+      if (!attached) {
+        return {
+          outbound: [
+            "You can send a PDF or photo of your resume, or reply SKIP to finish.",
+          ],
+          person,
+        };
+      }
+      const resumeUrl = await saveInboundDocument(person.id, attached);
+      return finishIntake(person, { resumeUrl });
     }
     // Legacy steps removed from the flow — route to the next valid question or finish.
     case "dating_lesson":
@@ -421,7 +472,7 @@ async function processStep(
       return advance(person, "physical_type", [question("physical_type")]);
     case "five_year":
     case "readiness":
-      return advance(person, "complete", [CLOSING_MESSAGE]);
+      return finishIntake(person);
     default: {
       return advance(person, "full_name", [
         `Let's pick back up gently. ${question("full_name")}`,

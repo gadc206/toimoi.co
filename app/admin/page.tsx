@@ -38,7 +38,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   const params = await searchParams;
   const people = (await prisma.person.findMany({
     include: { profile: true },
-    orderBy: { updatedAt: "desc" },
+    orderBy: [
+      { listPriority: "desc" },
+      { listBoostedAt: { sort: "desc", nulls: "last" } },
+      { updatedAt: "desc" },
+    ],
   })) as PersonWithProfile[];
 
   await prisma.ensureMatchmakers();
@@ -228,17 +232,29 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
                   {p.firstName || "Unnamed"}
                   {p.age ? `, ${p.age}` : ""}
                 </h2>
-                <span
-                  className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}
-                >
-                  {statusLabel(p.status)}
-                </span>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}
+                  >
+                    {statusLabel(p.status)}
+                  </span>
+                  {p.listPriority > 0 ? (
+                    <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-medium text-white">
+                      Moved up
+                    </span>
+                  ) : null}
+                </div>
               </div>
               <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
                 {[p.gender, p.profile?.everydayLife, p.profile?.religiosity]
                   .filter(Boolean)
                   .join(" · ") || p.phone}
               </p>
+              {p.referralCount > 0 ? (
+                <p className="mt-0.5 text-xs text-[var(--accent)]">
+                  {p.referralCount} referral{p.referralCount === 1 ? "" : "s"}
+                </p>
+              ) : null}
             </div>
           </Link>
         ))}

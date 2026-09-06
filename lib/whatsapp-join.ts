@@ -1,3 +1,5 @@
+import { referralJoinMessage } from "@/lib/toimo/referral-message"
+
 export function whatsAppDeepLink(message = "Hi"): string {
   const raw =
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
@@ -5,4 +7,8 @@ export function whatsAppDeepLink(message = "Hi"): string {
     "+14155238886"
   const digits = raw.replace(/\D/g, "")
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
+}
+
+export function whatsAppJoinLink(referralCode?: string | null): string {
+  return whatsAppDeepLink(referralJoinMessage(referralCode))
 }

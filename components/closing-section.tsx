@@ -15,7 +15,7 @@ export function ClosingSection() {
     <>
       <section
         id="closing"
-        className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
+        className="flex min-h-0 flex-col items-center justify-center bg-background px-6 py-16 md:min-h-[100svh] md:py-32"
       >
         <Reveal className="flex flex-col items-center text-center">
           <p className="label text-foreground/50">When you are ready</p>
@@ -30,7 +30,7 @@ export function ClosingSection() {
             to change everything.
           </p>
           <div className="mt-14 flex flex-col items-center gap-5">
-            <GetAddedButton>Begin Your Journey</GetAddedButton>
+            <GetAddedButton>Join the TOIMOI network</GetAddedButton>
             <SiteButton onClick={() => setIsConsultOpen(true)}>Private Consultation</SiteButton>
           </div>
         </Reveal>

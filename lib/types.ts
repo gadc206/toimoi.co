@@ -5,12 +5,18 @@ export type Person = {
   dateOfBirth: string | null;
   email: string | null;
   photoUrl: string | null;
+  resumeUrl: string | null;
   age: number | null;
   gender: string | null;
   lookingFor: string | null;
   status: string;
   currentStep: string;
   branchFlags: string;
+  referralCode: string | null;
+  referredById: string | null;
+  referralCount: number;
+  listPriority: number;
+  listBoostedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
   completedAt: Date | null;

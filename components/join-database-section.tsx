@@ -31,7 +31,7 @@ export function JoinDatabaseSection() {
         <SectionShell maxWidth="2xl" className="text-center">
           <SectionEyebrow>Private list</SectionEyebrow>
           <h2 className="mb-6 font-serif text-3xl font-light text-foreground md:text-4xl">
-            Add yourself to our database
+            Join the TOIMOI network
           </h2>
 
           <p className="mb-10 text-lg leading-relaxed text-muted-foreground">

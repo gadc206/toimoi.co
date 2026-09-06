@@ -12,6 +12,9 @@ next.user-config.*
 .env
 .env.*
 
+# Local Supabase CLI link
+/supabase/.temp/
+
 # Common ignores
 node_modules
 .next/

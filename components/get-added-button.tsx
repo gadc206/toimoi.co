@@ -2,7 +2,8 @@
 
 import { SiteButton } from "@/components/site-button"
 import type { SiteButtonProps } from "@/components/site-button"
-import { whatsAppDeepLink } from "@/lib/whatsapp-join"
+import { useReferralCode } from "@/hooks/use-referral-code"
+import { whatsAppJoinLink } from "@/lib/whatsapp-join"
 
 type GetAddedButtonProps = {
   children?: React.ReactNode
@@ -11,13 +12,15 @@ type GetAddedButtonProps = {
 }
 
 export function GetAddedButton({
-  children = "Begin Your Journey",
+  children = "Join the TOIMOI network",
   variant = "outline",
   className,
 }: GetAddedButtonProps) {
+  const referralCode = useReferralCode()
+
   return (
     <SiteButton asChild variant={variant} className={className}>
-      <a href={whatsAppDeepLink("Hi")} target="_blank" rel="noopener noreferrer">
+      <a href={whatsAppJoinLink(referralCode)} target="_blank" rel="noopener noreferrer">
         <span className="underline-lux">{children}</span>
         <span className="cta-arrow" aria-hidden>
           →

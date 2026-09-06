@@ -40,7 +40,7 @@ export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
 
         <p className="label text-foreground/40">Private list</p>
         <h2 className="display mt-4 pr-12 text-4xl text-foreground sm:text-5xl">
-          Join our database
+          Join the TOIMOI network
         </h2>
         <p className="mt-5 max-w-lg text-[16px] leading-[1.8] text-foreground/65">
           We will continue with you on WhatsApp.

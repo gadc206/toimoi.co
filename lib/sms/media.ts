@@ -3,6 +3,7 @@ import { put } from "@vercel/blob";
 import {
   downloadTwilioMedia,
   isAudioContentType,
+  isDocumentContentType,
   isImageContentType,
 } from "@/lib/whatsapp/media";
 
@@ -14,6 +15,9 @@ function extensionFromContentType(contentType: string | null): string {
   if (t.includes("gif")) return "gif";
   if (t.includes("heic") || t.includes("heif")) return "heic";
   if (t.includes("jpeg") || t.includes("jpg")) return "jpg";
+  if (t.includes("pdf")) return "pdf";
+  if (t.includes("wordprocessingml") || t.includes("docx")) return "docx";
+  if (t.includes("msword") || t.includes("doc")) return "doc";
   return "jpg";
 }
 
@@ -30,7 +34,10 @@ export function collectPhotoUrls(
 ): string[] {
   const nonAudio = media.filter((m) => !isAudioContentType(m.contentType));
   const labeled = nonAudio.filter(
-    (m) => isImageContentType(m.contentType) || !m.contentType.trim(),
+    (m) =>
+      isImageContentType(m.contentType) ||
+      isDocumentContentType(m.contentType) ||
+      !m.contentType.trim(),
   );
   return (labeled.length ? labeled : nonAudio).map((m) => m.url);
 }
@@ -47,6 +54,33 @@ async function storePhoto(
     contentType: contentType || "image/jpeg",
   });
   return `/api/file?pathname=${encodeURIComponent(blob.pathname)}`;
+}
+
+export async function saveInboundDocument(
+  personId: string,
+  mediaUrl: string,
+): Promise<string> {
+  if (
+    mediaUrl.startsWith("/uploads/") ||
+    mediaUrl.startsWith("/api/uploads/") ||
+    mediaUrl.startsWith("/api/file")
+  ) {
+    return mediaUrl;
+  }
+
+  try {
+    const { buffer, contentType } = await downloadTwilioMedia(mediaUrl);
+    const ext = extensionFromContentType(contentType);
+    const filename = `${personId}-resume-${crypto.randomBytes(6).toString("hex")}.${ext}`;
+    const blob = await put(`people/${filename}`, buffer, {
+      access: "private",
+      contentType: contentType || "application/pdf",
+    });
+    return `/api/file?pathname=${encodeURIComponent(blob.pathname)}`;
+  } catch (err) {
+    console.error("saveInboundDocument failed", err);
+    return "";
+  }
 }
 
 /** Save a WhatsApp/Twilio image to Vercel Blob (persists on the live site). */

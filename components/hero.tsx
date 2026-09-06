@@ -51,9 +51,12 @@ export function Hero() {
       </ul>
 
       <div
-        className="absolute inset-x-0 bottom-10 flex justify-center px-6 transition-opacity duration-[1600ms] sm:bottom-12"
+        className="absolute inset-x-0 bottom-10 flex flex-col items-center px-6 transition-opacity duration-[1600ms] sm:bottom-12"
         style={{ opacity: locked ? 1 : 0, pointerEvents: locked ? "auto" : "none" }}
       >
+        <p className="mb-6 max-w-md text-center text-[15px] leading-[1.7] text-foreground/62 md:text-[16px]">
+          Private Jewish matchmaking, for people who are done leaving love to an algorithm.
+        </p>
         <LandingJoin />
       </div>
     </section>

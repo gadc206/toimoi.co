@@ -1,8 +1,11 @@
 "use client"
 
-import { whatsAppDeepLink } from "@/lib/whatsapp-join"
+import { useReferralCode } from "@/hooks/use-referral-code"
+import { whatsAppJoinLink } from "@/lib/whatsapp-join"
 
 export function LandingJoin() {
+  const referralCode = useReferralCode()
+
   const handleMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (window.matchMedia("(pointer: coarse)").matches) return
     const el = e.currentTarget
@@ -14,7 +17,7 @@ export function LandingJoin() {
 
   return (
     <a
-      href={whatsAppDeepLink("Hi")}
+      href={whatsAppJoinLink(referralCode)}
       target="_blank"
       rel="noopener noreferrer"
       className="btn-lux group"
@@ -24,7 +27,7 @@ export function LandingJoin() {
         e.currentTarget.style.transform = ""
       }}
     >
-      <span>Join our database</span>
+      <span>Join the TOIMOI network</span>
       <span className="cta-arrow" aria-hidden>
         →
       </span>

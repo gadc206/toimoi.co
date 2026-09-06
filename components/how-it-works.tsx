@@ -4,7 +4,7 @@ const steps = [
   {
     n: "01",
     title: "Begin quietly.",
-    body: "Join our private database. We reach you on WhatsApp. Nothing is posted, and you are not on an app.",
+    body: "Join the TOIMOI network. We reach you on WhatsApp. Nothing is posted, and you are not on an app.",
   },
   {
     n: "02",
@@ -22,7 +22,7 @@ export function HowItWorks() {
   return (
     <section
       id="approach"
-      className="flex min-h-[100svh] flex-col items-center justify-center bg-background px-6 py-32"
+      className="flex min-h-0 flex-col items-center justify-center bg-background px-6 py-16 md:min-h-[100svh] md:py-32"
     >
       <div id="join" className="sr-only" />
       <Reveal className="w-full max-w-xl text-center">
@@ -32,7 +32,7 @@ export function HowItWorks() {
         </h2>
       </Reveal>
 
-      <div className="mt-24 flex w-full max-w-xl flex-col gap-16">
+      <div className="mt-12 flex w-full max-w-xl flex-col gap-10 md:mt-24 md:gap-16">
         {steps.map((step, i) => (
           <Reveal key={step.n} delay={i * 90} className="text-center">
             <p className="label text-foreground/45">{step.n}</p>

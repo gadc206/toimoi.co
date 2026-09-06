@@ -9,7 +9,6 @@ export const TOIMOI_SECTIONS = [
   "gender",
   "email",
   "partner_age_range",
-  "photo",
   "everyday_life",
   "religiosity",
   "partner_religiosity",
@@ -18,4 +17,6 @@ export const TOIMOI_SECTIONS = [
   "partner_qualities",
   "non_negotiables",
   "physical_type",
+  "photo",
+  "resume",
 ] as const;
