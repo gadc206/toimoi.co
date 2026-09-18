@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/db";
 import { ALGORITHM_VERSION, MATCH_ENGINE_MODE } from "@/lib/matching/config";
-import { extractMatchProfile } from "@/lib/matching/extract-profile";
+import {
+  extractFreeTextSignalsWithOpenAI,
+  extractMatchProfile,
+} from "@/lib/matching/extract-profile";
+import {
+  EXTRACTOR_VERSION,
+  matchProfileSchema,
+  type MatchProfile,
+  type ProfileSignal,
+} from "@/lib/matching/profile-schema";
 import { scoreReciprocalPair } from "@/lib/matching/reciprocal-score";
 import {
   legacyShadowScore,
@@ -21,27 +30,104 @@ export type MatchSuggestion = {
   legacyScore: number | null;
 };
 
-export function assessPair(
+const inflightProfiles = new Map<string, Promise<MatchProfile>>();
+
+function mergeSignals(base: ProfileSignal[], extra: ProfileSignal[]): ProfileSignal[] {
+  const seen = new Set(base.map((signal) => `${signal.key}:${signal.evidence.quote}`));
+  const merged = [...base];
+  for (const signal of extra) {
+    const key = `${signal.key}:${signal.evidence.quote}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(signal);
+  }
+  return merged;
+}
+
+export async function enrichMatchProfile(person: PersonWithProfile): Promise<MatchProfile> {
+  const base = extractMatchProfile(person);
+  const cacheKey = `${person.id}:${base.sourceHash}:${EXTRACTOR_VERSION}`;
+  const existing = inflightProfiles.get(cacheKey);
+  if (existing) return existing;
+
+  const pending = (async () => {
+    const cached = await prisma.derivedMatchProfile.findUnique({
+      personId: person.id,
+      sourceHash: base.sourceHash,
+      extractorVersion: EXTRACTOR_VERSION,
+    });
+    if (cached) {
+      try {
+        return matchProfileSchema.parse(JSON.parse(cached.profileJson));
+      } catch {
+        // Rebuild if an older cached payload no longer matches the schema.
+      }
+    }
+
+    let signals = base.signals;
+    if (process.env.OPENAI_API_KEY) {
+      const extra = await extractFreeTextSignalsWithOpenAI(person);
+      if (extra.length) signals = mergeSignals(base.signals, extra);
+    }
+
+    const enriched = matchProfileSchema.parse({
+      ...base,
+      signals,
+    });
+    await prisma.derivedMatchProfile.upsert({
+      personId: person.id,
+      profileJson: JSON.stringify(enriched),
+      sourceHash: enriched.sourceHash,
+      extractorVersion: enriched.extractorVersion,
+    });
+    return enriched;
+  })();
+
+  inflightProfiles.set(cacheKey, pending);
+  try {
+    return await pending;
+  } finally {
+    inflightProfiles.delete(cacheKey);
+  }
+}
+
+export function assessEnrichedPair(
   first: PersonWithProfile,
+  firstProfile: MatchProfile,
   second: PersonWithProfile,
+  secondProfile: MatchProfile,
 ): {
   personA: PersonWithProfile;
   personB: PersonWithProfile;
-  profileA: ReturnType<typeof extractMatchProfile>;
-  profileB: ReturnType<typeof extractMatchProfile>;
+  profileA: MatchProfile;
+  profileB: MatchProfile;
   data: MatchAssessmentData;
 } {
-  const [personA, personB] =
-    first.id.localeCompare(second.id) <= 0 ? [first, second] : [second, first];
-  const profileA = extractMatchProfile(personA);
-  const profileB = extractMatchProfile(personB);
+  const ordered =
+    first.id.localeCompare(second.id) <= 0
+      ? { personA: first, profileA: firstProfile, personB: second, profileB: secondProfile }
+      : { personA: second, profileA: secondProfile, personB: first, profileB: firstProfile };
   return {
-    personA,
-    personB,
-    profileA,
-    profileB,
-    data: scoreReciprocalPair(personA, profileA, personB, profileB),
+    ...ordered,
+    data: scoreReciprocalPair(ordered.personA, ordered.profileA, ordered.personB, ordered.profileB),
   };
+}
+
+export async function assessPair(
+  first: PersonWithProfile,
+  second: PersonWithProfile,
+): Promise<{
+  personA: PersonWithProfile;
+  personB: PersonWithProfile;
+  profileA: MatchProfile;
+  profileB: MatchProfile;
+  data: MatchAssessmentData;
+}> {
+  const [firstProfile, secondProfile] = await Promise.all([
+    enrichMatchProfile(first),
+    enrichMatchProfile(second),
+  ]);
+  return assessEnrichedPair(first, firstProfile, second, secondProfile);
 }
 
 export async function assessAndStorePair(
@@ -49,7 +135,7 @@ export async function assessAndStorePair(
   second: PersonWithProfile,
   options: { force?: boolean; exposureForPersonId?: string; location?: string } = {},
 ): Promise<StoredMatchAssessment> {
-  const assessment = assessPair(first, second);
+  const assessment = await assessPair(first, second);
   await Promise.all([
     prisma.derivedMatchProfile.upsert({
       personId: assessment.personA.id,
@@ -119,11 +205,17 @@ export async function suggestMatches(personId: string, limit = 8): Promise<Match
     include: { profile: true },
   })) as PersonWithProfile[];
 
-  const evaluated = candidates.map((candidate) => ({
-    candidate,
-    preview: assessPair(person, candidate),
-    legacy: legacyShadowScore(person, candidate),
-  }));
+  const subjectProfile = await enrichMatchProfile(person);
+  const evaluated = await Promise.all(
+    candidates.map(async (candidate) => {
+      const candidateProfile = await enrichMatchProfile(candidate);
+      return {
+        candidate,
+        preview: assessEnrichedPair(person, subjectProfile, candidate, candidateProfile),
+        legacy: legacyShadowScore(person, candidate),
+      };
+    }),
+  );
   const ranked = evaluated
     .filter((item) => item.preview.data.eligibility !== "blocked")
     .sort((a, b) => {

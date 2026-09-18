@@ -17,6 +17,14 @@ export type Person = {
   referralCount: number;
   listPriority: number;
   listBoostedAt: Date | null;
+  isClient: boolean;
+  howHeard: string | null;
+  lastNudgedAt: Date | null;
+  consultationAt: Date | null;
+  consultationPaidAt: Date | null;
+  consultationCheckoutUrl: string | null;
+  consultationReminderSentAt: Date | null;
+  stripeCheckoutSessionId: string | null;
   createdAt: Date;
   updatedAt: Date;
   completedAt: Date | null;
@@ -112,6 +120,13 @@ export type ProfileAnswers = {
   smokingBoundaries: string | null;
   marriageTimeline: string | null;
   matchmakerEligibilityNotes: string | null;
+  lifestyle: string | null;
+  consultationNotes: string | null;
+  clientLookingFor: string | null;
+  clientNonNegotiables: string | null;
+  date1Feedback: string | null;
+  date2Feedback: string | null;
+  date3Feedback: string | null;
   profileJson: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -134,8 +149,27 @@ export type ProfileUpdateInput = Partial<
   Omit<ProfileAnswers, "id" | "personId" | "createdAt" | "updatedAt">
 >;
 
+export type AdminQuestion = {
+  id: string;
+  text: string;
+  createdAt: Date;
+};
+
+export type PersonAdminAnswer = {
+  id: string;
+  personId: string;
+  questionText: string;
+  answer: string;
+  createdAt: Date;
+};
+
 export type PersonWithProfile = Person & { profile: ProfileAnswers | null };
-export type PersonWithDetails = PersonWithProfile & { messages: Message[] };
+export type PersonWithDetails = PersonWithProfile & {
+  messages: Message[];
+  referredBy?: Person | null;
+  referrals?: Person[];
+  adminAnswers?: PersonAdminAnswer[];
+};
 
 export type MatchmakerName = "Vanessa" | "Noga";
 export type MatchSource = "algorithm" | "manual";

@@ -16,7 +16,14 @@ import {
 
 type AnswerField = Exclude<
   keyof ProfileAnswers,
-  "id" | "personId" | "createdAt" | "updatedAt" | "profileJson"
+  | "id"
+  | "personId"
+  | "createdAt"
+  | "updatedAt"
+  | "profileJson"
+  | "date1Feedback"
+  | "date2Feedback"
+  | "date3Feedback"
 >;
 
 const FIELD_DOMAINS: Record<AnswerField, CompatibilityDomain> = {
@@ -106,10 +113,15 @@ const FIELD_DOMAINS: Record<AnswerField, CompatibilityDomain> = {
   smokingBoundaries: "practical",
   marriageTimeline: "practical",
   matchmakerEligibilityNotes: "practical",
+  lifestyle: "lifestyle",
+  consultationNotes: "values_character",
+  clientLookingFor: "values_character",
+  clientNonNegotiables: "values_character",
 };
 
 const REQUIREMENT_FIELDS = new Set<AnswerField>([
   "nonNegotiables",
+  "clientNonNegotiables",
   "backgroundImportance",
   "partnerAgeRange",
   "openToPartnerChildren",
@@ -122,6 +134,7 @@ const PREFERENCE_FIELDS = new Set<AnswerField>([
   "partnerReligiosity",
   "partnerSuccessImportance",
   "partnerQualities",
+  "clientLookingFor",
   "personalityAttracted",
   "personalityNotAttracted",
   "physicalAttracted",

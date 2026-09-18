@@ -49,8 +49,13 @@ npm start
 | `GOOGLE_SERVICE_ACCOUNT_EMAIL` | `/api/submit-to-sheets` | Service account client email. |
 | `GOOGLE_PRIVATE_KEY` | `/api/submit-to-sheets` | Service account private key (paste with `\n` for newlines, or single-line PEM). |
 | `GOOGLE_SHEET_RANGE` | `/api/submit-to-sheets` | Optional. Default `Sheet1!A:J`. Set to your tab, e.g. `survey!A:J`. |
+| `TOIMOI_FROM_EMAIL` | Admin email composer + consultation reminder | Must be a **verified Resend from address** (e.g. `ToiMoi <hello@toimoi.co>`). Unverified domains fail. |
+| `CRON_SECRET` | `/api/cron/reminders` | Bearer secret for the hourly Vercel cron (weekly WhatsApp nudges + 24h consult emails). |
+| `STRIPE_SECRET_KEY` | Consultation Checkout | Restricted key (`rk_`). Enable Apple Pay and cards in the Dashboard; register `www.toimoi.co`. |
+| `STRIPE_WEBHOOK_SECRET` | `/api/stripe/webhook` | Marks `consultationPaidAt` on `checkout.session.completed`. |
+| `CONSULTATION_AMOUNT_CENTS` | Checkout session | Dollar amount in cents. Production must be `36000` ($360). |
 
-After adding `RESEND_API_KEY`, set a verified **from** domain in [Resend](https://resend.com) and update the `from` field in `app/api/send-inquiry/route.ts` if you no longer use `onboarding@resend.dev`.
+After adding `RESEND_API_KEY`, set a verified **from** domain in [Resend](https://resend.com) and put that address in `TOIMOI_FROM_EMAIL`. Until the domain is verified, ToiMoi emails will fail.
 
 ## Why Google Sheets often failed on v0
 

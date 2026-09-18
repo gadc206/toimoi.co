@@ -32,6 +32,14 @@ model Person {
   referralCount Int     @default(0)
   listPriority Int      @default(0)
   listBoostedAt DateTime?
+  isClient     Boolean  @default(false)
+  howHeard     String?
+  lastNudgedAt DateTime?
+  consultationAt DateTime?
+  consultationPaidAt DateTime?
+  consultationCheckoutUrl String?
+  consultationReminderSentAt DateTime?
+  stripeCheckoutSessionId String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   completedAt  DateTime?
@@ -49,6 +57,7 @@ model Person {
   assessmentAsB    MatchAssessment[] @relation("AssessmentPersonB")
   exposures        MatchExposure[]
   shadowEvaluations ShadowEvaluation[]
+  adminAnswers     PersonAdminAnswer[]
 }
 
 model ProfileAnswers {
@@ -142,6 +151,13 @@ model ProfileAnswers {
   smokingBoundaries          String?
   marriageTimeline           String?
   matchmakerEligibilityNotes String?
+  lifestyle                  String?
+  consultationNotes          String?
+  clientLookingFor           String?
+  clientNonNegotiables       String?
+  date1Feedback              String?
+  date2Feedback              String?
+  date3Feedback              String?
   profileJson                String? // overflow JSON
 
   createdAt DateTime @default(now())
@@ -272,4 +288,21 @@ model ShadowEvaluation {
   createdAt          DateTime @default(now())
 
   @@index([personId, createdAt])
+}
+
+model AdminQuestion {
+  id        String   @id @default(cuid())
+  text      String   @unique
+  createdAt DateTime @default(now())
+}
+
+model PersonAdminAnswer {
+  id           String   @id @default(cuid())
+  personId     String
+  person       Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  questionText String
+  answer       String
+  createdAt    DateTime @default(now())
+
+  @@index([personId])
 }

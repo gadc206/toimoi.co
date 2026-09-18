@@ -26,3 +26,4 @@ node_modules
 *.sqlite
 /public/uploads
 !/public/uploads/.gitkeep
+.env*

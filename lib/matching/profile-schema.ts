@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const PROFILE_VERSION = "match-profile-v1";
-export const EXTRACTOR_VERSION = "deterministic-v1";
+export const EXTRACTOR_VERSION = "notes-aware-v2";
 
 export const compatibilityDomainSchema = z.enum([
   "jewish_life",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { nudgeMessage, nudgedWithinWeek } from "@/lib/nudge";
 import { sendWhatsAppAndLog } from "@/lib/sms/send";
 
 export async function POST(req: NextRequest) {
@@ -20,8 +21,17 @@ export async function POST(req: NextRequest) {
   if (person.status === "opted_out" || person.status === "complete") {
     return NextResponse.json({ error: "Cannot nudge this person" }, { status: 400 });
   }
+  if (nudgedWithinWeek(person.lastNudgedAt)) {
+    return NextResponse.json(
+      { error: "A nudge was already sent in the last week.", lastNudgedAt: person.lastNudgedAt },
+      { status: 400 },
+    );
+  }
 
-  const body = `Hi${person.firstName ? ` ${person.firstName}` : ""} 😊 Just gently checking in — whenever you're ready, reply CONTINUE and we can pick up our conversation.`;
-  await sendWhatsAppAndLog(person.id, person.phone, [body]);
-  return NextResponse.json({ ok: true });
+  await sendWhatsAppAndLog(person.id, person.phone, [nudgeMessage(person.firstName)]);
+  const updated = await prisma.person.update({
+    where: { id: personId },
+    data: { lastNudgedAt: new Date() },
+  });
+  return NextResponse.json({ ok: true, lastNudgedAt: updated.lastNudgedAt });
 }

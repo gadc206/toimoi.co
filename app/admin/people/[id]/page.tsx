@@ -2,13 +2,15 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { suggestMatches } from "@/lib/matching";
-import { QUESTIONS } from "@/lib/toimo/copy";
 import { NudgeButton } from "@/app/admin/people/[id]/NudgeButton";
 import { DeletePersonButton } from "@/app/admin/DeletePersonButton";
-import { SuggestionReview } from "@/app/admin/people/[id]/SuggestionReview";
 import { MatchingDetailsEditor } from "@/app/admin/people/[id]/MatchingDetailsEditor";
-import type { Matchmaker, PersonWithDetails, ProfileAnswers } from "@/lib/types";
+import { PersonPhoto } from "@/app/admin/people/[id]/PersonPhoto";
+import { ClientToggle } from "@/app/admin/people/[id]/ClientToggle";
+import { ClientNotesEditor } from "@/app/admin/people/[id]/ClientNotesEditor";
+import { ContactActions } from "@/app/admin/people/[id]/ContactActions";
+import { HowHeardEditor } from "@/app/admin/people/[id]/HowHeardEditor";
+import type { PersonWithDetails, ProfileAnswers } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +18,8 @@ function Field({ label, value }: { label: string; value?: string | number | null
   if (value == null || value === "") return null;
   return (
     <div className="py-3">
-      <dt className="text-xs uppercase tracking-wide text-[var(--muted)]">{label}</dt>
-      <dd className="mt-1 whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--ink)]">
+      <dt className="text-sm font-semibold text-[var(--ink)]">{label}</dt>
+      <dd className="mt-1 whitespace-pre-wrap text-[15px] leading-relaxed text-[var(--muted)]">
         {String(value)}
       </dd>
     </div>
@@ -44,7 +46,6 @@ function Section({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-base font-semibold text-[var(--ink)]">{title}</p>
-            {subtitle ? <p className="mt-0.5 text-sm text-[var(--muted)]">{subtitle}</p> : null}
           </div>
           <span className="shrink-0 pt-0.5 text-[var(--muted)]">▸</span>
         </div>
@@ -56,19 +57,19 @@ function Section({
 
 function intakeFields(person: PersonWithDetails, profile: ProfileAnswers | null) {
   return [
-    { label: QUESTIONS.full_name, value: person.firstName },
-    { label: QUESTIONS.date_of_birth, value: person.dateOfBirth },
-    { label: QUESTIONS.gender, value: person.gender },
-    { label: QUESTIONS.email, value: person.email },
-    { label: QUESTIONS.partner_age_range, value: profile?.partnerAgeRange },
-    { label: QUESTIONS.everyday_life, value: profile?.everydayLife },
-    { label: QUESTIONS.religiosity, value: profile?.religiosity },
-    { label: QUESTIONS.partner_religiosity, value: profile?.partnerReligiosity },
-    { label: QUESTIONS.family_background, value: profile?.familyBackground },
-    { label: QUESTIONS.self_description, value: profile?.selfDescription },
-    { label: QUESTIONS.partner_qualities, value: profile?.partnerQualities },
-    { label: QUESTIONS.non_negotiables, value: profile?.nonNegotiables },
-    { label: QUESTIONS.physical_type, value: profile?.physicalAttracted },
+    { label: "Name", value: person.firstName },
+    { label: "Birthday", value: person.dateOfBirth },
+    { label: "Gender", value: person.gender },
+    { label: "Email", value: person.email },
+    { label: "Partner age", value: profile?.partnerAgeRange },
+    { label: "Everyday life", value: profile?.everydayLife },
+    { label: "Religiosity", value: profile?.religiosity },
+    { label: "Partner religiosity", value: profile?.partnerReligiosity },
+    { label: "Family", value: profile?.familyBackground },
+    { label: "Self", value: profile?.selfDescription },
+    { label: "Looking for", value: profile?.partnerQualities },
+    { label: "Non-negotiables", value: profile?.nonNegotiables },
+    { label: "Physical", value: profile?.physicalAttracted },
   ];
 }
 
@@ -126,12 +127,13 @@ export default async function PersonDetailPage({
     include: {
       profile: true,
       messages: { orderBy: { createdAt: "asc" } },
+      referredBy: true,
+      referrals: { orderBy: { createdAt: "desc" } },
+      adminAnswers: { orderBy: { createdAt: "asc" } },
     },
   })) as PersonWithDetails | null;
   if (!person) notFound();
 
-  const matches = person.status === "complete" ? await suggestMatches(person.id) : [];
-  const matchmakers = (await prisma.matchmaker.findMany()) as Matchmaker[];
   const profile = person.profile;
   const answers = intakeFields(person, profile);
   const answeredCount = answers.filter((item) => item.value != null && item.value !== "").length;
@@ -144,17 +146,21 @@ export default async function PersonDetailPage({
       </Link>
 
       <section className="mt-4 overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--panel)]">
-        <div className="aspect-[4/3] bg-[var(--accent-soft)]">
-          {person.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={person.photoUrl} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full items-center justify-center text-5xl font-semibold text-[var(--accent)]">
-              {(person.firstName || "?").slice(0, 1).toUpperCase()}
-            </div>
-          )}
-        </div>
+        {person.photoUrl ? (
+          <PersonPhoto src={person.photoUrl} name={person.firstName || "Unnamed"} />
+        ) : (
+          <div className="flex min-h-56 items-center justify-center bg-[var(--accent-soft)] text-5xl font-semibold text-[var(--accent)]">
+            {(person.firstName || "?").slice(0, 1).toUpperCase()}
+          </div>
+        )}
         <div className="p-4">
+          <div className="mb-4">
+            <ClientToggle
+              personId={person.id}
+              isClient={person.isClient}
+              consultationAt={person.consultationAt?.toISOString() || null}
+            />
+          </div>
           <div className="flex items-start justify-between gap-3">
             <div>
               <h1 className="text-3xl font-semibold text-[var(--ink)]">
@@ -167,30 +173,43 @@ export default async function PersonDetailPage({
                   .join(" · ")}
               </p>
             </div>
-            <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-700">
-              {statusLabel(person.status)}
-            </span>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-medium text-stone-700">
+                {statusLabel(person.status)}
+              </span>
+              {person.isClient ? (
+                <span className="rounded-full bg-[var(--ink)] px-2.5 py-1 text-[11px] font-medium text-white">
+                  Client
+                </span>
+              ) : null}
+            </div>
           </div>
-          <div className="mt-4 space-y-1 text-sm">
-            <p>
-              <span className="text-[var(--muted)]">Phone </span>
-              <a href={`tel:${person.phone}`} className="text-[var(--accent)]">
-                {person.phone}
-              </a>
-            </p>
-            {person.email ? (
+          <div className="mt-4 space-y-3 text-sm">
+            <ContactActions
+              personId={person.id}
+              phone={person.phone}
+              email={person.email}
+              firstName={person.firstName}
+            />
+            {person.consultationCheckoutUrl ? (
               <p>
-                <span className="text-[var(--muted)]">Email </span>
-                <a href={`mailto:${person.email}`} className="text-[var(--accent)]">
-                  {person.email}
+                <a
+                  href={person.consultationCheckoutUrl}
+                  className="text-[var(--accent)]"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {person.consultationPaidAt ? "Paid" : "Pay link"}
                 </a>
               </p>
             ) : null}
-            <p className="text-[var(--muted)]">
-              {answeredCount} of 13 intake answers · step {person.currentStep.replace(/_/g, " ")}
-            </p>
-            {person.listPriority > 0 ? (
-              <p className="text-[var(--accent)]">Moved up the list from referrals</p>
+            {person.referredBy ? (
+              <p className="text-[var(--muted)]">
+                Referred by{" "}
+                <Link href={`/admin/people/${person.referredBy.id}`} className="text-[var(--accent)]">
+                  {person.referredBy.firstName || person.referredBy.phone}
+                </Link>
+              </p>
             ) : null}
             {person.referralCount > 0 || person.referralCode ? (
               <p className="text-[var(--muted)]">
@@ -198,6 +217,34 @@ export default async function PersonDetailPage({
                 {person.referralCode ? ` · ${person.referralCode}` : ""}
               </p>
             ) : null}
+            {person.referrals && person.referrals.length > 0 ? (
+              <p className="text-[var(--muted)]">
+                Referred{" "}
+                {person.referrals
+                  .slice(0, 8)
+                  .map((referral) => referral.firstName || referral.phone)
+                  .join(", ")}
+                {person.referrals.length > 8 ? "…" : ""}
+              </p>
+            ) : null}
+            {person.adminAnswers && person.adminAnswers.length > 0 ? (
+              <div className="space-y-3">
+                {person.adminAnswers.map((item) => (
+                  <div key={item.id}>
+                    <p className="text-sm font-semibold text-[var(--ink)]">{item.questionText}</p>
+                    <p className="mt-1 whitespace-pre-wrap text-[15px] text-[var(--muted)]">
+                      {item.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <HowHeardEditor
+                personId={person.id}
+                initial={person.howHeard || ""}
+                referredByName={person.referredBy?.firstName || person.referredBy?.phone || null}
+              />
+            )}
             {person.resumeUrl ? (
               <p>
                 <a href={person.resumeUrl} className="text-[var(--accent)]" target="_blank" rel="noreferrer">
@@ -208,140 +255,49 @@ export default async function PersonDetailPage({
           </div>
           {person.status === "in_progress" ? (
             <div className="mt-4">
-              <NudgeButton personId={person.id} />
+              <NudgeButton
+                personId={person.id}
+                lastNudgedAt={person.lastNudgedAt?.toISOString() || null}
+              />
             </div>
           ) : null}
         </div>
       </section>
 
       <div className="mt-4 space-y-3">
-        <Section
-          title="Intake answers"
-          subtitle={`${answeredCount} of 13 answered`}
-          defaultOpen
-        >
+        {person.isClient ? (
+          <ClientNotesEditor
+            personId={person.id}
+            initial={{
+              consultationNotes: profile?.consultationNotes || "",
+              clientLookingFor: profile?.clientLookingFor || "",
+              clientNonNegotiables: profile?.clientNonNegotiables || "",
+              date1Feedback: profile?.date1Feedback || "",
+              date2Feedback: profile?.date2Feedback || "",
+              date3Feedback: profile?.date3Feedback || "",
+            }}
+          />
+        ) : (
+        <Section title="Intake" defaultOpen>
           <dl className="divide-y divide-[var(--line)]">
             {answers.map((item) => (
               <Field key={item.label} label={item.label} value={item.value} />
             ))}
             {answeredCount === 0 ? (
-              <p className="py-3 text-sm text-[var(--muted)]">No intake answers yet.</p>
+              <p className="py-3 text-sm text-[var(--muted)]">None yet.</p>
             ) : null}
           </dl>
         </Section>
+        )}
 
-        <Section
-          title="AI suggested matches"
-          subtitle={
-            person.status !== "complete"
-              ? "Available after intake is complete"
-              : matches.length > 0
-                ? `${matches.length} ranked ${matches.length === 1 ? "match" : "matches"} from the matching engine`
-                : "No compatible completed profiles yet"
-          }
-          defaultOpen={person.status === "complete"}
-        >
-          {person.status !== "complete" ? (
-            <p className="py-3 text-sm text-[var(--muted)]">
-              Finish the WhatsApp intake first. AI matches run once a profile is marked complete.
-            </p>
-          ) : matches.length === 0 ? (
-            <p className="py-3 text-sm text-[var(--muted)]">
-              No compatible completed profiles yet. Add more people or check back when new profiles
-              finish intake.
-            </p>
-          ) : (
-            <ul className="space-y-3 py-2">
-              {matches.map((m) => (
-                <li
-                  key={m.person.id}
-                  className="rounded-2xl border border-[var(--line)] bg-white p-3"
-                >
-                  <Link href={`/admin/people/${m.person.id}`} className="block">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-medium text-[var(--accent)]">
-                        {m.person.firstName || m.person.phone}
-                      </span>
-                      <span className="text-right text-xs text-[var(--muted)]">
-                        <span className="block capitalize">{m.assessment.fitBand}</span>
-                        <span>
-                          {m.score} · {Math.round(m.assessment.confidence * 100)}% evidence
-                        </span>
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-[var(--muted)]">
-                      {m.reasons.slice(0, 2).join(" · ") || "Open to review the evidence."}
-                    </p>
-                  </Link>
-                  <details className="mt-2 text-sm">
-                    <summary className="cursor-pointer text-xs font-medium text-[var(--accent)]">
-                      Evidence, cautions, and why not higher
-                    </summary>
-                    <div className="mt-2 space-y-3 text-xs">
-                      <div>
-                        <p className="font-medium">Strengths</p>
-                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[var(--muted)]">
-                          {m.assessment.strengths.map((reason) => (
-                            <li key={`${reason.label}-${reason.detail}`}>{reason.detail}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      {m.assessment.complements.length ? (
-                        <div>
-                          <p className="font-medium">Potential balances</p>
-                          <ul className="mt-1 list-disc space-y-1 pl-4 text-[var(--muted)]">
-                            {m.assessment.complements.map((reason) => (
-                              <li key={`${reason.label}-${reason.detail}`}>{reason.detail}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ) : null}
-                      <div>
-                        <p className="font-medium">Cautions / unknowns</p>
-                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[var(--muted)]">
-                          {[...m.assessment.cautions, ...m.assessment.unknowns]
-                            .slice(0, 4)
-                            .map((reason) => (
-                              <li key={`${reason.label}-${reason.detail}`}>{reason.detail}</li>
-                            ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <p className="font-medium">Why not higher?</p>
-                        <ul className="mt-1 list-disc space-y-1 pl-4 text-[var(--muted)]">
-                          {m.assessment.whyNotHigher.map((reason) => (
-                            <li key={reason}>{reason}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </details>
-                  <SuggestionReview
-                    assessmentId={m.assessment.id}
-                    eligibility={m.assessment.eligibility}
-                    matchmakers={matchmakers.map((matchmaker) => ({
-                      id: matchmaker.id,
-                      name: matchmaker.name,
-                    }))}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
-
-        <Section title="Matchmaker tools" subtitle="Manual matching and internal notes">
+        <Section title="Notes">
           <Link
             href={`/admin/matches/create?personA=${person.id}`}
             className="my-3 block rounded-2xl bg-[var(--accent)] px-4 py-3 text-center text-sm font-medium text-white"
           >
-            Manually match {person.firstName || "this person"}
+            Match
           </Link>
-
           <div className="border-t border-[var(--line)] pt-3">
-            <p className="mb-2 text-xs uppercase tracking-wide text-[var(--muted)]">
-              Matchmaker notes
-            </p>
             <MatchingDetailsEditor
               personId={person.id}
               initial={{
@@ -351,16 +307,18 @@ export default async function PersonDetailPage({
                 openToPartnerChildren: profile?.openToPartnerChildren || "",
                 smokingBoundaries: profile?.smokingBoundaries || "",
                 marriageTimeline: profile?.marriageTimeline || "",
+                fiveYearLife: profile?.fiveYearLife || "",
+                lifestyle: profile?.lifestyle || "",
                 matchmakerEligibilityNotes: profile?.matchmakerEligibilityNotes || "",
               }}
             />
           </div>
         </Section>
 
-        <Section title="WhatsApp conversation" subtitle={`${person.messages.length} messages`}>
+        <Section title="Chat">
           <div className="space-y-3 py-3">
             {person.messages.length === 0 ? (
-              <p className="text-sm text-[var(--muted)]">No messages yet.</p>
+              <p className="text-sm text-[var(--muted)]">None yet.</p>
             ) : (
               person.messages.map((m) => (
                 <div
@@ -378,8 +336,8 @@ export default async function PersonDetailPage({
           </div>
         </Section>
 
-        {extras.length > 0 ? (
-          <Section title="Additional notes" subtitle="Older or extra profile fields">
+        {!person.isClient && extras.length > 0 ? (
+          <Section title="More">
             <dl className="divide-y divide-[var(--line)]">
               {extras.map((item) => (
                 <Field key={item.label} label={item.label} value={item.value} />

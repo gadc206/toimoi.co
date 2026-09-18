@@ -118,7 +118,24 @@ export const prisma = {
   profileAnswers: client.profileAnswers,
   message: client.message,
   matchmaker: client.matchmaker,
+  adminQuestion: client.adminQuestion,
+  personAdminAnswer: client.personAdminAnswer,
   derivedMatchProfile: {
+    findUnique: async (args: {
+      personId: string;
+      sourceHash: string;
+      extractorVersion: string;
+    }) => {
+      return client.derivedMatchProfile.findUnique({
+        where: {
+          personId_sourceHash_extractorVersion: {
+            personId: args.personId,
+            sourceHash: args.sourceHash,
+            extractorVersion: args.extractorVersion,
+          },
+        },
+      });
+    },
     upsert: async (args: {
       personId: string;
       profileJson: string;

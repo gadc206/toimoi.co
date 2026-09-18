@@ -79,7 +79,7 @@ export async function attributeReferral(
   return updated;
 }
 
-async function creditReferrer(referrer: Person) {
+export async function creditReferrer(referrer: Person) {
   const nextCount = (referrer.referralCount ?? 0) + 1;
   const crossedThreshold =
     nextCount >= REFERRAL_THRESHOLD &&

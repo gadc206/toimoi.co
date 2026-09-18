@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 
 import { ContactModal } from "@/components/contact-modal"
@@ -19,14 +20,14 @@ const offerings = [
     title: "Personal Consultation",
     body: "One hour, in person.",
     price: "$360",
-    cta: "Begin",
+    cta: "Book",
   },
   {
     key: "coaching" as const,
     title: "Clarity & Connection",
     body: "A session for how you show up.",
     price: "$500",
-    cta: "Begin",
+    cta: "Book",
   },
 ]
 
@@ -62,7 +63,17 @@ export function ServicesSection() {
                 <p className="mt-3 text-[17px] leading-[1.85] text-foreground/65">{item.body}</p>
                 <p className="label mt-5 text-foreground/50">{item.price}</p>
                 <div className="mt-6 flex justify-center">
-                  <SiteButton onClick={() => openModal(item.key)}>{item.cta}</SiteButton>
+                  {item.key === "consultation" ? (
+                    <SiteButton asChild>
+                      <Link href="/consult">{item.cta}</Link>
+                    </SiteButton>
+                  ) : item.key === "coaching" ? (
+                    <SiteButton asChild>
+                      <Link href="/clarity">{item.cta}</Link>
+                    </SiteButton>
+                  ) : (
+                    <SiteButton onClick={() => openModal(item.key)}>{item.cta}</SiteButton>
+                  )}
                 </div>
               </div>
             </Reveal>

@@ -13,6 +13,7 @@ export const dynamic = "force-dynamic";
 type SearchParams = Promise<{
   status?: string;
   gender?: string;
+  client?: string;
   q?: string;
 }>;
 
@@ -32,6 +33,57 @@ function statusTone(status: string) {
   return "bg-stone-100 text-stone-700";
 }
 
+function PersonCard({ person: p }: { person: PersonWithProfile }) {
+  return (
+    <Link
+      href={`/admin/people/${p.id}`}
+      className="flex items-center gap-3 rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-3 active:scale-[0.99]"
+    >
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[var(--accent-soft)]">
+        {p.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={p.photoUrl} alt="" className="h-full w-full object-contain" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--accent)]">
+            {(p.firstName || "?").slice(0, 1).toUpperCase()}
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="truncate text-lg font-semibold text-[var(--ink)]">
+            {p.firstName || "Unnamed"}
+            {p.age ? `, ${p.age}` : ""}
+          </h2>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}>
+              {statusLabel(p.status)}
+            </span>
+            {p.isClient ? (
+              <span className="rounded-full bg-[var(--ink)] px-2 py-0.5 text-[10px] font-medium text-white">
+                Client
+              </span>
+            ) : null}
+            {p.listPriority > 0 ? (
+              <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-medium text-white">
+                Moved up
+              </span>
+            ) : null}
+          </div>
+        </div>
+        <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
+          {[p.gender, p.profile?.location].filter(Boolean).join(" · ") || p.phone}
+        </p>
+        {p.referralCount > 0 ? (
+          <p className="mt-0.5 text-xs text-[var(--accent)]">
+            {p.referralCount} referral{p.referralCount === 1 ? "" : "s"}
+          </p>
+        ) : null}
+      </div>
+    </Link>
+  );
+}
+
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
   if (!(await isAdminAuthenticated())) redirect("/admin/login");
 
@@ -48,6 +100,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   await prisma.ensureMatchmakers();
 
   const filtered = people.filter((p) => {
+    if (params.client === "1" && !p.isClient) return false;
     if (params.status && p.status !== params.status) return false;
 
     if (params.gender === "men" && personGenderCategory(p.gender) !== "men") {
@@ -67,6 +120,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         p.profile?.everydayLife,
         p.profile?.location,
         p.profile?.religiosity,
+        p.howHeard,
       ]
         .filter(Boolean)
         .join(" ")
@@ -82,6 +136,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     complete: people.filter((p) => p.status === "complete").length,
     men: people.filter((p) => personGenderCategory(p.gender) === "men").length,
     women: people.filter((p) => personGenderCategory(p.gender) === "women").length,
+    clients: people.filter((p) => p.isClient).length,
   };
 
   const filterTabs = [
@@ -115,11 +170,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
       label: "Women",
       count: counts.women,
     },
+    {
+      kind: "client" as const,
+      key: "1",
+      label: "Clients",
+      count: counts.clients,
+    },
   ];
 
   const queryState = {
     status: params.status,
     gender: params.gender,
+    client: params.client,
     q: params.q,
   };
 
@@ -132,47 +194,63 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         ...queryState,
         status: tab.key,
         gender: undefined,
+        client: undefined,
+      });
+    }
+    if (tab.kind === "client") {
+      return adminPeopleHref({
+        ...queryState,
+        status: undefined,
+        gender: undefined,
+        client: tab.key,
       });
     }
     return adminPeopleHref({
       ...queryState,
       status: undefined,
       gender: tab.key,
+      client: undefined,
     });
   }
 
   function tabActive(tab: (typeof filterTabs)[number]) {
     if (tab.kind === "all") {
-      return !params.status && !params.gender;
+      return !params.status && !params.gender && params.client !== "1";
     }
     if (tab.kind === "status") {
-      return params.status === tab.key;
+      return params.status === tab.key && params.client !== "1";
     }
-    return params.gender === tab.key;
+    if (tab.kind === "client") {
+      return params.client === "1";
+    }
+    return params.gender === tab.key && params.client !== "1";
   }
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-24 pt-6">
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">TOIMOI</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--ink)]">People</h1>
-        </div>
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-3xl font-semibold tracking-tight text-[var(--ink)]">People</h1>
         <LogoutButton />
       </header>
 
-      <nav className="mt-4 grid grid-cols-2 gap-2">
+      <nav className="mt-4 grid grid-cols-3 gap-2">
         <Link
           href="/admin/matches"
-          className="rounded-2xl border border-[var(--line)] bg-white px-4 py-3 text-center text-sm font-medium text-[var(--accent)]"
+          className="rounded-2xl border border-[var(--line)] bg-white px-3 py-3 text-center text-sm font-medium text-[var(--accent)]"
         >
-          View Matches
+          Matches
+        </Link>
+        <Link
+          href="/admin/people/new"
+          className="rounded-2xl border border-[var(--line)] bg-white px-3 py-3 text-center text-sm font-medium text-[var(--ink)]"
+        >
+          Add person
         </Link>
         <Link
           href="/admin/matches/create"
-          className="rounded-2xl bg-[var(--accent)] px-4 py-3 text-center text-sm font-medium text-white"
+          className="rounded-2xl bg-[var(--accent)] px-3 py-3 text-center text-sm font-medium text-white"
         >
-          Create Match
+          Create match
         </Link>
       </nav>
 
@@ -180,11 +258,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         <input
           name="q"
           defaultValue={params.q || ""}
-          placeholder="Search name, email, city…"
+          placeholder="Search"
           className="w-full rounded-2xl border border-[var(--line)] bg-white px-4 py-3 text-base outline-none focus:border-[var(--accent)]"
         />
         {params.status ? <input type="hidden" name="status" value={params.status} /> : null}
         {params.gender ? <input type="hidden" name="gender" value={params.gender} /> : null}
+        {params.client ? <input type="hidden" name="client" value={params.client} /> : null}
       </form>
 
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
@@ -209,76 +288,45 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
         })}
       </div>
 
-      <section className="mt-5 space-y-3">
-        {filtered.map((p) => (
-          <Link
-            key={p.id}
-            href={`/admin/people/${p.id}`}
-            className="flex items-center gap-3 rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-3 active:scale-[0.99]"
-          >
-            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-[var(--accent-soft)]">
-              {p.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.photoUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-[var(--accent)]">
-                  {(p.firstName || "?").slice(0, 1).toUpperCase()}
+      {(() => {
+        const movedUp = filtered.filter((p) => p.listPriority > 0);
+        const rest = filtered.filter((p) => p.listPriority <= 0);
+        return (
+          <>
+            {movedUp.length > 0 ? (
+              <section className="mt-5">
+                <h2 className="mb-3 text-sm font-semibold text-[var(--ink)]">Moved up</h2>
+                <div className="space-y-3">
+                  {movedUp.map((p) => (
+                    <PersonCard key={p.id} person={p} />
+                  ))}
                 </div>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <h2 className="truncate text-lg font-semibold text-[var(--ink)]">
-                  {p.firstName || "Unnamed"}
-                  {p.age ? `, ${p.age}` : ""}
-                </h2>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${statusTone(p.status)}`}
-                  >
-                    {statusLabel(p.status)}
-                  </span>
-                  {p.listPriority > 0 ? (
-                    <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[10px] font-medium text-white">
-                      Moved up
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-              <p className="mt-0.5 truncate text-sm text-[var(--muted)]">
-                {[p.gender, p.profile?.everydayLife, p.profile?.religiosity]
-                  .filter(Boolean)
-                  .join(" · ") || p.phone}
-              </p>
-              {p.referralCount > 0 ? (
-                <p className="mt-0.5 text-xs text-[var(--accent)]">
-                  {p.referralCount} referral{p.referralCount === 1 ? "" : "s"}
-                </p>
+              </section>
+            ) : null}
+
+            <section className={movedUp.length > 0 ? "mt-8" : "mt-5"}>
+              {movedUp.length > 0 ? (
+                <h2 className="mb-3 text-sm font-semibold text-[var(--ink)]">Everyone else</h2>
               ) : null}
-            </div>
-          </Link>
-        ))}
+              <div className="space-y-3">
+                {rest.map((p) => (
+                  <PersonCard key={p.id} person={p} />
+                ))}
+              </div>
+            </section>
+          </>
+        );
+      })()}
 
-        {filtered.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-[var(--line)] bg-white/60 px-5 py-10 text-center text-[var(--muted)]">
-            No people yet. Start outreach below, or use the simulator.
-          </div>
-        ) : null}
-      </section>
+      {filtered.length === 0 ? (
+        <div className="mt-5 rounded-3xl border border-dashed border-[var(--line)] bg-white/60 px-5 py-10 text-center text-[var(--muted)]">
+          No people yet.
+        </div>
+      ) : null}
 
-      <section className="mt-8 rounded-3xl border border-[var(--line)] bg-[var(--panel)] p-4">
-        <h2 className="text-base font-semibold">Start WhatsApp outreach</h2>
-        <p className="mt-1 text-sm text-[var(--muted)]">
-          Send the opening TOIMOI message on WhatsApp.
-        </p>
+      <section className="mt-8">
         <StartOutreachForm />
       </section>
-
-      <div className="mt-6 text-center">
-        <Link href="/sim" className="text-sm text-[var(--accent)]">
-          Open WhatsApp simulator
-        </Link>
-      </div>
     </main>
   );
 }

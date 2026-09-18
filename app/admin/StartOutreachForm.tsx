@@ -30,20 +30,20 @@ export function StartOutreachForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-4 flex flex-wrap gap-3">
+    <form onSubmit={onSubmit} className="flex flex-wrap gap-2">
       <input
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
-        placeholder="WhatsApp +15551234567"
-        className="min-w-[220px] flex-1 rounded-xl border border-[var(--line)] bg-white px-3 py-2"
+        placeholder="WhatsApp"
+        className="min-w-0 flex-1 rounded-2xl border border-[var(--line)] bg-white px-4 py-3"
       />
       <button
         disabled={loading || !phone.trim()}
-        className="rounded-full bg-[var(--accent)] px-5 py-2 text-white disabled:opacity-50"
+        className="shrink-0 rounded-2xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
       >
-        {loading ? "Sending…" : "Send WhatsApp opener"}
+        {loading ? "…" : "Open"}
       </button>
-      {message ? <p className="w-full text-sm text-[var(--muted)]">{message}</p> : null}
+      {message ? <p className="basis-full text-sm text-[var(--muted)]">{message}</p> : null}
     </form>
   );
 }

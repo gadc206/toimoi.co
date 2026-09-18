@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import { SiteButton } from "@/components/site-button"
 
@@ -227,15 +228,11 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                 <p className="text-muted-foreground leading-relaxed mb-6 italic">
                   Private, unhurried, and without pressure.
                 </p>
-                <p className="text-foreground leading-relaxed mb-2">
-                  To schedule, email:
-                </p>
-                <a
-                  href="mailto:toimoinow@gmail.com?subject=Personal%20Consultation%20Request"
-                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                >
-                  toimoinow@gmail.com
-                </a>
+                <SiteButton asChild>
+                  <Link href="/consult" onClick={handleClose}>
+                    Book consultation
+                  </Link>
+                </SiteButton>
               </div>
             ) : isCoaching ? (
               <div className="mb-8">
@@ -262,18 +259,11 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   Every conversation is completely private, personalized, and approached without judgment.
                 </p>
                 
-                <p className="text-foreground leading-relaxed mb-2">
-                  To schedule your session, please email us at:
-                </p>
-                <a 
-                  href="mailto:toimoinow@gmail.com?subject=Clarity%20%26%20Connection%20Session%20Request" 
-                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                >
-                  toimoinow@gmail.com
-                </a>
-                <p className="text-muted-foreground mt-6 italic">
-                  We look forward to connecting with you.
-                </p>
+                <SiteButton asChild>
+                  <Link href="/clarity" onClick={handleClose}>
+                    Book session
+                  </Link>
+                </SiteButton>
               </div>
             ) : (
               <>

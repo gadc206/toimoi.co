@@ -118,6 +118,13 @@ const profileColumns = [
   "smokingBoundaries",
   "marriageTimeline",
   "matchmakerEligibilityNotes",
+  "lifestyle",
+  "consultationNotes",
+  "clientLookingFor",
+  "clientNonNegotiables",
+  "date1Feedback",
+  "date2Feedback",
+  "date3Feedback",
   "profileJson",
 ]
   .map((c) => `"${c}" TEXT`)
@@ -275,6 +282,21 @@ ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "everydayLife" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "selfDescription" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "attractionMeaning" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "readiness" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "isClient" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "howHeard" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "lastNudgedAt" TIMESTAMP(3);
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationAt" TIMESTAMP(3);
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationPaidAt" TIMESTAMP(3);
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationCheckoutUrl" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationReminderSentAt" TIMESTAMP(3);
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "stripeCheckoutSessionId" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "lifestyle" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "consultationNotes" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "clientLookingFor" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "clientNonNegotiables" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date1Feedback" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date2Feedback" TEXT;
+ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date3Feedback" TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS "Person_referralCode_key" ON "Person"("referralCode");
 CREATE INDEX IF NOT EXISTS "Person_referredById_idx" ON "Person"("referredById");
 CREATE INDEX IF NOT EXISTS "Person_listPriority_idx" ON "Person"("listPriority");

@@ -1,6 +1,6 @@
 import type { CompatibilityDomain } from "@/lib/matching/profile-schema";
 
-export const ALGORITHM_VERSION = "explainable-reciprocal-v1";
+export const ALGORITHM_VERSION = "explainable-reciprocal-v2";
 
 export const DOMAIN_CONFIG: Record<
   CompatibilityDomain,

@@ -43,6 +43,8 @@ const SELF_FIELDS = new Set([
   "raisingFamily",
   "judaismForChildren",
   "fiveYearLife",
+  "lifestyle",
+  "consultationNotes",
   "everydayLife",
   "readiness",
   "homeFeel",
@@ -61,7 +63,9 @@ const SEEK_FIELDS = new Set([
   "loveLanguageReceive",
   "coreEmotionalNeeds",
   "nonNegotiables",
+  "clientNonNegotiables",
   "partnerQualities",
+  "clientLookingFor",
   "qualityDefinitions",
   "personalityAttracted",
   "personalityNotAttracted",
@@ -266,6 +270,9 @@ export function evaluateDomains(
   for (const [domain, config] of SCORED_DOMAINS) {
     const signalsA = pa.signals.filter((item) => item.domain === domain);
     const signalsB = pb.signals.filter((item) => item.domain === domain);
+    if (!signalsA.length || !signalsB.length) {
+      continue;
+    }
     const rawAtoB = directionalScore(config.method, signalsA, signalsB);
     const rawBtoA = directionalScore(config.method, signalsB, signalsA);
     const answeredSides = Number(signalsA.length > 0) + Number(signalsB.length > 0);

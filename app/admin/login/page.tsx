@@ -30,9 +30,7 @@ export default function AdminLoginPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">TOIMOI</p>
-      <h1 className="mt-2 text-3xl font-semibold text-[var(--ink)]">Matchmaker login</h1>
-      <p className="mt-2 text-[var(--muted)]">Enter the admin password to view people.</p>
+      <h1 className="text-3xl font-semibold text-[var(--ink)]">Login</h1>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
         <input
           type="password"

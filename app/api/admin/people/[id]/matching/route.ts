@@ -11,6 +11,8 @@ const schema = z
     openToPartnerChildren: z.string().max(300).nullable().optional(),
     smokingBoundaries: z.string().max(500).nullable().optional(),
     marriageTimeline: z.string().max(500).nullable().optional(),
+    fiveYearLife: z.string().max(2000).nullable().optional(),
+    lifestyle: z.string().max(2000).nullable().optional(),
     matchmakerEligibilityNotes: z.string().max(2000).nullable().optional(),
   })
   .refine((value) => Object.keys(value).length > 0);

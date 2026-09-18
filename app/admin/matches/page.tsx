@@ -52,13 +52,8 @@ export default async function MatchesPage({ searchParams }: { searchParams: Sear
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-24 pt-5">
-      <header className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">TOIMOI</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[var(--ink)]">
-            Matches
-          </h1>
-        </div>
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-3xl font-semibold tracking-tight text-[var(--ink)]">Matches</h1>
         <Link
           href="/admin/matches/create"
           className="rounded-2xl bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-white"

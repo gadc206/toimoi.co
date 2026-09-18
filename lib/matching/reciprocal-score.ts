@@ -51,6 +51,7 @@ export function scoreReciprocalPair(
   const eligibility = evaluateGates(a, profileA, b, profileB);
   const evaluation = evaluateDomains(a, profileA, b, profileB);
 
+  const totalWeight = evaluation.scores.reduce((sum, domain) => sum + domain.weight, 0);
   const weightedScore = evaluation.scores.reduce(
     (sum, domain) => sum + (domain.reciprocal / 100) * domain.weight,
     0,
@@ -59,9 +60,8 @@ export function scoreReciprocalPair(
     (sum, domain) => sum + domain.confidence * domain.weight,
     0,
   );
-  const totalWeight = evaluation.scores.reduce((sum, domain) => sum + domain.weight, 0);
   const confidence = totalWeight ? weightedConfidence / totalWeight : 0;
-  const score = Math.round(weightedScore);
+  const score = totalWeight ? Math.round((weightedScore / totalWeight) * 100) : 0;
 
   const unknowns: MatchReason[] = [];
   for (const domain of evaluation.scores) {
