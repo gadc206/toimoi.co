@@ -24,6 +24,9 @@ export type Person = {
   consultationPaidAt: Date | null;
   consultationCheckoutUrl: string | null;
   consultationReminderSentAt: Date | null;
+  consultationHost: string | null;
+  discoveryAt: Date | null;
+  discoveryHost: string | null;
   stripeCheckoutSessionId: string | null;
   createdAt: Date;
   updatedAt: Date;

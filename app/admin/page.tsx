@@ -227,13 +227,19 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-24 pt-6">
+    <main className="mx-auto min-h-screen w-full max-w-lg px-4 pb-28 pt-6">
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-3xl font-semibold tracking-tight text-[var(--ink)]">People</h1>
         <LogoutButton />
       </header>
 
-      <nav className="mt-4 grid grid-cols-3 gap-2">
+      <nav className="mt-4 grid grid-cols-2 gap-2">
+        <Link
+          href="/admin/consultations"
+          className="rounded-2xl border border-[var(--line)] bg-white px-3 py-3 text-center text-sm font-medium text-[var(--ink)]"
+        >
+          Consultations
+        </Link>
         <Link
           href="/admin/matches"
           className="rounded-2xl border border-[var(--line)] bg-white px-3 py-3 text-center text-sm font-medium text-[var(--accent)]"

@@ -49,6 +49,10 @@ export default function AdminLoginPage() {
           {loading ? "Checking…" : "Sign in"}
         </button>
       </form>
+      <p className="mt-8 text-sm leading-relaxed text-[var(--muted)]">
+        Add this to your phone home screen so it opens like its own app. On iPhone: Share, then Add
+        to Home Screen. On Android: the browser menu, then Add to Home screen.
+      </p>
     </main>
   );
 }

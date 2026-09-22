@@ -1,6 +1,7 @@
 import { randomBytes } from "crypto";
 import Stripe from "stripe";
 import { bookingAmountCents, bookingAmountLabel, getBookingService, type BookingServiceId } from "@/lib/booking";
+import { CONSULTATION_CHECKOUT_HOLD_MS } from "@/lib/consultation";
 import { siteBaseUrl } from "@/lib/toimo/referral";
 
 let client: Stripe | null = null;
@@ -28,6 +29,7 @@ export async function createConsultationCheckout(args: {
   name?: string | null;
   consultationAt?: Date | null;
   service?: BookingServiceId;
+  host?: string | null;
 }) {
   const service = getBookingService(args.service);
   const amount = bookingAmountCents(service.id);
@@ -44,6 +46,7 @@ export async function createConsultationCheckout(args: {
       guestName: args.name || "",
       guestEmail: args.email || "",
       service: service.id,
+      host: args.host || "",
     },
     line_items: [
       {
@@ -58,6 +61,7 @@ export async function createConsultationCheckout(args: {
         },
       },
     ],
+    expires_at: Math.floor(Date.now() / 1000) + Math.ceil(CONSULTATION_CHECKOUT_HOLD_MS / 1000) + 120,
     success_url: `${base}/consult/paid?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${base}${service.path}`,
     integration_identifier: `toimoi-${service.id}-${Array.from(randomBytes(8), (byte) =>

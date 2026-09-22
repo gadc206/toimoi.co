@@ -1,0 +1,22 @@
+{
+  "name": "ToiMoi Studio",
+  "short_name": "ToiMoi",
+  "description": "Private workspace for Noga and Vanessa.",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "background_color": "#f7f4ef",
+  "theme_color": "#0f5c4c",
+  "icons": [
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

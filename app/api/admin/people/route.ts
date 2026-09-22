@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getOrCreatePerson, openingBodies } from "@/lib/toimo/engine";
 import { sendWhatsAppAndLog } from "@/lib/sms/send";
 import { toE164 } from "@/lib/whatsapp/phone";
+import { notifyConsultationScheduled } from "@/lib/email";
 import { createConsultationCheckout } from "@/lib/stripe";
 import { creditReferrer } from "@/lib/toimo/referral";
 import type { Person } from "@/lib/types";
@@ -127,6 +128,15 @@ export async function POST(request: NextRequest) {
 
   if (referrer) {
     await creditReferrer(referrer);
+  }
+
+  if (consultationAt) {
+    await notifyConsultationScheduled({
+      name: updated.firstName,
+      email: updated.email,
+      when: consultationAt,
+      source: "Admin",
+    });
   }
 
   if (parsed.data.sendOpening) {

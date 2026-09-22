@@ -1,6 +1,18 @@
-export type BookingServiceId = "consultation" | "coaching";
+export type BookingServiceId = "consultation" | "coaching" | "discovery";
 
 export const BOOKING_SERVICES = {
+  discovery: {
+    id: "discovery" as const,
+    title: "Discovery call",
+    productName: "ToiMoi discovery call",
+    calendarTitle: "ToiMoi discovery call",
+    calendarDetails: "A complimentary 15-minute discovery call with ToiMoi.",
+    path: "/discover",
+    amountEnv: "",
+    defaultCents: 0,
+    durationMinutes: 15,
+    requiresPayment: false,
+  },
   consultation: {
     id: "consultation" as const,
     title: "Personal consultation",
@@ -10,6 +22,8 @@ export const BOOKING_SERVICES = {
     path: "/consult",
     amountEnv: "CONSULTATION_AMOUNT_CENTS",
     defaultCents: 36000,
+    durationMinutes: 60,
+    requiresPayment: true,
   },
   coaching: {
     id: "coaching" as const,
@@ -20,11 +34,15 @@ export const BOOKING_SERVICES = {
     path: "/clarity",
     amountEnv: "COACHING_AMOUNT_CENTS",
     defaultCents: 50000,
+    durationMinutes: 60,
+    requiresPayment: true,
   },
 };
 
 export function getBookingService(id?: string | null) {
-  return id === "coaching" ? BOOKING_SERVICES.coaching : BOOKING_SERVICES.consultation;
+  if (id === "coaching") return BOOKING_SERVICES.coaching;
+  if (id === "discovery") return BOOKING_SERVICES.discovery;
+  return BOOKING_SERVICES.consultation;
 }
 
 export function bookingAmountCents(id?: string | null) {

@@ -26,8 +26,7 @@ export default function ConsultPaidPage() {
 
       <article className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-6 py-20 text-center">
         <p className="label text-foreground/50">TOIMOI</p>
-        <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">You’re confirmed</h1>
-        <Suspense>
+        <Suspense fallback={<h1 className="display mt-4 text-4xl text-foreground md:text-5xl">You’re confirmed</h1>}>
           <ConsultPaidClient />
         </Suspense>
       </article>

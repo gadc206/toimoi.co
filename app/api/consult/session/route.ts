@@ -15,17 +15,19 @@ export async function GET(request: NextRequest) {
     const whenRaw = session.metadata?.consultationAt;
     const when = whenRaw ? new Date(whenRaw) : null;
     const validWhen = when && !Number.isNaN(when.getTime()) ? when : null;
+    const paid = session.payment_status === "paid";
     return NextResponse.json({
-      paid: session.payment_status === "paid",
+      paid,
       title: service.title,
-      when: validWhen?.toISOString() || null,
-      whenLabel: validWhen ? formatConsultationTime(validWhen) : null,
-      calendarUrl: validWhen
-        ? googleCalendarConsultUrl(validWhen, {
-            title: service.calendarTitle,
-            details: service.calendarDetails,
-          })
-        : null,
+      when: paid && validWhen ? validWhen.toISOString() : null,
+      whenLabel: paid && validWhen ? formatConsultationTime(validWhen) : null,
+      calendarUrl:
+        paid && validWhen
+          ? googleCalendarConsultUrl(validWhen, {
+              title: service.calendarTitle,
+              details: service.calendarDetails,
+            })
+          : null,
     });
   } catch {
     return NextResponse.json({ error: "Could not load this payment." }, { status: 404 });

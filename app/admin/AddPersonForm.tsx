@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { consultationDateFromLocalInput } from "@/lib/consultation";
 
 type Option = { id: string; label: string };
 type SavedQuestion = { id: string; text: string };
@@ -91,7 +92,10 @@ export function AddPersonForm({
         email: String(form.get("email") || ""),
         referredById: String(form.get("referredById") || "") || undefined,
         isClient,
-        consultationAt: isClient && consultationAt ? new Date(consultationAt).toISOString() : undefined,
+        consultationAt:
+          isClient && consultationAt
+            ? consultationDateFromLocalInput(consultationAt)?.toISOString()
+            : undefined,
         sendOpening,
         answers,
       }),
@@ -197,7 +201,9 @@ export function AddPersonForm({
 
       {isClient ? (
         <label className="block space-y-2">
-          <span className="block text-base font-semibold text-[var(--ink)]">When is the consultation?</span>
+          <span className="block text-base font-semibold text-[var(--ink)]">
+            When is the consultation? (New York time)
+          </span>
           <input type="datetime-local" name="consultationAt" required className={fieldClass} />
         </label>
       ) : null}

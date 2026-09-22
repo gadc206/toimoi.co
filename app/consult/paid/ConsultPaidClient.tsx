@@ -27,8 +27,25 @@ export function ConsultPaidClient() {
       .catch(() => {})
   }, [sessionId])
 
+  if (!sessionId || info?.paid === false) {
+    return (
+      <>
+        <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">Payment not complete</h1>
+        <p className="mt-3 text-[17px] leading-[1.85] text-foreground/65">
+          A consultation is only booked after payment. No charge was made.
+        </p>
+        <div className="mt-10">
+          <SiteButton asChild>
+            <Link href="/consult">Back to booking</Link>
+          </SiteButton>
+        </div>
+      </>
+    )
+  }
+
   return (
     <>
+      <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">You’re confirmed</h1>
       {info?.whenLabel ? (
         <p className="mt-3 text-[17px] leading-[1.85] text-foreground/65">{info.whenLabel}</p>
       ) : (

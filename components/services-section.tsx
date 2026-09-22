@@ -72,7 +72,9 @@ export function ServicesSection() {
                       <Link href="/clarity">{item.cta}</Link>
                     </SiteButton>
                   ) : (
-                    <SiteButton onClick={() => openModal(item.key)}>{item.cta}</SiteButton>
+                    <SiteButton asChild>
+                      <Link href="/discover">{item.cta}</Link>
+                    </SiteButton>
                   )}
                 </div>
               </div>

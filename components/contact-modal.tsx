@@ -210,15 +210,11 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   No pressure. No commitment. Just a thoughtful introduction.
                 </p>
                 
-                <p className="text-foreground leading-relaxed mb-2">
-                  To schedule your Discovery Call, please email us at:
-                </p>
-                <a 
-                  href="mailto:toimoinow@gmail.com?subject=Discovery%20Call%20Request" 
-                  className="text-foreground font-medium underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                >
-                  toimoinow@gmail.com
-                </a>
+                <SiteButton asChild>
+                  <Link href="/discover" onClick={handleClose}>
+                    Book discovery call
+                  </Link>
+                </SiteButton>
               </div>
             ) : serviceType === "consultation" ? (
               <div className="mb-8">

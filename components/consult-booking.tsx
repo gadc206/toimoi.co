@@ -4,11 +4,12 @@ import { useEffect, useMemo, useState } from "react"
 
 import { SiteButton } from "@/components/site-button"
 import type { BookingServiceId } from "@/lib/booking"
-import { formatConsultationSlot } from "@/lib/consultation"
+import { formatConsultationSlot, type FounderId } from "@/lib/consultation"
 
+type Slot = { at: string; hosts: FounderId[] }
 type Availability = {
   amountLabel: string
-  days: { date: string; slots: string[] }[]
+  days: { date: string; slots: Slot[] }[]
 }
 
 const fieldClass =
@@ -21,6 +22,7 @@ export function ConsultBooking({
   service?: BookingServiceId
   fallbackAmountLabel?: string
 }) {
+  const free = service === "discovery"
   const [availability, setAvailability] = useState<Availability | null>(null)
   const [month, setMonth] = useState(() => {
     const now = new Date()
@@ -54,10 +56,9 @@ export function ConsultBooking({
   }, [service])
 
   const slotsByDay = useMemo(() => {
-    const map = new Map<string, string[]>()
+    const map = new Map<string, Slot[]>()
     for (const day of availability?.days || []) {
-      const key = new Date(day.date).toDateString()
-      map.set(key, day.slots)
+      map.set(new Date(day.date).toDateString(), day.slots)
     }
     return map
   }, [availability])
@@ -80,7 +81,7 @@ export function ConsultBooking({
     setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1))
   }
 
-  const pay = async () => {
+  const book = async () => {
     setError("")
     if (!selectedSlot || !name.trim() || !email.trim()) {
       setError("Choose a time and add your name and email.")
@@ -88,6 +89,21 @@ export function ConsultBooking({
     }
     setPending(true)
     try {
+      if (free) {
+        const response = await fetch("/api/discover/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim(),
+            at: selectedSlot,
+          }),
+        })
+        const data = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(data.error || "Could not book this time.")
+        window.location.href = `/discover/confirmed?when=${encodeURIComponent(selectedSlot)}`
+        return
+      }
       const response = await fetch("/api/consult/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,7 +120,7 @@ export function ConsultBooking({
       }
       window.location.href = data.url
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start payment.")
+      setError(err instanceof Error ? err.message : "Could not complete this booking.")
       setPending(false)
     }
   }
@@ -133,7 +149,7 @@ export function ConsultBooking({
         <div className="mt-2 grid grid-cols-7 gap-1">
           {monthDays.map((day, index) => {
             if (!day) return <span key={`empty-${index}`} />
-            const enabled = slotsByDay.has(day.toDateString())
+            const enabled = (slotsByDay.get(day.toDateString()) || []).length > 0
             const selected = selectedDay?.toDateString() === day.toDateString()
             return (
               <button
@@ -168,16 +184,16 @@ export function ConsultBooking({
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {slots.map((slot) => (
                 <button
-                  key={slot}
+                  key={slot.at}
                   type="button"
-                  onClick={() => setSelectedSlot(slot)}
+                  onClick={() => setSelectedSlot(slot.at)}
                   className={`border px-3 py-3 text-sm tracking-wide transition-colors ${
-                    selectedSlot === slot
+                    selectedSlot === slot.at
                       ? "border-foreground bg-foreground text-background"
                       : "border-foreground/15 text-foreground hover:border-foreground/40"
                   }`}
                 >
-                  {formatConsultationSlot(new Date(slot))}
+                  {formatConsultationSlot(new Date(slot.at))}
                 </button>
               ))}
             </div>
@@ -214,8 +230,8 @@ export function ConsultBooking({
       {error ? <p className="text-sm text-foreground/70">{error}</p> : null}
 
       <div className="flex justify-center">
-        <SiteButton onClick={pay} disabled={pending || !selectedSlot}>
-          {pending ? "Opening payment…" : `Pay ${amountLabel} to confirm`}
+        <SiteButton onClick={book} disabled={pending || !selectedSlot}>
+          {pending ? "Saving…" : free ? "Confirm time" : `Pay ${amountLabel} to confirm`}
         </SiteButton>
       </div>
     </div>

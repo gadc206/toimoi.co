@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
   const upcoming = await prisma.person.findMany({
     where: {
       isClient: true,
+      consultationPaidAt: { not: null },
       consultationAt: { gt: now },
       consultationReminderSentAt: null,
       email: { not: null },

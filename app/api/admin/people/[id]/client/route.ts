@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { notifyConsultationScheduled } from "@/lib/email";
 import { createConsultationCheckout } from "@/lib/stripe";
 
 const schema = z.object({
@@ -78,5 +79,13 @@ export async function PATCH(
       ...(timeChanged ? { consultationReminderSentAt: null } : {}),
     },
   });
+  if (timeChanged) {
+    await notifyConsultationScheduled({
+      name: updated.firstName,
+      email: updated.email,
+      when: consultationAt,
+      source: "Admin",
+    });
+  }
   return NextResponse.json({ person: updated });
 }

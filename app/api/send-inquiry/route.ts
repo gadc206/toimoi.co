@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { NextRequest, NextResponse } from "next/server";
+import { TOIMOI_NOTIFY_EMAIL } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -40,7 +41,7 @@ ${message || "No message provided"}
 
     const { error } = await resend.emails.send({
       from: "ToiMoi <onboarding@resend.dev>",
-      to: "toimoinow@gmail.com",
+      to: TOIMOI_NOTIFY_EMAIL,
       subject: `New ${serviceName} Inquiry from ${name}`,
       text: emailContent,
       replyTo: email,

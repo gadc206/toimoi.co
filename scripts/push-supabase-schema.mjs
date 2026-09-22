@@ -290,6 +290,9 @@ ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationPaidAt" TIMESTAMP(3);
 ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationCheckoutUrl" TEXT;
 ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationReminderSentAt" TIMESTAMP(3);
 ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "stripeCheckoutSessionId" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "consultationHost" TEXT;
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "discoveryAt" TIMESTAMP(3);
+ALTER TABLE "Person" ADD COLUMN IF NOT EXISTS "discoveryHost" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "lifestyle" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "consultationNotes" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "clientLookingFor" TEXT;
@@ -297,6 +300,13 @@ ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "clientNonNegotiables" TEX
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date1Feedback" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date2Feedback" TEXT;
 ALTER TABLE "ProfileAnswers" ADD COLUMN IF NOT EXISTS "date3Feedback" TEXT;
+CREATE TABLE IF NOT EXISTS "ConsultationHours" (
+  "id" TEXT PRIMARY KEY,
+  "slotsJson" TEXT NOT NULL,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE "ConsultationHours" ENABLE ROW LEVEL SECURITY;
+
 CREATE UNIQUE INDEX IF NOT EXISTS "Person_referralCode_key" ON "Person"("referralCode");
 CREATE INDEX IF NOT EXISTS "Person_referredById_idx" ON "Person"("referredById");
 CREATE INDEX IF NOT EXISTS "Person_listPriority_idx" ON "Person"("listPriority");
@@ -310,6 +320,20 @@ const client = new pg.Client({
 await client.connect();
 try {
   await client.query(sql);
+  await client.query(`
+    DO $$
+    DECLARE r record;
+    BEGIN
+      FOR r IN
+        SELECT c.relname
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public' AND c.relkind = 'r' AND NOT c.relrowsecurity
+      LOOP
+        EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', r.relname);
+      END LOOP;
+    END $$;
+  `);
   const tables = await client.query(
     `SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename`,
   );

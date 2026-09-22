@@ -1,4 +1,28 @@
 import type { CSSProperties, ReactNode } from "react"
+import type { Metadata, Viewport } from "next"
+import { AdminChrome } from "./AdminChrome"
+
+export const metadata: Metadata = {
+  title: "ToiMoi Studio",
+  description: "Private workspace for Noga and Vanessa.",
+  robots: { index: false, follow: false },
+  manifest: "/admin.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "ToiMoi",
+    statusBarStyle: "default",
+  },
+  icons: {
+    apple: "/apple-icon.png",
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: "#0f5c4c",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+}
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -14,7 +38,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         } as CSSProperties
       }
     >
-      {children}
+      <AdminChrome>{children}</AdminChrome>
     </div>
   )
 }

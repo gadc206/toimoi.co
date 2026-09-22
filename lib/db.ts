@@ -118,6 +118,7 @@ export const prisma = {
   profileAnswers: client.profileAnswers,
   message: client.message,
   matchmaker: client.matchmaker,
+  consultationHours: client.consultationHours,
   adminQuestion: client.adminQuestion,
   personAdminAnswer: client.personAdminAnswer,
   derivedMatchProfile: {

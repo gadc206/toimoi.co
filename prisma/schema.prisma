@@ -39,6 +39,9 @@ model Person {
   consultationPaidAt DateTime?
   consultationCheckoutUrl String?
   consultationReminderSentAt DateTime?
+  consultationHost String?
+  discoveryAt DateTime?
+  discoveryHost String?
   stripeCheckoutSessionId String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -288,6 +291,12 @@ model ShadowEvaluation {
   createdAt          DateTime @default(now())
 
   @@index([personId, createdAt])
+}
+
+model ConsultationHours {
+  id        String   @id @default("default")
+  slotsJson String
+  updatedAt DateTime @updatedAt
 }
 
 model AdminQuestion {

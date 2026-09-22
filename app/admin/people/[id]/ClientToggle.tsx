@@ -2,39 +2,51 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-function toLocalInput(value: string | null) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
+import {
+  consultationDateFromLocalInput,
+  consultationDateTimeLocal,
+  formatConsultationTime,
+  googleCalendarConsultUrl,
+} from "@/lib/consultation";
 
 export function ClientToggle({
   personId,
   isClient,
   consultationAt,
+  consultationPaidAt,
 }: {
   personId: string;
   isClient: boolean;
   consultationAt: string | null;
+  consultationPaidAt: string | null;
 }) {
   const router = useRouter();
   const [on, setOn] = useState(isClient);
-  const [when, setWhen] = useState(toLocalInput(consultationAt));
+  const [when, setWhen] = useState(() =>
+    consultationAt ? consultationDateTimeLocal(new Date(consultationAt)) : "",
+  );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+
+  const savedWhen = consultationAt ? new Date(consultationAt) : null;
+  const savedLabel =
+    savedWhen && !Number.isNaN(savedWhen.getTime()) ? formatConsultationTime(savedWhen) : null;
 
   async function save(next: boolean) {
     setPending(true);
     setError("");
+    const parsed = when ? consultationDateFromLocalInput(when) : null;
+    if (next && when && !parsed) {
+      setPending(false);
+      setError("That consultation time is not valid.");
+      return;
+    }
     const response = await fetch(`/api/admin/people/${personId}/client`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         isClient: next,
-        consultationAt: next && when ? new Date(when).toISOString() : undefined,
+        consultationAt: next && parsed ? parsed.toISOString() : undefined,
       }),
     });
     const data = (await response.json()) as { error?: string };
@@ -68,8 +80,21 @@ export function ClientToggle({
           />
         </button>
       </div>
+      <div>
+        <p className="text-sm font-semibold text-[var(--ink)]">Consultation</p>
+        {savedLabel ? (
+          <p className="mt-1 text-sm text-[var(--ink)]">{savedLabel}</p>
+        ) : (
+          <p className="mt-1 text-sm text-[var(--muted)]">No consultation booked.</p>
+        )}
+        {savedLabel ? (
+          <p className="mt-1 text-xs text-[var(--muted)]">
+            {consultationPaidAt ? "Paid" : "Not paid yet"}
+          </p>
+        ) : null}
+      </div>
       <label className="block text-sm font-semibold text-[var(--ink)]">
-        Consultation
+        Set a New York time
         <input
           type="datetime-local"
           value={when}
@@ -86,6 +111,16 @@ export function ClientToggle({
         >
           {pending ? "Saving…" : "Save consultation time"}
         </button>
+      ) : null}
+      {savedWhen ? (
+        <a
+          href={googleCalendarConsultUrl(savedWhen)}
+          target="_blank"
+          rel="noreferrer"
+          className="block text-center text-sm text-[var(--accent)]"
+        >
+          Add to Google Calendar
+        </a>
       ) : null}
       {error ? <p className="text-xs text-rose-700">{error}</p> : null}
     </div>

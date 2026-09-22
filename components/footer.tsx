@@ -31,9 +31,6 @@ export function Footer() {
             <SiteButton asChild variant="footer-link" className="text-foreground/40 hover:text-foreground">
               <Link href="/terms">Terms</Link>
             </SiteButton>
-            <SiteButton asChild variant="footer-link" className="text-foreground/40 hover:text-foreground">
-              <Link href="/admin">Admin</Link>
-            </SiteButton>
           </div>
           <p className="label text-foreground/30">© {new Date().getFullYear()} TOIMOI</p>
         </div>

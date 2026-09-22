@@ -159,6 +159,7 @@ export default async function PersonDetailPage({
               personId={person.id}
               isClient={person.isClient}
               consultationAt={person.consultationAt?.toISOString() || null}
+              consultationPaidAt={person.consultationPaidAt?.toISOString() || null}
             />
           </div>
           <div className="flex items-start justify-between gap-3">
