@@ -83,6 +83,12 @@ export async function saveInboundDocument(
   }
 }
 
+/** Save an admin-uploaded portrait to the same private photo storage as inbound selfies. */
+export async function saveUploadedPhoto(buffer: Buffer, contentType: string | null): Promise<string> {
+  const owner = `admin-${crypto.randomBytes(4).toString("hex")}`;
+  return storePhoto(owner, buffer, contentType);
+}
+
 /** Save a WhatsApp/Twilio image to Vercel Blob (persists on the live site). */
 export async function saveInboundPhoto(
   personId: string,

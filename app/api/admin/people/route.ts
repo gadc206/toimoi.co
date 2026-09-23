@@ -3,12 +3,16 @@ import { z } from "zod";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getOrCreatePerson, openingBodies } from "@/lib/toimo/engine";
+import { saveUploadedPhoto } from "@/lib/sms/media";
 import { sendWhatsAppAndLog } from "@/lib/sms/send";
 import { toE164 } from "@/lib/whatsapp/phone";
+import { isImageContentType } from "@/lib/whatsapp/media";
 import { notifyConsultationScheduled } from "@/lib/email";
 import { createConsultationCheckout } from "@/lib/stripe";
 import { creditReferrer } from "@/lib/toimo/referral";
 import type { Person } from "@/lib/types";
+
+const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
 
 const schema = z.object({
   firstName: z.string().trim().max(120).optional(),
@@ -19,6 +23,10 @@ const schema = z.object({
   isClient: z.boolean().optional(),
   consultationAt: z.string().optional(),
   sendOpening: z.boolean().optional(),
+  age: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.coerce.number().int().min(18).max(99).optional(),
+  ),
   answers: z
     .array(
       z.object({
@@ -29,13 +37,72 @@ const schema = z.object({
     .optional(),
 });
 
+function formBoolean(value: FormDataEntryValue | null): boolean {
+  return value === "true" || value === "1" || value === "on";
+}
+
+async function readCreateRequest(request: NextRequest): Promise<{ body: unknown; photo: File | null }> {
+  const contentType = request.headers.get("content-type") || "";
+  if (!contentType.includes("multipart/form-data")) {
+    return { body: await request.json(), photo: null };
+  }
+
+  const form = await request.formData();
+  const file = form.get("photo");
+  let answers: unknown = [];
+  const answersRaw = form.get("answers");
+  if (typeof answersRaw === "string" && answersRaw.trim()) {
+    try {
+      answers = JSON.parse(answersRaw);
+    } catch {
+      answers = [];
+    }
+  }
+
+  return {
+    photo: file instanceof File && file.size > 0 ? file : null,
+    body: {
+      firstName: form.get("firstName") || undefined,
+      phone: form.get("phone") || "",
+      email: form.get("email") || "",
+      howHeard: form.get("howHeard") || undefined,
+      referredById: form.get("referredById") || undefined,
+      isClient: formBoolean(form.get("isClient")),
+      consultationAt: form.get("consultationAt") || undefined,
+      sendOpening: formBoolean(form.get("sendOpening")),
+      age: form.get("age") || undefined,
+      answers,
+    },
+  };
+}
+
+function photoError(photo: File): string | null {
+  if (!isImageContentType(photo.type) || photo.type === "application/octet-stream") {
+    return "Choose an image for the photo.";
+  }
+  if (photo.size > MAX_PHOTO_BYTES) {
+    return "That photo is too large. Use one under 4 MB.";
+  }
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const parsed = schema.safeParse(await request.json());
+  const { body, photo } = await readCreateRequest(request);
+  const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "A valid phone number is required." }, { status: 400 });
+    const ageIssue = parsed.error.issues.some((issue) => issue.path[0] === "age");
+    return NextResponse.json(
+      { error: ageIssue ? "Age needs to be between 18 and 99." : "A valid phone number is required." },
+      { status: 400 },
+    );
+  }
+
+  if (photo) {
+    const invalid = photoError(photo);
+    if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
   }
 
   const phone = toE164(parsed.data.phone);
@@ -61,13 +128,24 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const person = await getOrCreatePerson(phone);
-  if (referrer && referrer.id === person.id) {
-    return NextResponse.json({ error: "A person cannot refer themselves." }, { status: 400 });
-  }
   const consultationAt = parsed.data.consultationAt ? new Date(parsed.data.consultationAt) : null;
   if (consultationAt && Number.isNaN(consultationAt.getTime())) {
     return NextResponse.json({ error: "That consultation time is not valid." }, { status: 400 });
+  }
+
+  let photoUrl: string | null = null;
+  if (photo) {
+    try {
+      photoUrl = await saveUploadedPhoto(Buffer.from(await photo.arrayBuffer()), photo.type || null);
+    } catch (error) {
+      console.error("admin photo upload failed", error);
+      return NextResponse.json({ error: "Could not save that photo." }, { status: 500 });
+    }
+  }
+
+  const person = await getOrCreatePerson(phone);
+  if (referrer && referrer.id === person.id) {
+    return NextResponse.json({ error: "A person cannot refer themselves." }, { status: 400 });
   }
 
   let checkoutUrl: string | null = null;
@@ -96,6 +174,8 @@ export async function POST(request: NextRequest) {
     data: {
       firstName: parsed.data.firstName || null,
       email: parsed.data.email || null,
+      age: parsed.data.age ?? null,
+      ...(photoUrl ? { photoUrl } : {}),
       howHeard: parsed.data.howHeard || heard?.answer || null,
       referredById: referrer?.id || null,
       isClient: Boolean(parsed.data.isClient),

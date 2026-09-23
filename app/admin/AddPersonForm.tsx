@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { consultationDateFromLocalInput } from "@/lib/consultation";
 
@@ -51,10 +51,51 @@ export function AddPersonForm({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState("");
+  const [savedPersonId, setSavedPersonId] = useState("");
   const [isClient, setIsClient] = useState(false);
   const [sendOpening, setSendOpening] = useState(false);
   const [saved, setSaved] = useState(questions);
   const [rows, setRows] = useState<AnswerRow[]>([newRow()]);
+  const [age, setAge] = useState("");
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoName, setPhotoName] = useState("");
+  const photoRef = useRef<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function clearPhoto() {
+    photoRef.current = null;
+    setPhotoName("");
+    setPhotoPreview((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return null;
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }
+
+  function onPhoto(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0] || null;
+    if (!file) {
+      clearPhoto();
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setMessage("Choose an image for the photo.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setMessage("That photo is too large. Use one under 4 MB.");
+      event.target.value = "";
+      return;
+    }
+    setMessage("");
+    photoRef.current = file;
+    setPhotoName(file.name);
+    setPhotoPreview((current) => {
+      if (current) URL.revokeObjectURL(current);
+      return URL.createObjectURL(file);
+    });
+  }
 
   async function rememberQuestion(text: string) {
     const trimmed = text.trim();
@@ -78,32 +119,43 @@ export function AddPersonForm({
     event.preventDefault();
     setPending(true);
     setMessage("");
+    setSavedPersonId("");
     const form = new FormData(event.currentTarget);
+    const trimmedAge = age.trim();
+    if (trimmedAge) {
+      const parsedAge = Number(trimmedAge);
+      if (!Number.isInteger(parsedAge) || parsedAge < 18 || parsedAge > 99) {
+        setPending(false);
+        setMessage("Age needs to be between 18 and 99.");
+        return;
+      }
+    }
     const consultationAt = String(form.get("consultationAt") || "");
     const answers = rows
       .map((row) => ({ question: row.question.trim(), answer: row.answer.trim() }))
       .filter((row) => row.question && row.answer);
+    const body = new FormData();
+    body.set("firstName", String(form.get("firstName") || ""));
+    body.set("phone", String(form.get("phone") || ""));
+    body.set("email", String(form.get("email") || ""));
+    body.set("referredById", String(form.get("referredById") || ""));
+    body.set("isClient", String(isClient));
+    body.set("sendOpening", String(sendOpening));
+    body.set("age", trimmedAge);
+    body.set("answers", JSON.stringify(answers));
+    if (isClient && consultationAt) {
+      body.set("consultationAt", consultationDateFromLocalInput(consultationAt)?.toISOString() || "");
+    }
+    if (photoRef.current) body.set("photo", photoRef.current);
     const response = await fetch("/api/admin/people", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstName: String(form.get("firstName") || ""),
-        phone: String(form.get("phone") || ""),
-        email: String(form.get("email") || ""),
-        referredById: String(form.get("referredById") || "") || undefined,
-        isClient,
-        consultationAt:
-          isClient && consultationAt
-            ? consultationDateFromLocalInput(consultationAt)?.toISOString()
-            : undefined,
-        sendOpening,
-        answers,
-      }),
+      body,
     });
     const data = (await response.json()) as { error?: string; personId?: string; warning?: string };
     setPending(false);
     if (!response.ok) {
       setMessage(data.error || "Could not add this person.");
+      setSavedPersonId(data.personId || "");
       return;
     }
     if (data.personId) router.push(`/admin/people/${data.personId}`);
@@ -112,9 +164,59 @@ export function AddPersonForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
+      <div className="space-y-2">
+        <span className="block text-base font-semibold text-[var(--ink)]">Photo</span>
+        <div className="flex items-center gap-4">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[var(--accent-soft)]">
+            {photoPreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoPreview} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-2xl font-semibold text-[var(--accent)]">+</span>
+            )}
+          </div>
+          <div className="min-w-0 space-y-1">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={onPhoto}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-2xl border border-[var(--line)] bg-white px-4 py-2 text-sm font-medium text-[var(--ink)]"
+            >
+              {photoPreview ? "Change photo" : "Add photo"}
+            </button>
+            {photoName ? (
+              <p className="truncate text-sm text-[var(--muted)]">{photoName}</p>
+            ) : (
+              <p className="text-sm text-[var(--muted)]">Optional. JPG, PNG, or HEIC under 4 MB.</p>
+            )}
+            {photoPreview ? (
+              <button type="button" onClick={clearPhoto} className="text-sm text-[var(--muted)]">
+                Remove
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </div>
       <label className="block space-y-2">
         <span className="block text-base font-semibold text-[var(--ink)]">Name</span>
         <input name="firstName" className={fieldClass} />
+      </label>
+      <label className="block space-y-2">
+        <span className="block text-base font-semibold text-[var(--ink)]">Age</span>
+        <input
+          name="age"
+          inputMode="numeric"
+          value={age}
+          onChange={(event) => setAge(event.target.value.replace(/[^\d]/g, "").slice(0, 2))}
+          placeholder="Optional"
+          className={fieldClass}
+        />
       </label>
       <label className="block space-y-2">
         <span className="block text-base font-semibold text-[var(--ink)]">Phone</span>
@@ -221,6 +323,13 @@ export function AddPersonForm({
         {pending ? "Saving…" : "Add"}
       </button>
       {message ? <p className="text-center text-sm text-rose-700">{message}</p> : null}
+      {savedPersonId ? (
+        <p className="text-center text-sm">
+          <a href={`/admin/people/${savedPersonId}`} className="text-[var(--accent)]">
+            Open their page
+          </a>
+        </p>
+      ) : null}
     </form>
   );
 }
