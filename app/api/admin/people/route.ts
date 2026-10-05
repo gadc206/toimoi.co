@@ -6,13 +6,11 @@ import { getOrCreatePerson, openingBodies } from "@/lib/toimo/engine";
 import { saveUploadedPhoto } from "@/lib/sms/media";
 import { sendWhatsAppAndLog } from "@/lib/sms/send";
 import { toE164 } from "@/lib/whatsapp/phone";
-import { isImageContentType } from "@/lib/whatsapp/media";
+import { photoUploadError, uploadFromForm } from "@/lib/admin/photo-upload";
 import { notifyConsultationScheduled } from "@/lib/email";
 import { createConsultationCheckout } from "@/lib/stripe";
 import { creditReferrer } from "@/lib/toimo/referral";
 import type { Person } from "@/lib/types";
-
-const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
 
 const schema = z.object({
   firstName: z.string().trim().max(120).optional(),
@@ -60,7 +58,7 @@ async function readCreateRequest(request: NextRequest): Promise<{ body: unknown;
   }
 
   return {
-    photo: file instanceof File && file.size > 0 ? file : null,
+    photo: uploadFromForm(file),
     body: {
       firstName: form.get("firstName") || undefined,
       phone: form.get("phone") || "",
@@ -74,16 +72,6 @@ async function readCreateRequest(request: NextRequest): Promise<{ body: unknown;
       answers,
     },
   };
-}
-
-function photoError(photo: File): string | null {
-  if (!isImageContentType(photo.type) || photo.type === "application/octet-stream") {
-    return "Choose an image for the photo.";
-  }
-  if (photo.size > MAX_PHOTO_BYTES) {
-    return "That photo is too large. Use one under 4 MB.";
-  }
-  return null;
 }
 
 export async function POST(request: NextRequest) {
@@ -101,7 +89,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (photo) {
-    const invalid = photoError(photo);
+    const invalid = photoUploadError(photo);
     if (invalid) return NextResponse.json({ error: invalid }, { status: 400 });
   }
 
@@ -131,16 +119,6 @@ export async function POST(request: NextRequest) {
   const consultationAt = parsed.data.consultationAt ? new Date(parsed.data.consultationAt) : null;
   if (consultationAt && Number.isNaN(consultationAt.getTime())) {
     return NextResponse.json({ error: "That consultation time is not valid." }, { status: 400 });
-  }
-
-  let photoUrl: string | null = null;
-  if (photo) {
-    try {
-      photoUrl = await saveUploadedPhoto(Buffer.from(await photo.arrayBuffer()), photo.type || null);
-    } catch (error) {
-      console.error("admin photo upload failed", error);
-      return NextResponse.json({ error: "Could not save that photo." }, { status: 500 });
-    }
   }
 
   const person = await getOrCreatePerson(phone);
@@ -175,7 +153,6 @@ export async function POST(request: NextRequest) {
       firstName: parsed.data.firstName || null,
       email: parsed.data.email || null,
       age: parsed.data.age ?? null,
-      ...(photoUrl ? { photoUrl } : {}),
       howHeard: parsed.data.howHeard || heard?.answer || null,
       referredById: referrer?.id || null,
       isClient: Boolean(parsed.data.isClient),
@@ -186,6 +163,18 @@ export async function POST(request: NextRequest) {
       currentStep: parsed.data.sendOpening ? "full_name" : person.currentStep,
     },
   });
+
+  if (photo) {
+    try {
+      const photoUrl = await saveUploadedPhoto(Buffer.from(await photo.arrayBuffer()), photo.type || null);
+      await prisma.person.update({ where: { id: updated.id }, data: { photoUrl } });
+    } catch (error) {
+      console.error("admin photo upload failed", error);
+      warning = [warning, "Saved the person, but the photo did not upload. Add it from their page."]
+        .filter(Boolean)
+        .join(" ");
+    }
+  }
 
   if (answers.length > 0) {
     await prisma.personAdminAnswer.createMany({

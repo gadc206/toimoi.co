@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { consultationDateFromLocalInput } from "@/lib/consultation";
+import { preparePhoto } from "@/app/admin/prepare-photo";
 
 type Option = { id: string; label: string };
 type SavedQuestion = { id: string; text: string };
@@ -59,6 +60,7 @@ export function AddPersonForm({
   const [age, setAge] = useState("");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoName, setPhotoName] = useState("");
+  const [photoPending, setPhotoPending] = useState(false);
   const photoRef = useRef<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -72,29 +74,34 @@ export function AddPersonForm({
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
-  function onPhoto(event: ChangeEvent<HTMLInputElement>) {
+  async function onPhoto(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] || null;
     if (!file) {
       clearPhoto();
       return;
     }
-    if (!file.type.startsWith("image/")) {
-      setMessage("Choose an image for the photo.");
-      event.target.value = "";
-      return;
-    }
-    if (file.size > 4 * 1024 * 1024) {
-      setMessage("That photo is too large. Use one under 4 MB.");
-      event.target.value = "";
-      return;
-    }
+    setPhotoPending(true);
     setMessage("");
-    photoRef.current = file;
-    setPhotoName(file.name);
-    setPhotoPreview((current) => {
-      if (current) URL.revokeObjectURL(current);
-      return URL.createObjectURL(file);
-    });
+    try {
+      const prepared = await preparePhoto(file);
+      photoRef.current = prepared;
+      setPhotoName(file.name);
+      setPhotoPreview((current) => {
+        if (current) URL.revokeObjectURL(current);
+        return URL.createObjectURL(prepared);
+      });
+    } catch (error) {
+      photoRef.current = null;
+      setPhotoName("");
+      setPhotoPreview((current) => {
+        if (current) URL.revokeObjectURL(current);
+        return null;
+      });
+      setMessage(error instanceof Error ? error.message : "Could not read that photo.");
+      event.target.value = "";
+    } finally {
+      setPhotoPending(false);
+    }
   }
 
   async function rememberQuestion(text: string) {
@@ -117,6 +124,10 @@ export function AddPersonForm({
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (photoPending) {
+      setMessage("Still reading the photo. Try again in a moment.");
+      return;
+    }
     setPending(true);
     setMessage("");
     setSavedPersonId("");
@@ -147,11 +158,22 @@ export function AddPersonForm({
       body.set("consultationAt", consultationDateFromLocalInput(consultationAt)?.toISOString() || "");
     }
     if (photoRef.current) body.set("photo", photoRef.current);
-    const response = await fetch("/api/admin/people", {
-      method: "POST",
-      body,
-    });
-    const data = (await response.json()) as { error?: string; personId?: string; warning?: string };
+    let response: Response;
+    try {
+      response = await fetch("/api/admin/people", {
+        method: "POST",
+        body,
+      });
+    } catch {
+      setPending(false);
+      setMessage("Could not reach the server. Check your connection and try again.");
+      return;
+    }
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      personId?: string;
+      warning?: string;
+    };
     setPending(false);
     if (!response.ok) {
       setMessage(data.error || "Could not add this person.");
@@ -176,24 +198,20 @@ export function AddPersonForm({
             )}
           </div>
           <div className="min-w-0 space-y-1">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              onChange={onPhoto}
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-2xl border border-[var(--line)] bg-white px-4 py-2 text-sm font-medium text-[var(--ink)]"
-            >
-              {photoPreview ? "Change photo" : "Add photo"}
-            </button>
+            <label className="relative inline-flex cursor-pointer items-center rounded-2xl border border-[var(--line)] bg-white px-4 py-2 text-sm font-medium text-[var(--ink)]">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                onChange={onPhoto}
+              />
+              {photoPending ? "Reading photo…" : photoPreview ? "Change photo" : "Add photo"}
+            </label>
             {photoName ? (
               <p className="truncate text-sm text-[var(--muted)]">{photoName}</p>
             ) : (
-              <p className="text-sm text-[var(--muted)]">Optional. JPG, PNG, or HEIC under 4 MB.</p>
+              <p className="text-sm text-[var(--muted)]">Optional. Take one or choose from your photos.</p>
             )}
             {photoPreview ? (
               <button type="button" onClick={clearPhoto} className="text-sm text-[var(--muted)]">
@@ -317,7 +335,7 @@ export function AddPersonForm({
 
       <button
         type="submit"
-        disabled={pending}
+        disabled={pending || photoPending}
         className="w-full rounded-2xl bg-[var(--accent)] px-4 py-3 text-sm font-medium text-white disabled:opacity-50"
       >
         {pending ? "Saving…" : "Add"}

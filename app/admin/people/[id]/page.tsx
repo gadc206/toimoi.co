@@ -6,6 +6,7 @@ import { NudgeButton } from "@/app/admin/people/[id]/NudgeButton";
 import { DeletePersonButton } from "@/app/admin/DeletePersonButton";
 import { MatchingDetailsEditor } from "@/app/admin/people/[id]/MatchingDetailsEditor";
 import { PersonPhoto } from "@/app/admin/people/[id]/PersonPhoto";
+import { PersonPhotoAge } from "@/app/admin/people/[id]/PersonPhotoAge";
 import { ClientToggle } from "@/app/admin/people/[id]/ClientToggle";
 import { ClientNotesEditor } from "@/app/admin/people/[id]/ClientNotesEditor";
 import { ContactActions } from "@/app/admin/people/[id]/ContactActions";
@@ -185,6 +186,7 @@ export default async function PersonDetailPage({
               ) : null}
             </div>
           </div>
+          <PersonPhotoAge personId={person.id} age={person.age} />
           <div className="mt-4 space-y-3 text-sm">
             <ContactActions
               personId={person.id}
