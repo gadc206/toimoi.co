@@ -30,6 +30,7 @@ export default async function AddPersonPage() {
         <AddPersonForm
           people={people.map((person) => ({
             id: person.id,
+            name: person.firstName || "",
             label: `${person.firstName || "Unnamed"} · ${person.phone}`,
           }))}
           questions={questions}

@@ -18,6 +18,10 @@ const schema = z.object({
   email: z.string().trim().email().optional().or(z.literal("")),
   howHeard: z.string().trim().max(500).optional(),
   referredById: z.string().optional(),
+  referredByName: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z.string().trim().max(120).optional(),
+  ),
   isClient: z.boolean().optional(),
   consultationAt: z.string().optional(),
   sendOpening: z.boolean().optional(),
@@ -65,6 +69,7 @@ async function readCreateRequest(request: NextRequest): Promise<{ body: unknown;
       email: form.get("email") || "",
       howHeard: form.get("howHeard") || undefined,
       referredById: form.get("referredById") || undefined,
+      referredByName: form.get("referredByName") || undefined,
       isClient: formBoolean(form.get("isClient")),
       consultationAt: form.get("consultationAt") || undefined,
       sendOpening: formBoolean(form.get("sendOpening")),
@@ -146,6 +151,9 @@ export async function POST(request: NextRequest) {
 
   const answers = (parsed.data.answers || []).filter((item) => item.answer);
   const heard = answers.find((item) => /heard/i.test(item.question));
+  const writtenReferrer =
+    !referrer && parsed.data.referredByName ? `Referred by ${parsed.data.referredByName}` : null;
+  const heardText = parsed.data.howHeard || heard?.answer || null;
 
   const updated = await prisma.person.update({
     where: { id: person.id },
@@ -153,7 +161,10 @@ export async function POST(request: NextRequest) {
       firstName: parsed.data.firstName || null,
       email: parsed.data.email || null,
       age: parsed.data.age ?? null,
-      howHeard: parsed.data.howHeard || heard?.answer || null,
+      howHeard:
+        [writtenReferrer, heardText && heardText !== writtenReferrer ? heardText : null]
+          .filter(Boolean)
+          .join("\n") || null,
       referredById: referrer?.id || null,
       isClient: Boolean(parsed.data.isClient),
       consultationAt,

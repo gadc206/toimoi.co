@@ -5,7 +5,17 @@ import { useRouter } from "next/navigation";
 import { consultationDateFromLocalInput } from "@/lib/consultation";
 import { preparePhoto } from "@/app/admin/prepare-photo";
 
-type Option = { id: string; label: string };
+type Option = { id: string; name: string; label: string };
+
+function matchedReferrer(text: string, people: Option[]): string | null {
+  const trimmed = text.trim().toLowerCase();
+  if (!trimmed) return null;
+  const byLabel = people.find((person) => person.label.toLowerCase() === trimmed);
+  if (byLabel) return byLabel.id;
+  const byName = people.filter((person) => person.name.trim().toLowerCase() === trimmed);
+  if (byName.length === 1) return byName[0].id;
+  return null;
+}
 type SavedQuestion = { id: string; text: string };
 type AnswerRow = { id: string; question: string; answer: string };
 
@@ -149,7 +159,9 @@ export function AddPersonForm({
     body.set("firstName", String(form.get("firstName") || ""));
     body.set("phone", String(form.get("phone") || ""));
     body.set("email", String(form.get("email") || ""));
-    body.set("referredById", String(form.get("referredById") || ""));
+    const referredByText = String(form.get("referredBy") || "").trim();
+    body.set("referredById", matchedReferrer(referredByText, people) || "");
+    body.set("referredByName", referredByText);
     body.set("isClient", String(isClient));
     body.set("sendOpening", String(sendOpening));
     body.set("age", trimmedAge);
@@ -246,14 +258,18 @@ export function AddPersonForm({
       </label>
       <label className="block space-y-2">
         <span className="block text-base font-semibold text-[var(--ink)]">Who referred them?</span>
-        <select name="referredById" className={fieldClass}>
-          <option value="">Unknown</option>
+        <input
+          name="referredBy"
+          list="referrers"
+          placeholder="Type a name"
+          autoComplete="off"
+          className={fieldClass}
+        />
+        <datalist id="referrers">
           {people.map((person) => (
-            <option key={person.id} value={person.id}>
-              {person.label}
-            </option>
+            <option key={person.id} value={person.label} />
           ))}
-        </select>
+        </datalist>
       </label>
 
       <div className="space-y-5">

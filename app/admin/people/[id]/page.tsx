@@ -213,6 +213,8 @@ export default async function PersonDetailPage({
                   {person.referredBy.firstName || person.referredBy.phone}
                 </Link>
               </p>
+            ) : person.howHeard?.startsWith("Referred by ") ? (
+              <p className="text-[var(--muted)]">{person.howHeard.split("\n")[0]}</p>
             ) : null}
             {person.referralCount > 0 || person.referralCode ? (
               <p className="text-[var(--muted)]">
