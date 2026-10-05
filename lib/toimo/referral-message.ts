@@ -1,7 +1,7 @@
 /** Browser-safe referral helpers. Keep server DB logic in referral.ts. */
 
 export function referralJoinMessage(code?: string | null): string {
-  return code ? `Hi ${code}` : "Hi"
+  return code ? `Hi ${code}! Tap send to start.` : "Hi! Tap send to start."
 }
 
 export function normalizeReferralCode(raw: string | null | undefined): string | null {
