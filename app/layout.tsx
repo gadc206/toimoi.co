@@ -28,10 +28,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.toimoi.co'),
   title: {
-    default: 'TOIMOI | Private Matchmaking & Dating Coaching in New York',
+    default: 'TOIMOI | Private Matchmaking & Relationship Coaching in New York',
     template: '%s | TOIMOI',
   },
-  description: 'TOIMOI is a private matchmaking and dating coaching house in New York. Personalized introductions and guidance for meaningful connection.',
+  description: 'TOIMOI is a private matchmaking and relationship coaching house in New York. Personalized introductions and guidance for meaningful connection.',
   keywords: [
     'matchmaking',
     'matchmaker',
@@ -40,14 +40,12 @@ export const metadata: Metadata = {
     'New York matchmaker',
     'NYC matchmaking',
     'relationship coaching',
-    'dating coach',
     'personal matchmaking',
     'bespoke matchmaking',
     'elite matchmaking',
     'professional matchmaking',
     'Jewish matchmaker',
     'relationship guidance',
-    'dating service',
     'find love',
     'meaningful connections',
     'ToiMoi',
@@ -66,8 +64,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://www.toimoi.co',
     siteName: 'TOIMOI',
-    title: 'TOIMOI | Private Matchmaking & Dating Coaching',
-    description: 'A private matchmaking and dating coaching house in New York.',
+    title: 'TOIMOI | Private Matchmaking & Relationship Coaching',
+    description: 'A private matchmaking and relationship coaching house in New York.',
     images: [
       {
         url: '/og-image.jpg',
@@ -79,8 +77,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TOIMOI | Private Matchmaking & Dating Coaching',
-    description: 'A private matchmaking and dating coaching house in New York.',
+    title: 'TOIMOI | Private Matchmaking & Relationship Coaching',
+    description: 'A private matchmaking and relationship coaching house in New York.',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -117,7 +115,7 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
     name: 'TOIMOI',
-    description: 'Private matchmaking and dating coaching in New York.',
+    description: 'Private matchmaking and relationship coaching in New York.',
     url: 'https://www.toimoi.co',
     logo: 'https://www.toimoi.co/og-image.jpg',
     image: 'https://www.toimoi.co/og-image.jpg',
@@ -144,7 +142,7 @@ export default function RootLayout({
         name: 'United States',
       },
     ],
-    serviceType: ['Matchmaking', 'Dating Coaching', 'Relationship Consultation'],
+    serviceType: ['Matchmaking', 'Relationship Coaching', 'Relationship Consultation'],
     priceRange: '$$$',
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',

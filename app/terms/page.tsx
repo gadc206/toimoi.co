@@ -113,7 +113,7 @@ export default function TermsPage() {
         <p className="mt-3">
           To the fullest extent permitted by law, TOIMOI and its operators are
           not liable for indirect, incidental, or consequential damages arising
-          from use of the service, including dating outcomes or communications
+          from use of the service, including relationship outcomes or communications
           between users.
         </p>
       </section>

@@ -179,7 +179,7 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   When you introduce someone to us, and we begin working with them either as a client or through a curated introduction, you will receive a complimentary 30 minute private guidance session as our way of saying thank you.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  This session can be used for relationship clarity, dating guidance, communication insight, or simply to better understand your own patterns and what you are looking for.
+                  This session can be used for relationship clarity, personal guidance, communication insight, or simply to better understand your own patterns and what you are looking for.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-6 italic">
                   Because meaningful connections deserve to be noticed, honored, and celebrated.
@@ -236,19 +236,19 @@ export function ContactModal({ isOpen, onClose, serviceType }: ContactModalProps
                   A personalized one on one experience designed to help you gain clarity, strengthen your confidence, refine the way you communicate, and better understand the relationship patterns that may be holding you back.
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  Whether you are navigating modern dating, struggling with emotional patterns, feeling disconnected, recovering from past relationships, or simply looking for honest guidance, these sessions are designed to help you approach relationships with greater self awareness, confidence, and authenticity.
+                  Whether you are navigating modern relationships, struggling with emotional patterns, feeling disconnected, recovering from past relationships, or simply looking for honest guidance, these sessions are designed to help you approach relationships with greater self awareness, confidence, and authenticity.
                 </p>
                 
                 <p className="text-foreground font-medium mb-3">Topics may include:</p>
                 <ul className="text-muted-foreground space-y-1 mb-6">
-                  <li>• Dating & relationship clarity</li>
+                  <li>• Relationship clarity</li>
                   <li>• Communication & confidence</li>
                   <li>• Emotional availability</li>
                   <li>• Relationship patterns</li>
                   <li>• Masculine & feminine dynamics</li>
                   <li>• Post date insight & guidance</li>
                   <li>• Understanding attraction & compatibility</li>
-                  <li>• Navigating modern dating</li>
+                  <li>• Navigating modern relationships</li>
                 </ul>
                 
                 <p className="text-muted-foreground leading-relaxed mb-6 italic">

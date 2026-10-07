@@ -47,7 +47,7 @@ export function Hero() {
         style={{ opacity: locked ? 1 : 0 }}
       >
         <li>Private Matchmaking</li>
-        <li>Dating Coaching</li>
+        <li>Relationship Coaching</li>
       </ul>
 
       <div
