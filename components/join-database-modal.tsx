@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 
 import { JoinPaths } from "@/components/join-paths"
+import { JOIN_VIA_FORM } from "@/lib/whatsapp-join"
 
 type JoinDatabaseModalProps = {
   isOpen: boolean
@@ -43,7 +44,9 @@ export function JoinDatabaseModal({ isOpen, onClose }: JoinDatabaseModalProps) {
           Join the TOIMOI network
         </h2>
         <p className="mt-5 max-w-lg text-[16px] leading-[1.8] text-foreground/65">
-          We will continue with you on WhatsApp.
+          {JOIN_VIA_FORM
+            ? "Answer 13 questions and add a selfie. It takes about ten minutes."
+            : "We will continue with you on WhatsApp."}
         </p>
 
         <div className="mt-10">

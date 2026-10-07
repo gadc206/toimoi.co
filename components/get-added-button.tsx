@@ -3,7 +3,7 @@
 import { SiteButton } from "@/components/site-button"
 import type { SiteButtonProps } from "@/components/site-button"
 import { useReferralCode } from "@/hooks/use-referral-code"
-import { whatsAppJoinLink } from "@/lib/whatsapp-join"
+import { joinLink, joinLinkTarget } from "@/lib/whatsapp-join"
 
 type GetAddedButtonProps = {
   children?: React.ReactNode
@@ -20,7 +20,7 @@ export function GetAddedButton({
 
   return (
     <SiteButton asChild variant={variant} className={className}>
-      <a href={whatsAppJoinLink(referralCode)} target="_blank" rel="noopener noreferrer">
+      <a href={joinLink(referralCode)} {...joinLinkTarget}>
         <span className="underline-lux">{children}</span>
         <span className="cta-arrow" aria-hidden>
           →

@@ -1,7 +1,7 @@
 "use client"
 
 import { useReferralCode } from "@/hooks/use-referral-code"
-import { whatsAppJoinLink } from "@/lib/whatsapp-join"
+import { joinLink, joinLinkTarget } from "@/lib/whatsapp-join"
 
 export function LandingJoin() {
   const referralCode = useReferralCode()
@@ -17,9 +17,8 @@ export function LandingJoin() {
 
   return (
     <a
-      href={whatsAppJoinLink(referralCode)}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={joinLink(referralCode)}
+      {...joinLinkTarget}
       className="btn-lux group"
       data-magnetic=""
       onMouseMove={handleMove}

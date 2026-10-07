@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 
 import { useReferralCode } from "@/hooks/use-referral-code"
 import { cn } from "@/lib/utils"
-import { whatsAppJoinLink } from "@/lib/whatsapp-join"
+import { joinLink, joinLinkTarget } from "@/lib/whatsapp-join"
 
 export function FloatingJoinCta() {
   const referralCode = useReferralCode()
@@ -30,9 +30,8 @@ export function FloatingJoinCta() {
     >
       <div className="mx-auto flex max-w-xl justify-center">
         <a
-          href={whatsAppJoinLink(referralCode)}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={joinLink(referralCode)}
+          {...joinLinkTarget}
           className="btn-lux group w-full max-w-md"
         >
           <span>Join the TOIMOI network</span>
