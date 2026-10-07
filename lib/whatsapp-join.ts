@@ -1,6 +1,6 @@
 import { referralJoinMessage } from "@/lib/toimo/referral-message"
 
-export function whatsAppDeepLink(message = "Hi! Tap send to start."): string {
+export function whatsAppDeepLink(message = "Hi! Please tap Send."): string {
   const raw =
     process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ||
     process.env.NEXT_PUBLIC_TWILIO_PHONE_NUMBER ||

@@ -5,7 +5,11 @@ import { sendWhatsAppAndLog } from "@/lib/sms/send";
 import { normalizeReferralCode } from "@/lib/toimo/referral-message";
 import type { Person } from "@/lib/types";
 
-export { normalizeReferralCode, referralJoinMessage } from "@/lib/toimo/referral-message";
+export {
+  isJoinGreeting,
+  normalizeReferralCode,
+  referralJoinMessage,
+} from "@/lib/toimo/referral-message";
 
 export const REFERRAL_THRESHOLD = 5;
 const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";

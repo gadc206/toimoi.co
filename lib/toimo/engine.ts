@@ -22,6 +22,7 @@ import {
   referralShareUrl,
   siteBaseUrl,
 } from "@/lib/toimo/referral";
+import { isJoinGreeting } from "@/lib/toimo/referral-message";
 import {
   inferLookingFor,
   normalize,
@@ -293,6 +294,13 @@ export async function handleInbound(
       return advance(person, "full_name", openingBodies());
     }
 
+    // Join draft / bare "Hi" is never a real answer — especially not their name.
+    const awaitingName =
+      person.currentStep === "full_name" && !person.firstName;
+    if (isJoinGreeting(text) && awaitingName) {
+      return { outbound: openingBodies(), person };
+    }
+
     return await processStep(person, text, mediaUrls);
   } finally {
     meta.onTiming?.({
@@ -332,7 +340,7 @@ async function processStep(
   switch (step) {
     case "full_name": {
       const name = text.trim();
-      if (name.length < 1) {
+      if (name.length < 1 || isJoinGreeting(name)) {
         return { outbound: [unclear(question("full_name"))], person };
       }
       return advance(person, "date_of_birth", [question("date_of_birth")], {
